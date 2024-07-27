@@ -6,3 +6,65 @@
 //
 
 import Foundation
+
+class Move {
+    var fromSquare: Int?
+    var targetSquare: Int?
+    
+    var asString: String {
+        "\(fromSquare!) \(targetSquare!)"
+    }
+    
+    
+    
+    init(fromSquare: Int, targetSquare: Int) {
+        self.fromSquare = fromSquare
+        self.targetSquare = targetSquare
+    }
+    
+    
+    init(notation: String) {
+        // think about it
+        self.fromSquare = translateFromNotationToSquare(String(notation.prefix(2)))
+        self.targetSquare = translateFromNotationToSquare(String(notation.suffix(2)))
+    }
+    
+
+    
+    func squareToNotation(square: Int) -> String {
+        let ranks = square / 8 + 1
+        let files = square % 8
+        let letters = "abcdefgh"
+
+        guard ranks >= 1 && ranks <= 8 && files >= 0 && files < 8 else {
+            return "Invalid square"
+        }
+
+        let fileLetter = letters[letters.index(letters.startIndex, offsetBy: files)]
+        return "\(fileLetter)\(ranks)"
+    }
+    
+    func moveToNotation() -> String {
+        return "\(squareToNotation(square: fromSquare!))\(squareToNotation(square: targetSquare!))"
+    }
+    
+    var letterToNumber: [String : Int] = [
+        "A" : 0,
+        "B" : 1,
+        "C" : 2,
+        "D" : 3,
+        "E" : 4,
+        "F" : 5,
+        "G" : 6,
+        "H" : 7,
+    ]
+    
+    func translateFromNotationToSquare(_ notation: String) -> Int? {
+        guard notation.count == 2 else { return nil }
+        let letter = String(notation.prefix(1))
+        guard let fileIndex = letterToNumber[letter.uppercased()] else { return nil }
+        guard let rankNumber: Int = Int(String(notation.suffix(1))), rankNumber >= 1, rankNumber <= 8 else { return nil }
+        let rankIndex = rankNumber - 1
+        return 8 * rankIndex + fileIndex
+    }
+}

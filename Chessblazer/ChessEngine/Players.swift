@@ -6,3 +6,13 @@
 //
 
 import Foundation
+
+protocol Player {}
+
+class Human: Player {
+    
+}
+
+class AIPlayer: Player {
+    
+}

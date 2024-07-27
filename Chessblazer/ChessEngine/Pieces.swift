@@ -2,7 +2,98 @@
 //  Pieces.swift
 //  Chessblazer
 //
-//  Created by Szymon Kluska on 25/07/2024.
+//  Created by sergiusz on 25/07/2024.
 //
 
 import Foundation
+
+class Piece {
+    enum PieceType: Int {
+        case empty = 0
+        case king = 1
+        case pawn = 2
+        case knight = 3
+        case bishop = 4
+        case rook = 5
+        case queen = 6 //hetman
+    }
+    
+    
+    enum PieceColor: Int {
+        case white = 8
+        case black = 16
+    }
+    
+    static func combine(type: PieceType, color: PieceColor) -> Int {
+        return type.rawValue | color.rawValue
+    }
+    
+    static func isType(piece: Int, typeToCheck: PieceType) -> Bool {
+        return piece == combine(type: typeToCheck, color: .black) ||         piece == combine(type: typeToCheck, color: .white)
+
+    }
+    
+    static func checkColor(piece: Int) -> Piece.PieceColor {
+        if piece / Piece.PieceColor.black.rawValue == 1 {
+            return .black
+        } else {
+            return .white
+        }
+    }
+    
+    static func areOppositeColors(piece1: Int, piece2: Int) -> Bool {
+        return Piece.checkColor(piece: piece1) != Piece.checkColor(piece: piece2)
+
+    }
+    
+    static func checkIfCheck(board: [Int]) -> Bool {
+        // todo
+        return false
+    }
+    
+    static let PiecesDict: [Character: PieceType] = [
+        "0": PieceType.empty,
+        "k": PieceType.king,
+        "p": PieceType.pawn,
+        "n": PieceType.knight,
+        "b": PieceType.bishop,
+        "r": PieceType.rook,
+        "q": PieceType.queen
+    ]
+    
+    static var ValueToPieceDict: [Int: Character] = [
+        0: ".",
+        combine(type: .king, color: .black): "k",
+        combine(type: .pawn, color: .black): "p",
+        combine(type: .knight, color: .black): "n",
+        combine(type: .bishop, color: .black): "b",
+        combine(type: .rook, color: .black): "r",
+        combine(type: .queen, color: .black): "q",
+        combine(type: .king, color: .white): "K",
+        combine(type: .pawn, color: .white): "P",
+        combine(type: .knight, color: .white): "N",
+        combine(type: .bishop, color: .white): "B",
+        combine(type: .rook, color: .white): "R",
+        combine(type: .queen, color: .white): "Q"
+      ]
+    
+    // ♚ ♛ ♝ ♞ ♟ ♜
+    // ♔ ♕ ♗ ♘ ♙ ♖
+    
+    static var ValueToPieceEmojiDict: [Int: Character] = [
+        0: ".",
+        combine(type: .king, color: .black): "♚",
+        combine(type: .pawn, color: .black): "♟",
+        combine(type: .knight, color: .black): "♞",
+        combine(type: .bishop, color: .black): "♝",
+        combine(type: .rook, color: .black): "♜",
+        combine(type: .queen, color: .black): "♛",
+        combine(type: .king, color: .white): "♔",
+        combine(type: .pawn, color: .white): "♙",
+        combine(type: .knight, color: .white): "♘",
+        combine(type: .bishop, color: .white): "♗",
+        combine(type: .rook, color: .white): "♖",
+        combine(type: .queen, color: .white): "♕"
+      ]
+}
+
