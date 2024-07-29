@@ -18,6 +18,12 @@
 		318129322C55B0C4002F1E40 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129312C55B0C4002F1E40 /* ContentView.swift */; };
 		318129342C55B0C5002F1E40 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 318129332C55B0C5002F1E40 /* Assets.xcassets */; };
 		318129382C55B0C5002F1E40 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 318129372C55B0C5002F1E40 /* Preview Assets.xcassets */; };
+		3181293E2C56DAA4002F1E40 /* BoardPrinter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129262C5440A0002F1E40 /* BoardPrinter.swift */; };
+		3181293F2C56DAA4002F1E40 /* Pieces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3181291A2C51B3EC002F1E40 /* Pieces.swift */; };
+		318129402C56DAA4002F1E40 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3181291E2C51B803002F1E40 /* Game.swift */; };
+		318129412C56DAA4002F1E40 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129202C5277FA002F1E40 /* Engine.swift */; };
+		318129422C56DAA4002F1E40 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129222C529FD9002F1E40 /* Players.swift */; };
+		318129432C56DAA4002F1E40 /* Move.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129242C530BB0002F1E40 /* Move.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -232,6 +238,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3181293E2C56DAA4002F1E40 /* BoardPrinter.swift in Sources */,
+				3181293F2C56DAA4002F1E40 /* Pieces.swift in Sources */,
+				318129402C56DAA4002F1E40 /* Game.swift in Sources */,
+				318129412C56DAA4002F1E40 /* Engine.swift in Sources */,
+				318129422C56DAA4002F1E40 /* Players.swift in Sources */,
+				318129432C56DAA4002F1E40 /* Move.swift in Sources */,
 				318129322C55B0C4002F1E40 /* ContentView.swift in Sources */,
 				318129302C55B0C4002F1E40 /* ChessblazerGUIApp.swift in Sources */,
 			);

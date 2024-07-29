@@ -9,7 +9,7 @@ import Foundation
 class BoardPrinter {
     
     func printPossibleMoves(game: Game) {
-        let moves = game.generateMoves()
+        let moves = game.generatePseudoLegalMoves(forColor: game.currentTurnColor)
         for move in moves {
             let piece = Piece.ValueToPieceDict[game.board[move.fromSquare!]]
             

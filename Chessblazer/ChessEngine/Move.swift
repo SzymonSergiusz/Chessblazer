@@ -10,6 +10,7 @@ import Foundation
 class Move {
     var fromSquare: Int?
     var targetSquare: Int?
+    var promotionPiece: String = ""
     
     var asString: String {
         "\(fromSquare!) \(targetSquare!)"
@@ -25,11 +26,19 @@ class Move {
     
     init(notation: String) {
         // think about it
-        self.fromSquare = translateFromNotationToSquare(String(notation.prefix(2)))
-        self.targetSquare = translateFromNotationToSquare(String(notation.suffix(2)))
+        
+        if notation.count == 4 {
+            self.fromSquare = Move.translateFromNotationToSquare(String(notation.prefix(2)))
+            self.targetSquare = Move.translateFromNotationToSquare(String(notation.suffix(2)))
+        } else {
+            self.fromSquare = Move.translateFromNotationToSquare(String(notation.prefix(2)))
+            
+            let start = notation.index(notation.startIndex, offsetBy: 2)
+            let end = notation.index(notation.startIndex, offsetBy: 4)
+            self.targetSquare = Move.translateFromNotationToSquare(String(notation[start..<end]))
+            self.promotionPiece = String(notation.suffix(1))
+        }
     }
-    
-
     
     func squareToNotation(square: Int) -> String {
         let ranks = square / 8 + 1
@@ -48,7 +57,7 @@ class Move {
         return "\(squareToNotation(square: fromSquare!))\(squareToNotation(square: targetSquare!))"
     }
     
-    var letterToNumber: [String : Int] = [
+    static var letterToNumber: [String : Int] = [
         "A" : 0,
         "B" : 1,
         "C" : 2,
@@ -59,7 +68,7 @@ class Move {
         "H" : 7,
     ]
     
-    func translateFromNotationToSquare(_ notation: String) -> Int? {
+    static func translateFromNotationToSquare(_ notation: String) -> Int? {
         guard notation.count == 2 else { return nil }
         let letter = String(notation.prefix(1))
         guard let fileIndex = letterToNumber[letter.uppercased()] else { return nil }

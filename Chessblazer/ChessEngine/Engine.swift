@@ -24,7 +24,7 @@ class Engine {
     func getInput(command input: String) {
         let args = input.components(separatedBy: .whitespaces)
         guard let command = CommandsGUItoEngine(rawValue: args[0]) else { return }
-       
+
         switch command {
         case .uci:
             sendOutput(output: engineId)
@@ -35,33 +35,57 @@ class Engine {
             game.startNewGame()
             
         case .position:
-            var argIndex = 2
+            
             if args[1] == "fen" {
                 game.loadBoardFromFen(fen: args[2])
-                argIndex += 1
             } else if args[1] == "startpos" {
-                game.startNewGame()
-            }
-            
-            if args[argIndex] == "moves" {
-                argIndex += 1
-                for i in argIndex...args.count {
-                    game.makeMove(move: Move(notation: args[i]))
+                if args[2] == "moves" {
+                    let moves = args[3..<args.count]
+                    for move in moves {
+                        game.makeMove(board: &game.board, move: Move(notation: "move"))
+                    }
+                    
                 }
             }
+//           var argIndex = 1
+//            if args[argIndex] == "startpos" {
+//                game.startNewGame()
+//                argIndex += 1
+//            } else if args[argIndex] == "fen" {
+//                let fenParts = args[argIndex + 1...(args.count - 1)].prefix(6)
+//                let fen = fenParts.joined(separator: " ")
+//                game.loadBoardFromFen(fen: fen)
+//                argIndex += 7
+//            }
+//            
+//            if argIndex < args.count && args[argIndex] == "moves" {
+//                argIndex += 1
+//                for i in argIndex..<args.count {
+//                    game.makeMove(board: &game.board, move: Move(notation: args[i]))
+//                }
+//            }
+
         case .go:
-            
-            let randomMove = game.generateMoves().randomElement() ?? Move(notation: "e2e4")
+//            let randomMove = game.generatePseudoLegalMoves(forColor: game.currentTurnColor).randomElement() ?? Move(notation: "e2e4")
+//            let toNotation = randomMove.moveToNotation()
+//            sendOutput(output: "bestmove \(toNotation)")
+            sendOutput(output: "")
+        case .stop:
+            let randomMove = game.generatePseudoLegalMoves(forColor: game.currentTurnColor).randomElement() ?? Move(notation: "e2e4")
             let toNotation = randomMove.moveToNotation()
             sendOutput(output: "bestmove \(toNotation)")
         case .quit:
             quit = true
+            
+        case .printBoard:
+            let printer = BoardPrinter()
+            printer.printBoard(board: game.board, emojiMode: true, perspectiveColor: .white)
         default:
             return
         }
     }
-    
-    
+
+
     func sendOutput(output: String) {
         print(output)
     }
@@ -79,6 +103,8 @@ enum CommandsGUItoEngine: String {
     case stop
     case ponderhit
     case quit
+    //custom
+    case printBoard
 }
 
 enum CommandsEnginetoGUI {

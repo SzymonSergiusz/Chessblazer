@@ -29,8 +29,8 @@ class Piece {
     }
     
     static func isType(piece: Int, typeToCheck: PieceType) -> Bool {
-        return piece == combine(type: typeToCheck, color: .black) ||         piece == combine(type: typeToCheck, color: .white)
-
+        return piece == combine(type: typeToCheck, color: .black) || piece == combine(type: typeToCheck, color: .white)
+        
     }
     
     static func checkColor(piece: Int) -> Piece.PieceColor {
@@ -43,13 +43,18 @@ class Piece {
     
     static func areOppositeColors(piece1: Int, piece2: Int) -> Bool {
         return Piece.checkColor(piece: piece1) != Piece.checkColor(piece: piece2)
-
+        
     }
     
-    static func checkIfCheck(board: [Int]) -> Bool {
-        // todo
-        return false
+
+    static func isSliding(piece: Int) -> Bool {
+        return Piece.isType(piece: piece, typeToCheck: .bishop) || Piece.isType(piece: piece, typeToCheck: .queen) || Piece.isType(piece: piece, typeToCheck: .rook)
     }
+    
+    static func isLeaping(piece: Int) -> Bool {
+        return Piece.isType(piece: piece, typeToCheck: .pawn) || Piece.isType(piece: piece, typeToCheck: .knight) || Piece.isType(piece: piece, typeToCheck: .king)
+    }
+    
     
     static let PiecesDict: [Character: PieceType] = [
         "0": PieceType.empty,
@@ -75,7 +80,7 @@ class Piece {
         combine(type: .bishop, color: .white): "B",
         combine(type: .rook, color: .white): "R",
         combine(type: .queen, color: .white): "Q"
-      ]
+    ]
     
     // ♚ ♛ ♝ ♞ ♟ ♜
     // ♔ ♕ ♗ ♘ ♙ ♖
@@ -94,6 +99,6 @@ class Piece {
         combine(type: .bishop, color: .white): "♗",
         combine(type: .rook, color: .white): "♖",
         combine(type: .queen, color: .white): "♕"
-      ]
+    ]
 }
 
