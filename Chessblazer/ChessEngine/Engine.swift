@@ -80,11 +80,36 @@ class Engine {
         case .printBoard:
             let printer = BoardPrinter()
             printer.printBoard(board: game.board, emojiMode: true, perspectiveColor: .white)
+        
+        case .main:
+            let game = Game()
+//            game.startNewGame()
+//            game.loadBoardFromFen(fen: "8/8/8/8/8/8/8/R7 w - - 0 1")
+            game.loadBoardFromFen(fen: "p7/8/8/8/8/8/8/R6p w - - 0 1")
+            var moves = [Move]()
+            for b in game.bitboards {
+                b.value.printBoardFromWhitePov()
+            }
+            Magic.generateRookMoves(game: game, square: 0, moves: &moves)
+            for move in moves {
+                print(move.moveToNotation())
+            }
+            
+        case .pve:
+            while true {
+                let input = readLine()
+                game.makeMove(board: &game.board, move: Move(notation: input!))
+                game.toggleColor()
+                let computerMove = game.generateLegalMoves(forColor: game.currentTurnColor).randomElement()!
+                game.makeMove(board: &game.board, move: computerMove)
+                game.toggleColor()
+                let printer = BoardPrinter()
+                printer.printBoard(board: game.board, emojiMode: true, perspectiveColor: .white)
+            }
         default:
             return
         }
     }
-
 
     func sendOutput(output: String) {
         print(output)
@@ -105,6 +130,8 @@ enum CommandsGUItoEngine: String {
     case quit
     //custom
     case printBoard
+    case pve
+    case main
 }
 
 enum CommandsEnginetoGUI {

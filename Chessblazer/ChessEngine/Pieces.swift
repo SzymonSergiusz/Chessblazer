@@ -24,6 +24,23 @@ class Piece {
         case black = 16
     }
     
+    enum ColoredPieces: Int {
+        case empty = 0
+        case blackKing = 17
+        case blackPawn = 18
+        case blackQueen = 22
+        case blackKnight = 19
+        case blackBishop = 20
+        case blackRook = 21
+    
+        case whiteKing = 9
+        case whitePawn = 10
+        case whiteQueen = 14
+        case whiteKnight = 11
+        case whiteBishop = 12
+        case whiteRook = 13
+    }
+    
     static func combine(type: PieceType, color: PieceColor) -> Int {
         return type.rawValue | color.rawValue
     }

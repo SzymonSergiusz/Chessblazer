@@ -60,4 +60,31 @@ extension Bitboard {
     func southOne() -> Bitboard {
         return self >> 8
     }
+    
+    func northEastOne() -> Bitboard {
+        return Bitboard((self.rawValue << 9) & ~Bitboard.Masks.fileA.rawValue)
+    }
+
+    func northWestOne() -> Bitboard {
+        return Bitboard((self.rawValue << 7) & ~Bitboard.Masks.fileH.rawValue)
+    }
+
+    func southEastOne() -> Bitboard {
+        return Bitboard((self.rawValue >> 7) & ~Bitboard.Masks.fileA.rawValue)
+    }
+
+    func southWestOne() -> Bitboard {
+        return Bitboard((self.rawValue >> 9) & ~Bitboard.Masks.fileH.rawValue)
+    }
+    
+    
+    static func popLSB(_ bitboard: inout Bitboard) -> Int {
+        let lsb = bitboard.rawValue & (~bitboard.rawValue + 1)
+        bitboard = bitboard & ~Bitboard(lsb)
+        return lsb.trailingZeroBitCount
+    }
+
+    func countBits(_ bitboard: Bitboard) -> Int {
+        return bitboard.rawValue.nonzeroBitCount
+    }
 }

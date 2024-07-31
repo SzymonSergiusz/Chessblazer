@@ -28,11 +28,16 @@ class Game {
     var isBlackKingChecked = false
     var isWhiteKingChecked = false
     
+    var bitboards = [Piece.ColoredPieces.RawValue : Bitboard]()
+    
     func loadBoardFromFen(fen: String) {
+        board = Array(repeating: 0, count: 64)
+        
+        bitboards = [Piece.ColoredPieces.RawValue : Bitboard]()
         
         let args = fen.components(separatedBy: " ")
         currentTurnColor = args[1] == "w" ? .white : .black
-        
+        #warning("todo possible bug here if game starts with startpos moves ....")
         for letter in args[2] {
             castlesAvailable.removeAll()
             if letter == "-" { break } else {castlesAvailable.insert(letter)}
@@ -53,7 +58,13 @@ class Game {
                 } else {
                     let piece: Int = Piece.combine(type: Piece.PiecesDict[char.lowercased().first!] ?? Piece.PieceType.empty, color: char.isUppercase ? Piece.PieceColor.white : Piece.PieceColor.black)
                     board[index] = piece
+
+                    #warning("bitboard logic")
+                    bitboards[piece] = (bitboards[piece]  ?? Bitboard(0)) | (Bitboard(1) << Bitboard(UInt64(index)))
+                    
+                    
                     index+=1
+                    
                 }
             }
         }
@@ -63,7 +74,7 @@ class Game {
         loadBoardFromFen(fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     }
     
-    // todo
+    #warning("not all possibilities handled")
     func generateLegalMoves(forColor color: Piece.PieceColor) -> [Move] {
         let pseudoMoves = generatePseudoLegalMoves(forColor: color)
         var legalMoves = [Move]()
@@ -112,15 +123,14 @@ class Game {
         return false
     }
     
-    static let directionOffsets = [8, -8, -1, 1, 7, -7, 9, -9]
-    
     private func generateSlidingMoves(moves: inout [Move], piece: Int, fromSquare: Int) {
+        let directionOffsets = [8, -8, -1, 1, 7, -7, 9, -9]
         let start = Piece.isType(piece: piece, typeToCheck: .bishop) ? 4 : 0
         let end = Piece.isType(piece: piece, typeToCheck: .rook) ? 4 : 8
         
         for direction in start..<end {
             for j in 0..<Game.squaresToEdge[fromSquare]![direction] {
-                let targetSquare = fromSquare + Game.directionOffsets[direction] * (j+1)
+                let targetSquare = fromSquare + directionOffsets[direction] * (j+1)
                 
                 if board[targetSquare] != 0 {
                     if (Piece.checkColor(piece: piece) == Piece.checkColor(piece: board[targetSquare])) {
@@ -172,7 +182,7 @@ class Game {
             }
             
             if (0...7).contains(targetSquare) || (56...63).contains(targetSquare) {
-                // todo Promotion
+                #warning("promotion not handled")
                 print("promocja")
             }
         } else if Piece.isType(piece: piece, typeToCheck: .knight) {
@@ -205,7 +215,7 @@ class Game {
         board[target] = board[from]
         board[from] = 0
         
-        toggleColor()
+//        toggleColor()
     }
     
     func toggleColor() {
