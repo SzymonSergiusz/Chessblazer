@@ -70,6 +70,22 @@ class Game {
         }
     }
     
+    func toBoardArrayRepresentation() -> [Int] {
+        var array = Array(repeating: 0, count: 64)
+        let copy = bitboards
+        
+        for bitboard in copy {
+            var pieceBitboard = bitboard.value
+            while pieceBitboard != 0 {
+                let piece = bitboard.key
+                let index = Bitboard.popLSB(&pieceBitboard)
+                
+                array[index] = piece
+            }
+        }
+        return array
+    }
+    
     func startNewGame() {
         loadBoardFromFen(fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     }

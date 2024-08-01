@@ -35,6 +35,7 @@ class Engine {
             game.startNewGame()
             
         case .position:
+            #warning("refactor with regex for: position fen ... | position startpos moves ...")
             
             if args[1] == "fen" {
                 game.loadBoardFromFen(fen: args[2])
@@ -84,13 +85,25 @@ class Engine {
         case .main:
             let game = Game()
 //            game.startNewGame()
-//            game.loadBoardFromFen(fen: "8/8/8/8/8/8/8/R7 w - - 0 1")
-            game.loadBoardFromFen(fen: "p7/8/8/8/8/8/8/R6p w - - 0 1")
+            game.loadBoardFromFen(fen: "rnbqkbnr/1ppp1ppp/8/4p3/4P3/8/1PPPQPPP/RNB1KBNR w KQk - 0 3")
+//            game.loadBoardFromFen(fen: "8/8/8/8/3B4/8/8/8 w - - 0 1")
             var moves = [Move]()
-            for b in game.bitboards {
-                b.value.printBoardFromWhitePov()
-            }
-            Magic.generateRookMoves(game: game, square: 0, moves: &moves)
+
+            
+//            Magic.generateBishopMask(square: 12).printBoardFromWhitePov() correct
+            
+            
+//            for b in game.bitboards {
+//                b.value.printBoardFromWhitePov()
+//            }
+//            game.bitboards[Piece.ColoredPieces.whiteBishop.rawValue]?.printBoardFromWhitePov()
+            
+//            Magic.createBishopLegalMoves(square: 0, blocker: Bitboard.Masks.rank4).printBoardFromWhitePov()
+//            Magic.createRookLegalMoves(square: 0, blocker:  Bitboard.Masks.rank4).printBoardFromWhitePov()
+            
+
+            generateAllPossibleMoves(game: game, moves: &moves)
+
             for move in moves {
                 print(move.moveToNotation())
             }

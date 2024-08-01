@@ -50,6 +50,13 @@ class Piece {
         
     }
     
+    static func getType(piece: Int) -> PieceType {
+        let colorValue = checkColor(piece: piece) == .white ? PieceColor.white.rawValue : PieceColor.black.rawValue
+        let noColorPiece = piece - colorValue
+        return PieceType(rawValue: noColorPiece) ?? PieceType.empty
+        
+    }
+    
     static func checkColor(piece: Int) -> Piece.PieceColor {
         if piece / Piece.PieceColor.black.rawValue == 1 {
             return .black

@@ -10,7 +10,6 @@ import Foundation
 class Magic {
     
     static var rookMasks: [Bitboard] = generateRookMasks()
-    static var bishopMasks: [Bitboard] = generateBishopMasks()
     
     static func generateRookMask(square: Int) -> Bitboard {
         
@@ -34,31 +33,7 @@ class Magic {
         return rookMasks
     }
     
-    static func generateBishopMask(square: Int) -> Bitboard {
-        let rank = square / 8
-        let file = square % 8
-        var mask = Bitboard(0)
-        for offset in 1..<8 {
-            // NE
-            if rank + offset < 8 && file + offset < 8 {
-                mask = mask | Bitboard(1) << Bitboard(((rank + offset) * 8 + (file + offset)))
-            }
-            // NW
-            if rank + offset < 8 && file - offset >= 0 {
-                mask = mask | Bitboard(1) << Bitboard((rank + offset) * 8 + (file - offset))
-            }
-            // SE
-            if rank - offset >= 0 && file + offset < 8 {
-                mask = mask | Bitboard(1) << Bitboard((rank - offset) * 8 + (file + offset))
-            }
-            // SW
-            if rank - offset >= 0 && file - offset >= 0 {
-                mask = mask | Bitboard(1) << Bitboard((rank - offset) * 8 + (file - offset))
-            }
-        }
-        
-        return mask
-    }
+
     
     static func generateBishopMasks() -> [Bitboard] {
         var bishopMasks: [Bitboard] = Array(repeating: Bitboard(0), count: 64)
@@ -98,12 +73,12 @@ class Magic {
     static func createAllBlockers(movementMask: Bitboard) -> [Bitboard] {
         
         var indexesToCheck = [Int]()
+        var mask = movementMask
         
-        for i in 0...63 {
-            if ((movementMask >> Bitboard(i)) & Bitboard(1) == 1) {
-                indexesToCheck.append(i)
-            }
+        while mask != 0 {
+            indexesToCheck.append(Bitboard.popLSB(&mask))
         }
+        
         
         let numberOfDiffBitboards = 1 << indexesToCheck.count // 2^n
         var blockers = Array(repeating: Bitboard(0), count: numberOfDiffBitboards)
@@ -119,47 +94,19 @@ class Magic {
     
     static let rookLookupTable = createRookLookupTable()
 
-    static func hashKey(blockerBitboard: Bitboard, square: Int) -> UInt64 {
+    static func hashKeyRook(blockerBitboard: Bitboard, square: Int) -> UInt64 {
         let magic = rookMagics[square]
         let shift = rookShifts[square]
-        return (blockerBitboard.rawValue &* magic) >> shift
+        let of = blockerBitboard.rawValue.multipliedReportingOverflow(by: magic)
+        return (of.0) >> shift
     }
-    
-    
-    static func generateRookMoves(game: Game, square: Int, moves: inout [Move]) {
-        let whitePieces = whitePiecesBitboards(bitboards: game.bitboards)
-        let blackPieces = blackPiecesBitboards(bitboards: game.bitboards)
-        let allPieces = whitePieces | blackPieces
-        #warning("no check xray mask")
-        let blockerBitboard = allPieces & rookMasks[square] // & checkRayMask
-        let key: UInt64 = hashKey(blockerBitboard: blockerBitboard, square: square)
 
-        var movesBitboard = rookLookupTable[square]![key]!
-        if game.currentTurnColor == .white {
-            movesBitboard = movesBitboard & ~whitePieces
-        } else {
-            movesBitboard = movesBitboard & ~blackPieces
-        }
-        
-        #warning("no pin mask check yet")
-        //movesBitboard = movesBitboard & getPinMask()
-        
-        #warning("it prints correct moves")
-        movesBitboard.printBoardFromWhitePov()
-        
-        while movesBitboard != 0 {
-            let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
-            moves.append(Move(fromSquare: square, targetSquare: targetSquare))
-        }
-    }
     
-    #warning("both function are ok")
     static func createRookLegalMoves(square: Int, blocker: Bitboard) -> Bitboard {
         var legalMoves = Bitboard(0)
-        let movementMask = Magic.rookMasks[square]
         
-        // Iterate through each direction: N, S, E, W
-        let directions: [(Int, Int)] = [(0, 1), (0, -1), (1, 0), (-1, 0)] // (deltaRow, deltaCol)
+        // N, S, E, W
+        let directions: [(Int, Int)] = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         
         for (deltaRow, deltaCol) in directions {
             var currentSquare = square
@@ -168,85 +115,200 @@ class Magic {
                 let newRow = currentSquare / 8 + deltaRow
                 let newCol = currentSquare % 8 + deltaCol
                 
-                // Check if new position is valid
                 if newRow < 0 || newRow >= 8 || newCol < 0 || newCol >= 8 {
-                    break // Out of bounds
+                    break
                 }
                 
                 let newSquare = newRow * 8 + newCol
                 
-                // Check if there is a blocker in the way
+                
                 if (blocker >> Bitboard(newSquare) & Bitboard(1)) != 0 {
-                    break // Blocked by a piece
+                    break
+                }
+                legalMoves = legalMoves | Bitboard(1) << Bitboard(newSquare)
+                currentSquare = newSquare
+            }
+        }
+        return legalMoves
+    }
+
+//    static func createRookLookupTable() -> [Int: [UInt64: Bitboard]] {
+//        var rookMovesLookup = [Int: [UInt64: Bitboard]]()
+//        for square in 0...63 {
+//            let movementMask = Magic.rookMasks[square]
+//            let blockers = createAllBlockers(movementMask: movementMask)
+//            rookMovesLookup[square] = [:]
+//
+//            for blocker in blockers {
+//                let legalMoves: Bitboard = createRookLegalMoves(square: square, blocker: blocker)
+//                rookMovesLookup[square]?[hashKeyRook(blockerBitboard: blocker, square: square)] = legalMoves
+//            }
+//        }
+//        return rookMovesLookup
+//    }
+    
+    struct KeyTuple: Hashable {
+        init(_ first: Int, _ second: UInt64) {
+            self.first = first
+            self.second = second
+        }
+        var first: Int
+        var second: UInt64
+    }
+    
+    static func createRookLookupTable() -> [KeyTuple: Bitboard] {
+        var rookMovesLookup = [KeyTuple: Bitboard]()
+        for square in 0...63 {
+            let movementMask = Magic.rookMasks[square]
+            let blockers = createAllBlockers(movementMask: movementMask)
+
+            for blocker in blockers {
+                let legalMoves: Bitboard = createRookLegalMoves(square: square, blocker: blocker)
+                rookMovesLookup[KeyTuple(square, blocker.rawValue)] = legalMoves
+            }
+        }
+        return rookMovesLookup
+    }
+    
+
+    static var bishopMasks: [Bitboard] = generateBishopMasks()
+    
+//    static let bishopLookupTable: [Int: [UInt64: Bitboard]] = createBishopLookupTable()
+    static let bishopLookupTable: [KeyTuple : Bitboard] = createBishopLookupTable()
+
+    static func generateBishopMask(square: Int) -> Bitboard {
+        let rank = square / 8
+        let file = square % 8
+        var mask = Bitboard(0)
+        for offset in 1..<8 {
+            // NE
+            if rank + offset < 8 && file + offset < 8 {
+                mask = mask | Bitboard(1) << Bitboard(((rank + offset) * 8 + (file + offset)))
+            }
+            // NW
+            if rank + offset < 8 && file - offset >= 0 {
+                mask = mask | Bitboard(1) << Bitboard((rank + offset) * 8 + (file - offset))
+            }
+            // SE
+            if rank - offset >= 0 && file + offset < 8 {
+                mask = mask | Bitboard(1) << Bitboard((rank - offset) * 8 + (file + offset))
+            }
+            // SW
+            if rank - offset >= 0 && file - offset >= 0 {
+                mask = mask | Bitboard(1) << Bitboard((rank - offset) * 8 + (file - offset))
+            }
+        }
+        
+        return mask
+    }
+    
+    static func hashKeyBishop(blockerBitboard: Bitboard, square: Int) -> UInt64 {
+        let magic = bishopMagics[square]
+        let shift = bishopShifts[square]
+        let of = blockerBitboard.rawValue.multipliedReportingOverflow(by: magic)
+        return (of.0) >> shift
+    }
+    
+    
+//    static func createBishopLookupTable() -> [Int: [UInt64: Bitboard]] {
+//        var bishopMovesLookup: [Int: [UInt64: Bitboard]] = [:]
+//        for square in 0...63 {
+//            let movementMask = Magic.bishopMasks[square] //ok
+//            let blockers = createAllBlockers(movementMask: movementMask) // raczej ok
+//            bishopMovesLookup[square] = [:]
+//            
+//            for blocker in blockers {
+//                let legalMoves: Bitboard = createBishopLegalMoves(square: square, blocker: blocker)
+//                bishopMovesLookup[square]![hashKeyBishop(blockerBitboard: blocker, square: square)] = legalMoves
+//            }
+//        }
+//        return bishopMovesLookup
+//    }
+    
+    
+    static func createBishopLookupTable() -> [KeyTuple: Bitboard] {
+        var bishopMovesLookup: [KeyTuple: Bitboard] = [:]
+        for square in 0...63 {
+            let movementMask = Magic.bishopMasks[square] //ok
+            let blockers = createAllBlockers(movementMask: movementMask) // raczej ok
+
+            for blocker in blockers {
+                let legalMoves: Bitboard = createBishopLegalMoves(square: square, blocker: blocker)
+                bishopMovesLookup[KeyTuple(square, blocker.rawValue)] = legalMoves
+            }
+        }
+        return bishopMovesLookup
+    }
+    
+//    static func createBishopLegalMoves(square: Int, blocker: Bitboard) -> Bitboard {
+//
+//        
+//    }
+
+
+    static func createBishopLegalMoves(square: Int, blocker: Bitboard) -> Bitboard {
+        var legalMoves = Bitboard(0)
+        
+        // NE, NW, SE, SW directions
+        let directions: [(Int, Int)] = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+        
+        for (deltaRow, deltaCol) in directions {
+            var currentRow = square / 8
+            var currentCol = square % 8
+            
+            while true {
+                currentRow += deltaRow
+                currentCol += deltaCol
+                
+                if currentRow < 0 || currentRow >= 8 || currentCol < 0 || currentCol >= 8 {
+                    break
                 }
                 
-                // Add the new square to legal moves
-                legalMoves = legalMoves | Bitboard(1) << Bitboard(newSquare)
+                let newSquare = currentRow * 8 + currentCol
+                legalMoves = Bitboard(legalMoves.rawValue | 1 << newSquare)
                 
-                // Continue in the same direction
-                currentSquare = newSquare
+                // Stop if there's a blocker at this square
+                if (blocker.rawValue & (1 << newSquare)) != 0 {
+                    break
+                }
             }
         }
         
         return legalMoves
     }
+
     
-//    static func createRookLegalMoves(square: Int, blocker: Bitboard) -> Bitboard {
+//    static func createBishopLegalMoves(square: Int, blocker: Bitboard) -> Bitboard {
 //        var legalMoves = Bitboard(0)
-//        let rank = square / 8
-//        let file = square % 8
-//
-//        for delta in stride(from: file - 1, through: 0, by: -1) {
-//            let targetSquare = rank * 8 + delta
-//            legalMoves = legalMoves | (Bitboard(1) << Bitboard(targetSquare))
-//            if (blocker >> Bitboard(targetSquare) & Bitboard(1)) != 0 {
-//                break
+//        
+//        // NE, NW, SE, SW directions
+//        let directions: [(Int, Int)] = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+//        
+//        for (deltaRow, deltaCol) in directions {
+//            var currentSquare = square
+//            
+//            while true {
+//                let newRow = currentSquare / 8 + deltaRow
+//                let newCol = currentSquare % 8 + deltaCol
+//                
+//                if newRow < 0 || newRow >= 8 || newCol < 0 || newCol >= 8 {
+//                    break
+//                }
+//                
+//                let newSquare = newRow * 8 + newCol
+//                legalMoves = legalMoves | (Bitboard(1) << Bitboard(newSquare))
+//                
+//                // Stop if there's a blocker at this square
+//                if (blocker >> Bitboard(newSquare) & Bitboard(1)) != 0 {
+//                    break
+//                }
+//                
+//                currentSquare = newSquare
 //            }
 //        }
-//
-//        for delta in file + 1..<8 {
-//            let targetSquare = rank * 8 + delta
-//            legalMoves = legalMoves | (Bitboard(1) << Bitboard(targetSquare))
-//            if (blocker >> Bitboard(targetSquare) & Bitboard(1)) != 0 {
-//                break
-//            }
-//        }
-//
-//        for delta in stride(from: rank - 1, through: 0, by: -1) {
-//            let targetSquare = delta * 8 + file
-//            legalMoves = legalMoves | (Bitboard(1) << Bitboard(targetSquare))
-//            if (blocker >> Bitboard(targetSquare) & Bitboard(1)) != 0 {
-//                break
-//            }
-//        }
-//
-//        for delta in rank + 1..<8 {
-//            let targetSquare = delta * 8 + file
-//            legalMoves = legalMoves | (Bitboard(1) << Bitboard(targetSquare))
-//            if (blocker >> Bitboard(targetSquare) & Bitboard(1)) != 0 {
-//                break
-//            }
-//        }
-//
+//        
 //        return legalMoves
 //    }
-
-    
-    static func createRookLookupTable() -> [Int: [UInt64: Bitboard]] {
-        var rookMovesLookup = [Int: [UInt64: Bitboard]]()
-
-        for square in 0...63 {
-            let movementMask = Magic.rookMasks[square]
-            let blockers = createAllBlockers(movementMask: movementMask)
-            rookMovesLookup[square] = [:] // Initialize the dictionary for each square
-
-            for blocker in blockers {
-                let legalMoves: Bitboard = createRookLegalMoves(square: square, blocker: blocker)
-                rookMovesLookup[square]?[hashKey(blockerBitboard: blocker, square: square)] = legalMoves
-            }
-        }
-        return rookMovesLookup
-    }
 }
 
 
