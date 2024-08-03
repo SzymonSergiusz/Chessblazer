@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct ChessPieceView: View {
-    
-    
     let pieceValue: Int
     @State var indexOfSquare: Int
     var width: CGFloat = 50
     var height: CGFloat = 50
     
+    @Bindable var gameState: GameState
     @State var piecePosition: CGPoint = CGPoint(x: 50, y: 50)
     @State var dragAmount = CGSize()
+    
     var body: some View {
         if let image = ChessPiece.pieceImage[pieceValue] {
             image
@@ -26,15 +26,17 @@ struct ChessPieceView: View {
                 .position(piecePosition)
                 .offset(dragAmount)
                 .onTapGesture {
-                    CurrentState.getMoves(square: indexOfSquare)
+                    gameState.onPieceTap(square: indexOfSquare)
                 }
             
                 .gesture(
                     DragGesture()
                         .onChanged { value in
-                            if Piece.checkColor(piece: pieceValue) == CurrentState.game.currentTurnColor {
+                            if Piece.checkColor(piece: pieceValue) == gameState.currentColorToMove {
                                 dragAmount = value.translation
+                                gameState.onPieceTap(square: indexOfSquare)
                             }
+                            
                         }
                         .onEnded { value in
                             
@@ -43,27 +45,25 @@ struct ChessPieceView: View {
                             
                             
                             print("rows: \(rows), columns: \(columns)")
-                            print("aktualne miejsce: \(CurrentState.squareToNotation(square: indexOfSquare))")
+                            print("current square: \(BoardUtils.squareToNotation(square: indexOfSquare))")
                             
                             
                             var newIndex = -1
                             newIndex = indexOfSquare + (rows*8)+(-columns)
                             
-                            print("nowe miejsce: \(CurrentState.squareToNotation(square: newIndex)) \(newIndex)")
+                            print("new square: \(BoardUtils.squareToNotation(square: newIndex)) \(newIndex)")
                             
                             if (0...63).contains(newIndex) {
-                                let validTargetSquares = CurrentState.validTargetSquares(fromSquare: indexOfSquare)
+                                let validTargetSquares = gameState.validTargetSquares(fromSquare: indexOfSquare)
                                 
                                 print(validTargetSquares)
                                 if validTargetSquares.contains(newIndex) {
-                                    // wykonac ruch
-                                    print("poprawny ruch")
+                                    // make a move
+                                    print("correct move")
                                     
-                                    #warning("poprawić")
-                                    CurrentState.game.makeMove(pieceValue: pieceValue, move: Move(fromSquare: indexOfSquare, targetSquare: newIndex))
+                                    
+                                    gameState.makeMove(indexOfSquare, newIndex)
                                     indexOfSquare = newIndex
-                                    
-                                    CurrentState.afterMove(game: CurrentState.game)
                                     
                                     return
                                 }
@@ -77,6 +77,12 @@ struct ChessPieceView: View {
                             
                         }
                 )
+        } else {
+            Rectangle()
+                .frame(width: width, height: height)
+                .position(piecePosition)
+                .hidden()
+            
         }
     }
 }

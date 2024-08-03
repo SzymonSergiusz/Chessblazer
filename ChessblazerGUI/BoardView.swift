@@ -10,7 +10,7 @@ import SwiftUI
 
 struct BoardView: View {
     
-//    @Binding var game: Game
+    @Bindable var gameState: GameState
     var body: some View {
         
         GeometryReader { geometry in
@@ -50,8 +50,8 @@ struct BoardView: View {
                         ForEach(0..<8) { column in
                             let index = (7 - row) * 8 + column
                             
-                            SquareView(color: (row + column).isMultiple(of: 2) ? Settings.lightBrown : Settings.brown, index: index, size: squareSize, piece: CurrentState.game.toBoardArrayRepresentation()[index])
-                                
+                            SquareView(color: (row + column).isMultiple(of: 2) ? Settings.lightBrown : Settings.brown, index: index, size: squareSize, piece: gameState.boardState[index], gameState: gameState)
+                            
                         }
                         
                     }
@@ -68,9 +68,9 @@ struct BoardView: View {
 }
 
 struct PiecesBoardView: View {
-//    @Binding var game: Game
+    @State var gameState: GameState
     var body: some View {
-
+        
         
         GeometryReader { geometry in
             
@@ -94,7 +94,7 @@ struct PiecesBoardView: View {
                                 .font(.title2)
                         }
                     }
-                }
+                }.hidden()
                 
                 
                 ForEach(0..<8) { row in
@@ -109,8 +109,7 @@ struct PiecesBoardView: View {
                         
                         ForEach(0..<8) { column in
                             let index = (7 - row) * 8 + column
-                            
-                            PieceView(color: (row + column).isMultiple(of: 2) ? Settings.white : Settings.black, index: index, size: squareSize, game: CurrentState.game, piece: CurrentState.game.toBoardArrayRepresentation()[index])
+                            ChessPieceView(pieceValue: gameState.boardState[index], indexOfSquare: index, width: squareSize, height: squareSize, gameState: gameState)
                         }
                         
                     }
@@ -121,18 +120,6 @@ struct PiecesBoardView: View {
             }   .frame(width: min(geometry.size.width, geometry.size.height), height: min(geometry.size.width, geometry.size.height))
                 .aspectRatio(1, contentMode: .fit)
                 .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
-            
         }
     }
 }
-
-/*
- 
- 
- ChessPieceView(pieceValue: CurrentState.game.toBoardArrayRepresentation()[index], indexOfSquare: index, width: squareSize, height: squareSize, game: CurrentState.game, piecePosition: squareSize)
- 
- */
-
-//#Preview {
-////    BoardView(game: .constant(Game()))
-//}
