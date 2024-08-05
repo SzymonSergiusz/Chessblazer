@@ -69,7 +69,7 @@ func whitePawnOnePush(whitePawns: Bitboard, emptySquares: Bitboard) -> Bitboard 
 
 func whitePawnDoublePush(whitePawns: Bitboard, emptySquares: Bitboard) -> Bitboard {
     let singlePush = whitePawnOnePush(whitePawns: whitePawns, emptySquares: emptySquares)
-    return singlePush << 8 & emptySquares & Bitboard.Masks.rank4
+    return (singlePush << 8) & emptySquares & Bitboard.Masks.rank4
 }
 
 func blackPawnOnePush(blackPawns: Bitboard, emptySquares: Bitboard) -> Bitboard{
@@ -78,21 +78,7 @@ func blackPawnOnePush(blackPawns: Bitboard, emptySquares: Bitboard) -> Bitboard{
 
 func blackPawnDoublePush(blackPawns: Bitboard, emptySquares: Bitboard) -> Bitboard {
     let singlePush = blackPawnOnePush(blackPawns: blackPawns, emptySquares: emptySquares)
-    return singlePush >> 8 & emptySquares & Bitboard.Masks.rank5
-}
-func generateWhitePawnsMoves(game: Game, pawns: Bitboard, moves: inout [Move]) {
-    var whitePawns = pawns
-    let empty = emptySquaresBitboard(bitboards: game.bitboards)
-    
-    while whitePawns != 0 {
-        let pawnFromSquare = Bitboard.popLSB(&whitePawns)
-        let pawn = Bitboard(1 << pawnFromSquare)
-        var movesBitboard = whitePawnOnePush(whitePawns: pawn, emptySquares: empty) | whitePawnDoublePush(whitePawns: pawn, emptySquares: empty) | (generateWhitePawnAttacks(whitePawns: pawn) & Magic.blackPiecesBitboards(bitboards: game.bitboards))
-        while movesBitboard != 0 {
-            let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
-            moves.append(Move(fromSquare: pawnFromSquare, targetSquare: targetSquare))
-        }
-    }
+    return (singlePush >> 8) & emptySquares & Bitboard.Masks.rank5
 }
 
 func generateWhitePawnMoves(game: Game, square: Int, moves: inout [Move]) {
@@ -122,7 +108,6 @@ func generateBlackPawnMoves(game: Game, square: Int, moves: inout [Move]) {
 func generatePawnMoves(game: Game, square: Int, moves: inout [Move]) {
 
     if game.currentTurnColor == .white {
-        var pawns = game.bitboards[Piece.ColoredPieces.whitePawn.rawValue]!
         generateWhitePawnMoves(game: game, square: square, moves: &moves)
     } else {
         var pawns = game.bitboards[Piece.ColoredPieces.blackPawn.rawValue]
@@ -154,6 +139,7 @@ func generateRookMoves(game: Game, square: Int, moves: inout [Move]) {
 //    var movesBitboard = Magic.rookLookupTable[square]![key]!
     var movesBitboard = Magic.rookLookupTable[Magic.KeyTuple(square, blockerBitboard.rawValue)]!
 
+    // seems useless
     if game.currentTurnColor == .white {
         movesBitboard = movesBitboard & ~whitePieces
     } else {
@@ -162,7 +148,7 @@ func generateRookMoves(game: Game, square: Int, moves: inout [Move]) {
     
     #warning("no pin mask check yet")
     //movesBitboard = movesBitboard & getPinMask()
-    movesBitboard.printBoardFromWhitePov()
+
     while movesBitboard != 0 {
         let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
         moves.append(Move(fromSquare: square, targetSquare: targetSquare))
@@ -190,7 +176,6 @@ func generateBishopMoves(game: Game, square: Int, moves: inout [Move]) {
     
     #warning("no pin mask check yet")
     //movesBitboard = movesBitboard & getPinMask()
-    movesBitboard.printBoardFromWhitePov()
 
     while movesBitboard != 0 {
         
@@ -251,11 +236,9 @@ func generateKnightMoves(game: Game, square: Int, moves: inout [Move]) {
 }
 
 func generateAllPossibleMoves(game: Game, moves: inout [Move]) {
-    
+    moves.removeAll()
     for bitboard in game.bitboards {
         if Piece.checkColor(piece: bitboard.key) == game.currentTurnColor {
-            let pieceName = Piece.ValueToPieceDict[bitboard.key]
-            print(pieceName ?? "XD")
             var pieceSquares = [Int]()
             var copyBitboard: Bitboard = bitboard.value
             

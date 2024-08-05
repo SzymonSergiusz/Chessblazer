@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Move {
+class Move: Equatable {
     var fromSquare: Int?
     var targetSquare: Int?
     var promotionPiece: String = ""
@@ -21,6 +21,10 @@ class Move {
     init(fromSquare: Int, targetSquare: Int) {
         self.fromSquare = fromSquare
         self.targetSquare = targetSquare
+    }
+    
+    static func == (lhs: Move, rhs: Move) -> Bool {
+        return (lhs.fromSquare == rhs.fromSquare) && (lhs.targetSquare == rhs.targetSquare)
     }
     
     

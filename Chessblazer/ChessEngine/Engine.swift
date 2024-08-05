@@ -43,7 +43,7 @@ class Engine {
                 if args[2] == "moves" {
                     let moves = args[3..<args.count]
                     for move in moves {
-                        game.makeMove(board: &game.board, move: Move(notation: "move"))
+//                        game.makeMove(board: &game.board, move: Move(notation: "move"))
                     }
                     
                 }
@@ -72,15 +72,12 @@ class Engine {
 //            sendOutput(output: "bestmove \(toNotation)")
             sendOutput(output: "")
         case .stop:
-            let randomMove = game.generatePseudoLegalMoves(forColor: game.currentTurnColor).randomElement() ?? Move(notation: "e2e4")
-            let toNotation = randomMove.moveToNotation()
-            sendOutput(output: "bestmove \(toNotation)")
+            print("")
         case .quit:
             quit = true
             
         case .printBoard:
-            let printer = BoardPrinter()
-            printer.printBoard(board: game.board, emojiMode: true, perspectiveColor: .white)
+            print("")
         
         case .main:
             let game = Game()
@@ -107,18 +104,7 @@ class Engine {
             for move in moves {
                 print(move.moveToNotation())
             }
-            
-        case .pve:
-            while true {
-                let input = readLine()
-                game.makeMove(board: &game.board, move: Move(notation: input!))
-                game.toggleColor()
-                let computerMove = game.generateLegalMoves(forColor: game.currentTurnColor).randomElement()!
-                game.makeMove(board: &game.board, move: computerMove)
-                game.toggleColor()
-                let printer = BoardPrinter()
-                printer.printBoard(board: game.board, emojiMode: true, perspectiveColor: .white)
-            }
+
         default:
             return
         }

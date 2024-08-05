@@ -6,14 +6,15 @@
 //
 
 import Foundation
-// find better naming
+import SwiftUI
+
+
 class Game {
     
     init() {
         startNewGame()
     }
     
-    var board: [Int] = Array(repeating: 0, count: 64)
     var castlesAvailable: Set<Character> = []
     var enPassant = "-"
     var currentTurnColor: Piece.PieceColor = .white
@@ -27,17 +28,16 @@ class Game {
     
     var isBlackKingChecked = false
     var isWhiteKingChecked = false
+    var currentValidMoves = [Move]()
     
     var bitboards = [Piece.ColoredPieces.RawValue : Bitboard]()
     
     func loadBoardFromFen(fen: String) {
-        board = Array(repeating: 0, count: 64)
-        
         bitboards = [Piece.ColoredPieces.RawValue : Bitboard]()
         
         let args = fen.components(separatedBy: " ")
         currentTurnColor = args[1] == "w" ? .white : .black
-        #warning("todo possible bug here if game starts with startpos moves ....")
+#warning("todo possible bug here if game starts with startpos moves ....")
         for letter in args[2] {
             castlesAvailable.removeAll()
             if letter == "-" { break } else {castlesAvailable.insert(letter)}
@@ -52,186 +52,60 @@ class Game {
             for char in rank {
                 if char.isNumber {
                     for _ in 0..<char.wholeNumberValue! {
-                        board[index] = 0 //empty
                         index+=1
                     }
                 } else {
                     let piece: Int = Piece.combine(type: Piece.PiecesDict[char.lowercased().first!] ?? Piece.PieceType.empty, color: char.isUppercase ? Piece.PieceColor.white : Piece.PieceColor.black)
-                    board[index] = piece
-
-                    #warning("bitboard logic")
-                    bitboards[piece] = (bitboards[piece]  ?? Bitboard(0)) | (Bitboard(1) << Bitboard(UInt64(index)))
                     
+#warning("bitboard logic")
+                    //                    bitboards[piece] = (bitboards[piece] ?? Bitboard(0)) | (Bitboard(1) << Bitboard(UInt64(index)))
+                    bitboards[piece] = (bitboards[piece] ?? Bitboard(0)) | (Bitboard(1) << Bitboard(UInt64(index)))
                     
                     index+=1
                     
                 }
             }
         }
+        generateAllPossibleMoves(game: self, moves: &currentValidMoves)
     }
     
-    func toBoardArrayRepresentation() -> [Int] {
-        var array = Array(repeating: 0, count: 64)
-        let copy = bitboards
-        
-        for bitboard in copy {
-            var pieceBitboard = bitboard.value
-            while pieceBitboard != 0 {
-                let piece = bitboard.key
-                let index = Bitboard.popLSB(&pieceBitboard)
-                
-                array[index] = piece
-            }
-        }
-        return array
-    }
+    
     
     func startNewGame() {
         loadBoardFromFen(fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     }
     
-    #warning("not all possibilities handled")
-    func generateLegalMoves(forColor color: Piece.PieceColor) -> [Move] {
-        let pseudoMoves = generatePseudoLegalMoves(forColor: color)
-        var legalMoves = [Move]()
-        for move in pseudoMoves {
-            var newBoardAfterMove = board
-            makeMove(board: &newBoardAfterMove, move: move)
-            if !checkIfCheck(board: newBoardAfterMove) {
-                legalMoves.append(move)
-            }
-        }
-        
-        return legalMoves
-    }
-    
-    func generatePseudoLegalMoves(forColor color: Piece.PieceColor) -> [Move] {
-        var moves = [Move]()
-        for (fromSquare, piece) in board.enumerated() {
-            if Piece.checkColor(piece: piece) == color {
-                if Piece.isSliding(piece: piece) {
-                    generateSlidingMoves(moves: &moves, piece: piece, fromSquare: fromSquare)
-                } else if Piece.isLeaping(piece: piece) {
-                    generateLeapingMoves(moves: &moves, piece: piece, fromSquare: fromSquare)
-                }
-            }
-        }
-        return moves
-    }
-    
-    func checkIfCheck(board: [Int]) -> Bool {
-        guard let whiteKingsPosition = board.firstIndex(of: 9),
-              let blackKingsPosition = board.firstIndex(of: 17) else {
-            return false
-        }
-        
-        let possibleMoves = generatePseudoLegalMoves(forColor: currentTurnColor)
-        
-        for move in possibleMoves {
-            if move.targetSquare == whiteKingsPosition && board[move.fromSquare!] < 16 {
-                return true
-            }
-            if move.targetSquare == blackKingsPosition && board[move.fromSquare!] > 16 {
-                return true
-            }
-        }
-        
-        return false
-    }
-    
-    private func generateSlidingMoves(moves: inout [Move], piece: Int, fromSquare: Int) {
-        let directionOffsets = [8, -8, -1, 1, 7, -7, 9, -9]
-        let start = Piece.isType(piece: piece, typeToCheck: .bishop) ? 4 : 0
-        let end = Piece.isType(piece: piece, typeToCheck: .rook) ? 4 : 8
-        
-        for direction in start..<end {
-            for j in 0..<Game.squaresToEdge[fromSquare]![direction] {
-                let targetSquare = fromSquare + directionOffsets[direction] * (j+1)
-                
-                if board[targetSquare] != 0 {
-                    if (Piece.checkColor(piece: piece) == Piece.checkColor(piece: board[targetSquare])) {
-                        break;
-                        
-                    }
-                    moves.append(Move(fromSquare: fromSquare, targetSquare: targetSquare))
-                    
-                    if (Piece.checkColor(piece: piece) != Piece.checkColor(piece: board[targetSquare])) {
-                        break;
-                    }
-                } else {
-                    moves.append(Move(fromSquare: fromSquare, targetSquare: targetSquare))
-                }
-            }
-        }
-    }
-    
-    private func generateLeapingMoves(moves: inout [Move], piece: Int, fromSquare: Int) {
-        if Piece.isType(piece: piece, typeToCheck: .pawn) {
-            let moveValue = Piece.checkColor(piece: piece) == .white ? 8 : -8
-            let targetSquare = fromSquare + moveValue
-            
-            if board[targetSquare] == 0 {
-                moves.append(Move(fromSquare: fromSquare, targetSquare: targetSquare))
-                if (8...15).contains(fromSquare) || (48...55).contains(fromSquare) {
-                    let firstPawnMove = fromSquare + 2 * moveValue
-                    if board[firstPawnMove] == 0 {
-                        moves.append(Move(fromSquare: fromSquare, targetSquare: firstPawnMove))
-                    }
-                }
-            }
-            
-            let attackOffsets = Piece.checkColor(piece: piece) == .white ? [7, 9] : [-7, -9]
-            for offset in attackOffsets {
-                let attackSquare = fromSquare + offset
-                if (0...63).contains(attackSquare) {
-                    if board[attackSquare] != 0 && Piece.areOppositeColors(piece1: board[attackSquare], piece2: piece) {
-                        moves.append(Move(fromSquare: fromSquare, targetSquare: attackSquare))
-                    }
-                }
-            }
-            
-            if let enPassantSquare = Move.translateFromNotationToSquare(enPassant),
-               //   attackOffsets.contains(enPassantSquare - fromSquare)
-               attackOffsets.contains(enPassantSquare)
-            {
-                moves.append(Move(fromSquare: fromSquare, targetSquare: enPassantSquare))
-            }
-            
-            if (0...7).contains(targetSquare) || (56...63).contains(targetSquare) {
-                #warning("promotion not handled")
-                print("promocja")
-            }
-        } else if Piece.isType(piece: piece, typeToCheck: .knight) {
-            let knightMoves = [10, -10, 6, -6, 15, -15, 17, -17]
-            for offset in knightMoves {
-                let targetSquare = fromSquare + offset
-                if (0...63).contains(targetSquare) {
-                    if board[targetSquare] == 0 || Piece.areOppositeColors(piece1: piece, piece2: board[targetSquare]) {
-                        moves.append(Move(fromSquare: fromSquare, targetSquare: targetSquare))
-                    }
-                }
-            }
-        } else if Piece.isType(piece: piece, typeToCheck: .king) {
-            let kingMoves = [1, -1, 8, -8, 7, -7, 9, -9]
-            for offset in kingMoves {
-                let targetSquare = fromSquare + offset
-                if (0...63).contains(targetSquare) {
-                    if board[targetSquare] == 0 || Piece.areOppositeColors(piece1: piece, piece2: board[targetSquare]) {
-                        moves.append(Move(fromSquare: fromSquare, targetSquare: targetSquare))
-                    }
-                }
-            }
-        }
-    }
-    
-    func makeMove(board: inout [Int], move: Move) {
+    func makeMove(pieceValue: Int, move: Move) {
         guard let from = move.fromSquare else { return }
         guard let target = move.targetSquare else { return }
-        
-        board[target] = board[from]
-        board[from] = 0
-        
-//        toggleColor()
+
+        if currentValidMoves.contains(move) {
+            var bitboardsCopy = bitboards
+            guard var bitboard = bitboardsCopy[pieceValue] else { return }
+
+            bitboard = bitboard & ~(Bitboard(1) << Bitboard(from))
+            bitboard = bitboard | (Bitboard(1) << Bitboard(target))
+            bitboardsCopy[pieceValue] = bitboard
+
+
+            for (key, value) in bitboardsCopy {
+                if (key != pieceValue) && (value & (Bitboard(1) << Bitboard(target))) != 0 {
+                    bitboardsCopy[key] = bitboardsCopy[key]! & ~(Bitboard(1) << Bitboard(target))
+                    break
+                }
+            }
+
+            bitboards = bitboardsCopy
+
+            let boardPrinter = BoardPrinter()
+            print("Engine board:")
+            boardPrinter.printBoard(board: toBoardArrayRepresentation(), emojiMode: true, perspectiveColor: .white)
+
+            toggleColor()
+            print("\(currentTurnColor) to move")
+
+            generateAllPossibleMoves(game: self, moves: &currentValidMoves)
+        }
     }
     
     func toggleColor() {
@@ -266,5 +140,33 @@ class Game {
         }
         return dict
     }()
+    
+    func toBoardArrayRepresentation() -> [Int] {
+        var array = Array(repeating: 0, count: 64)
+        let copy = bitboards
+        
+        for bitboard in copy {
+            var pieceBitboard = bitboard.value
+            while pieceBitboard != 0 {
+                let piece = bitboard.key
+                let index = Bitboard.popLSB(&pieceBitboard)
+                
+                array[index] = piece
+            }
+        }
+        return array
+    }
+    
+    private func toBitboardsRepresentation(array: [Int]) -> [Piece.ColoredPieces.RawValue : Bitboard] {
+        var bitboards = [Piece.ColoredPieces.RawValue : Bitboard]()
+        
+        for (index, piece) in array.enumerated() {
+            if piece > 0 {
+                bitboards[piece] = (bitboards[piece] ?? Bitboard(0)) | (Bitboard(1) << Bitboard(UInt64(index)))
+            }
+        }
+        
+        return bitboards
+    }
 }
 

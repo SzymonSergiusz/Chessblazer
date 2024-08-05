@@ -20,7 +20,9 @@ class Magic {
         var fileMask = Bitboard.Masks.fileA << Bitboard(file)
         
         //excluding A and H file
-        rankMask = (rankMask & ~Bitboard.Masks.fileA) & ~Bitboard.Masks.fileH
+//        rankMask = (rankMask & ~Bitboard.Masks.fileA) & ~Bitboard.Masks.fileH
+//        fileMask = fileMask & ~(Bitboard.Masks.rank1 | Bitboard.Masks.rank8)
+        rankMask = rankMask & ~(Bitboard.Masks.fileA | Bitboard.Masks.fileH)
         fileMask = fileMask & ~(Bitboard.Masks.rank1 | Bitboard.Masks.rank8)
         return rankMask | fileMask
     }
@@ -121,11 +123,17 @@ class Magic {
                 
                 let newSquare = newRow * 8 + newCol
                 
-                
-                if (blocker >> Bitboard(newSquare) & Bitboard(1)) != 0 {
-                    break
-                }
                 legalMoves = legalMoves | Bitboard(1) << Bitboard(newSquare)
+
+                if (blocker.rawValue & (1 << newSquare)) != 0 {
+                            break
+                }
+                
+//                if (blocker >> Bitboard(newSquare) & Bitboard(1)) != 0 {
+//                    break
+//                }
+//                                legalMoves = legalMoves | Bitboard(1) << Bitboard(newSquare)
+
                 currentSquare = newSquare
             }
         }

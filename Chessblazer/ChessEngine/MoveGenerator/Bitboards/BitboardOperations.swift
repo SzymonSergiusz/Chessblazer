@@ -87,4 +87,13 @@ extension Bitboard {
     func countBits(_ bitboard: Bitboard) -> Int {
         return bitboard.rawValue.nonzeroBitCount
     }
+    
+    func swapBits(bitboard: inout Bitboard, firstPosition: Int, secondPosition: Int) {
+        let firstBit = (bitboard.rawValue >> firstPosition) & 1
+        let secondBit = (bitboard.rawValue >> secondPosition) & 1
+        
+        if firstBit != secondBit {
+            bitboard = bitboard ^ Bitboard((1 << firstPosition) | (1 << secondPosition))
+        }
+    }
 }
