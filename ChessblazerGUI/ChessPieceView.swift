@@ -52,7 +52,7 @@ struct ChessPieceView: View {
                             newIndex = indexOfSquare + (rows*8)+(-columns)
                             
                             print("new square: \(BoardUtils.squareToNotation(square: newIndex)) \(newIndex)")
-                            
+
                             if (0...63).contains(newIndex) {
                                 let validTargetSquares = gameState.validTargetSquares(fromSquare: indexOfSquare)
                                 

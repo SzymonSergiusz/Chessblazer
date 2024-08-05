@@ -18,16 +18,12 @@ class GameState {
     var validMoves = [Move]()
     var currentColorToMove = Piece.PieceColor.white
     
-    func generateValidMoves() {
-        generateAllPossibleMoves(game: game, moves: &validMoves)
-    }
-    
     func startNewGame() {
         boardState.removeAll()
         validMoves.removeAll()
         currentColorToMove = Piece.PieceColor.white
         tappedPieceTargets.removeAll()
-        
+        validMoves = game.currentValidMoves
         game.startNewGame()
         boardState = game.toBoardArrayRepresentation()
     }
@@ -48,8 +44,11 @@ class GameState {
         tappedPieceTargets.removeAll()
         game.makeMove(pieceValue: boardState[from], move: Move(fromSquare: from, targetSquare: to))
         boardState = game.toBoardArrayRepresentation()
-        generateValidMoves()
+        validMoves = game.currentValidMoves
         currentColorToMove = game.currentTurnColor
+        
+        let bp = BoardPrinter()
+        bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true, perspectiveColor: .white)
     }
     
     func validTargetSquares(fromSquare: Int) -> [Int] {

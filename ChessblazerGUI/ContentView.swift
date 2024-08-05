@@ -8,8 +8,6 @@ struct ContentView: View {
         
         Button("Start new game") {
             gameState.startNewGame()
-            gameState.generateValidMoves()
-            
         }
         
         ZStack {
