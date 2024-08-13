@@ -1,17 +1,16 @@
 //
-//  BoardView.swift
+//  PiecesBoardView.swift
 //  ChessblazerGUI
 //
-//  Created by sergiusz on 01/08/2024.
+//  Created by sergiusz on 06/08/2024.
 //
 
 import SwiftUI
 
-
-struct BoardView: View {
-    
-    @Bindable var gameState: GameState
+struct PiecesBoardView: View {
+    @State var gameState: GameState
     var body: some View {
+        
         
         GeometryReader { geometry in
             
@@ -35,7 +34,7 @@ struct BoardView: View {
                                 .font(.title2)
                         }
                     }
-                }
+                }.hidden()
                 
                 
                 ForEach(0..<8) { row in
@@ -46,12 +45,11 @@ struct BoardView: View {
                             .background(.white)
                             .foregroundColor(.black)
                             .font(.title2)
+                            .hidden()
                         
                         ForEach(0..<8) { column in
                             let index = (7 - row) * 8 + column
-                            
-                            SquareView(color: (row + column).isMultiple(of: 2) ? Settings.lightBrown : Settings.brown, index: index, size: squareSize, piece: gameState.boardState[index], gameState: gameState)
-                            
+                            ChessPieceView(pieceValue: gameState.boardState[index], indexOfSquare: index, width: squareSize, height: squareSize, gameState: gameState)
                         }
                         
                     }
@@ -62,11 +60,13 @@ struct BoardView: View {
             }   .frame(width: min(geometry.size.width, geometry.size.height), height: min(geometry.size.width, geometry.size.height))
                 .aspectRatio(1, contentMode: .fit)
                 .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
-            
         }
     }
 }
 
+
 #Preview {
-    BoardView(gameState: GameState())
+    let gameState = GameState()
+    gameState.startNewGame()
+    return PiecesBoardView(gameState: gameState)
 }

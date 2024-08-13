@@ -7,6 +7,13 @@
 
 import Foundation
 
+struct MoveData {
+    var turn: Int
+    var color: Piece.PieceColor
+    var move: Move
+    var capturedPiece: Int
+}
+
 class Move: Equatable {
     var fromSquare: Int?
     var targetSquare: Int?

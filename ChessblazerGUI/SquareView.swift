@@ -20,14 +20,25 @@ struct SquareView: View {
             Rectangle()
                 .fill(gameState.tappedPieceTargets.contains(index) ? Color.green : color)
                 .frame(width: size, height: size)
+                .overlay(alignment: .center, content: {
+                    Text(String(index)).font(.title3)
+                })
                 .onTapGesture {
                     let square = BoardUtils.squareToNotation(square: index)
                     print("Square tapped: \(square)")
                     gameState.onPieceTap(square: index)
                 }
-                .overlay(alignment: .center, content: {
-                    Text(String(index)).font(.title)
-                })
+                
         }
     }
+}
+
+#Preview {
+    
+    HStack {
+        SquareView(color: Settings.lightBrown, index: 0, size: 150, piece: 0, piecePosition: CGPoint(x: CGFloat(25), y: CGFloat(25)), gameState: GameState())
+        
+        SquareView(color: Settings.brown, index: 0, size: 150, piece: 0, piecePosition: CGPoint(x: CGFloat(25), y: CGFloat(25)), gameState: GameState())
+    }
+
 }

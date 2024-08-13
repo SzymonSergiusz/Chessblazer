@@ -18,6 +18,8 @@ class GameState {
     var validMoves = [Move]()
     var currentColorToMove = Piece.PieceColor.white
     
+    var vsEngine = false
+    
     func startNewGame() {
         boardState.removeAll()
         validMoves.removeAll()
@@ -26,6 +28,16 @@ class GameState {
         validMoves = game.currentValidMoves
         game.startNewGame()
         boardState = game.toBoardArrayRepresentation()
+    }
+    func loadFenGame(fen: String) {
+        #warning("add validation for fen string here")
+        boardState.removeAll()
+        validMoves.removeAll()
+        tappedPieceTargets.removeAll()
+        game.loadBoardFromFen(fen: fen)
+        boardState = game.toBoardArrayRepresentation()
+        validMoves = game.currentValidMoves
+        currentColorToMove = game.currentTurnColor
     }
     
     func onPieceTap(square: Int) {
@@ -49,6 +61,15 @@ class GameState {
         
         let bp = BoardPrinter()
         bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true, perspectiveColor: .white)
+        
+        #warning("to refactor, fast check")
+        if vsEngine && currentColorToMove == .black {
+            let move = validMoves.randomElement()!
+            makeMove(move.fromSquare!, move.targetSquare!)
+        }
+        
+        
+        
     }
     
     func validTargetSquares(fromSquare: Int) -> [Int] {

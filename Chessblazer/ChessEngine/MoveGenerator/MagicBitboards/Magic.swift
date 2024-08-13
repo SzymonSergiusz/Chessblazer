@@ -18,10 +18,6 @@ class Magic {
         
         var rankMask = Bitboard.Masks.rank1 << (Bitboard(rank * 8))
         var fileMask = Bitboard.Masks.fileA << Bitboard(file)
-        
-        //excluding A and H file
-//        rankMask = (rankMask & ~Bitboard.Masks.fileA) & ~Bitboard.Masks.fileH
-//        fileMask = fileMask & ~(Bitboard.Masks.rank1 | Bitboard.Masks.rank8)
         rankMask = rankMask & ~(Bitboard.Masks.fileA | Bitboard.Masks.fileH)
         fileMask = fileMask & ~(Bitboard.Masks.rank1 | Bitboard.Masks.rank8)
         return rankMask | fileMask

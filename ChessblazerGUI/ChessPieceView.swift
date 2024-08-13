@@ -87,7 +87,6 @@ struct ChessPieceView: View {
     }
 }
 
-//#Preview {
-//
-//    ChessPieceView(pieceValue: 18, indexOfSquare: 0, game: .constant(Game()))
-//}
+#Preview {
+    ChessPieceView(pieceValue: 9, indexOfSquare: 0, width: 150, height: 150,gameState: GameState(), piecePosition: CGPoint(x: CGFloat(200), y: CGFloat(200)))
+}

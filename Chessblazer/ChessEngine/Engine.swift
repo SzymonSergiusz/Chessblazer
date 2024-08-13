@@ -42,9 +42,9 @@ class Engine {
             } else if args[1] == "startpos" {
                 if args[2] == "moves" {
                     let moves = args[3..<args.count]
-                    for move in moves {
+//                    for move in moves {
 //                        game.makeMove(board: &game.board, move: Move(notation: "move"))
-                    }
+//                    }
                     
                 }
             }

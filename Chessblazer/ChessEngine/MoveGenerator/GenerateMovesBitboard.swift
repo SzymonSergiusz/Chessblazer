@@ -110,7 +110,6 @@ func generatePawnMoves(game: Game, square: Int, moves: inout [Move]) {
     if game.currentTurnColor == .white {
         generateWhitePawnMoves(game: game, square: square, moves: &moves)
     } else {
-        var pawns = game.bitboards[Piece.ColoredPieces.blackPawn.rawValue]
         generateBlackPawnMoves(game: game, square: square, moves: &moves)
     }
     

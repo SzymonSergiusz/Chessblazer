@@ -15,6 +15,7 @@ class Game {
         startNewGame()
     }
     
+    var gameProgress = [MoveData]()
     var castlesAvailable: Set<Character> = []
     var enPassant = "-"
     var currentTurnColor: Piece.PieceColor = .white
@@ -56,9 +57,7 @@ class Game {
                     }
                 } else {
                     let piece: Int = Piece.combine(type: Piece.PiecesDict[char.lowercased().first!] ?? Piece.PieceType.empty, color: char.isUppercase ? Piece.PieceColor.white : Piece.PieceColor.black)
-                    
-#warning("bitboard logic")
-                    //                    bitboards[piece] = (bitboards[piece] ?? Bitboard(0)) | (Bitboard(1) << Bitboard(UInt64(index)))
+
                     bitboards[piece] = (bitboards[piece] ?? Bitboard(0)) | (Bitboard(1) << Bitboard(UInt64(index)))
                     
                     index+=1
@@ -95,6 +94,9 @@ class Game {
                 }
             }
 
+            #warning("add move data")
+            
+            
             bitboards = bitboardsCopy
 
             let boardPrinter = BoardPrinter()
@@ -106,6 +108,11 @@ class Game {
 
             generateAllPossibleMoves(game: self, moves: &currentValidMoves)
         }
+    }
+    
+    func undoneMove() {
+        #warning("using move data")
+
     }
     
     func toggleColor() {
@@ -169,4 +176,5 @@ class Game {
         return bitboards
     }
 }
+
 
