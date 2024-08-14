@@ -81,30 +81,22 @@ class Engine {
         
         case .main:
             let game = Game()
-//            game.startNewGame()
-            game.loadBoardFromFen(fen: "rnbqkbnr/1ppp1ppp/8/4p3/4P3/8/1PPPQPPP/RNB1KBNR w KQk - 0 3")
+            game.startNewGame()
+//            game.loadBoardFromFen(fen: "rnbqkbnr/1ppp1ppp/8/4p3/4P3/8/1PPPQPPP/RNB1KBNR w KQk - 0 3")
 //            game.loadBoardFromFen(fen: "8/8/8/8/3B4/8/8/8 w - - 0 1")
-            var moves = [Move]()
+            print(evaluate(game: game))
+        
+        case .promotion:
+            let game = Game()
+            let bp = BoardPrinter()
+            
+            
+            game.loadBoardFromFen(fen: "8/PPP5/n7/Q7/3K1k2/8/1p1p1p1p/8 w - - 0 1")
+            bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true)
 
+            game.makeMove(move: Move(notation: "a7a8Q"))
+            game.makeMove(move: Move(notation: "b2b1n"))
             
-//            Magic.generateBishopMask(square: 12).printBoardFromWhitePov() correct
-            
-            
-//            for b in game.bitboards {
-//                b.value.printBoardFromWhitePov()
-//            }
-//            game.bitboards[Piece.ColoredPieces.whiteBishop.rawValue]?.printBoardFromWhitePov()
-            
-//            Magic.createBishopLegalMoves(square: 0, blocker: Bitboard.Masks.rank4).printBoardFromWhitePov()
-//            Magic.createRookLegalMoves(square: 0, blocker:  Bitboard.Masks.rank4).printBoardFromWhitePov()
-            
-
-            generateAllPossibleMoves(game: game, moves: &moves)
-
-            for move in moves {
-                print(move.moveToNotation())
-            }
-
         default:
             return
         }
@@ -131,6 +123,7 @@ enum CommandsGUItoEngine: String {
     case printBoard
     case pve
     case main
+    case promotion
 }
 
 enum CommandsEnginetoGUI {

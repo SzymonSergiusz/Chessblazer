@@ -8,13 +8,19 @@
 import Foundation
 
 struct MoveData {
+    var piece: Int
     var turn: Int
     var color: Piece.PieceColor
     var move: Move
-    var capturedPiece: Int
+    var capturedPiece: Int?
 }
 
+
+
 class Move: Equatable {
+    
+    var castling = false
+    
     var fromSquare: Int?
     var targetSquare: Int?
     var promotionPiece: String = ""
@@ -87,4 +93,23 @@ class Move: Equatable {
         let rankIndex = rankNumber - 1
         return 8 * rankIndex + fileIndex
     }
+}
+
+class CastlingMove: Move {
+    var rookDestination: Int
+    var kingDestination: Int
+
+    init(fromSquare: Int, targetSquare: Int, rookDestination: Int, kingDestination: Int) {
+        self.rookDestination = rookDestination
+        self.kingDestination = kingDestination
+        super.init(fromSquare: fromSquare, targetSquare: targetSquare)
+        self.castling = true
+
+    }
+
+    
+}
+
+class PromotionMove: Move {
+    
 }

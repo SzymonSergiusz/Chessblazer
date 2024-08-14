@@ -29,18 +29,22 @@ class Game {
     
     var isBlackKingChecked = false
     var isWhiteKingChecked = false
-    var currentValidMoves = [Move]()
+    var currentValidMoves: [Move] = [Move]()
     
     var bitboards = [Piece.ColoredPieces.RawValue : Bitboard]()
     
     func loadBoardFromFen(fen: String) {
-        bitboards = [Piece.ColoredPieces.RawValue : Bitboard]()
+
+        for piece in Piece.ColoredPieces.allCases {
+            bitboards[piece.rawValue] = Bitboard(0)
+        }
         
         let args = fen.components(separatedBy: " ")
         currentTurnColor = args[1] == "w" ? .white : .black
 #warning("todo possible bug here if game starts with startpos moves ....")
+        castlesAvailable.removeAll()
         for letter in args[2] {
-            castlesAvailable.removeAll()
+            
             if letter == "-" { break } else {castlesAvailable.insert(letter)}
         }
         // in fly
@@ -57,7 +61,7 @@ class Game {
                     }
                 } else {
                     let piece: Int = Piece.combine(type: Piece.PiecesDict[char.lowercased().first!] ?? Piece.PieceType.empty, color: char.isUppercase ? Piece.PieceColor.white : Piece.PieceColor.black)
-
+                    
                     bitboards[piece] = (bitboards[piece] ?? Bitboard(0)) | (Bitboard(1) << Bitboard(UInt64(index)))
                     
                     index+=1
@@ -73,47 +77,129 @@ class Game {
     func startNewGame() {
         loadBoardFromFen(fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     }
-    
-    func makeMove(pieceValue: Int, move: Move) {
+    func makeMoveOperations(pieceValue: Int, from: Int, target: Int) {
+        var bitboardsCopy = bitboards
+        guard var bitboard = bitboardsCopy[pieceValue] else { return }
+        bitboard = bitboard & ~(Bitboard(1) << Bitboard(from))
+        bitboard = bitboard | (Bitboard(1) << Bitboard(target))
+        bitboardsCopy[pieceValue] = bitboard
+        for (key, value) in bitboardsCopy {
+            if (key != pieceValue) && (value & (Bitboard(1) << Bitboard(target))) != 0 {
+                bitboardsCopy[key] = bitboardsCopy[key]! & ~(Bitboard(1) << Bitboard(target))
+                break
+            }
+        }
+        bitboards = bitboardsCopy
+    }
+    func makeMove(move: Move) {
         guard let from = move.fromSquare else { return }
         guard let target = move.targetSquare else { return }
-
+        let board = toBoardArrayRepresentation()
+        let pieceValue = board[from]
+        
         if currentValidMoves.contains(move) {
-            var bitboardsCopy = bitboards
-            guard var bitboard = bitboardsCopy[pieceValue] else { return }
+            if let castlingMove = move as? CastlingMove {
+                makeMoveOperations(pieceValue: board[from], from: from, target: castlingMove.kingDestination)
+                makeMoveOperations(pieceValue: board[target], from: target, target: castlingMove.rookDestination)
+                
+                if board[from] == Piece.ColoredPieces.whiteKing.rawValue {
+                    castlesAvailable.remove("K")
+                    castlesAvailable.remove("Q")
+                } else if board[from] == Piece.ColoredPieces.blackKing.rawValue {
+                    castlesAvailable.remove("k")
+                    castlesAvailable.remove("q")
+                }
+                
+                
+            }  else if move.promotionPiece.count > 0 {
 
-            bitboard = bitboard & ~(Bitboard(1) << Bitboard(from))
-            bitboard = bitboard | (Bitboard(1) << Bitboard(target))
-            bitboardsCopy[pieceValue] = bitboard
-
-
-            for (key, value) in bitboardsCopy {
-                if (key != pieceValue) && (value & (Bitboard(1) << Bitboard(target))) != 0 {
-                    bitboardsCopy[key] = bitboardsCopy[key]! & ~(Bitboard(1) << Bitboard(target))
+                guard let newPiece = Piece.ColoredPiecesDict[move.promotionPiece] else { return }
+                var bitboardsCopy = bitboards
+                print(newPiece)
+                guard var newPieceBitboard = bitboardsCopy[newPiece.rawValue] else { return }
+                newPieceBitboard = newPieceBitboard | Bitboard(1) << Bitboard(target)
+                
+                let pawn = board[from]
+                guard var pawnBitboard = bitboardsCopy[pawn] else { return }
+                pawnBitboard = pawnBitboard & ~(Bitboard(1) << Bitboard(from))
+                
+                bitboardsCopy[newPiece.rawValue] = newPieceBitboard
+                bitboardsCopy[pawn] = pawnBitboard
+                
+                bitboards = bitboardsCopy
+                
+            } else {
+                makeMoveOperations(pieceValue: pieceValue, from: from, target: target)
+                
+                switch pieceValue {
+                case Piece.ColoredPieces.whiteKing.rawValue:
+                    castlesAvailable.remove("K")
+                    castlesAvailable.remove("Q")
+                    
+                case Piece.ColoredPieces.blackKing.rawValue:
+                    castlesAvailable.remove("k")
+                    castlesAvailable.remove("q")
+                    
+                case Piece.ColoredPieces.whiteRook.rawValue:
+                    if from == 0 {
+                        castlesAvailable.remove("Q")
+                    } else if from == 7 {
+                        castlesAvailable.remove("K")
+                    }
+                case Piece.ColoredPieces.blackRook.rawValue:
+                    if from == 56 {
+                        castlesAvailable.remove("q")
+                    } else if from == 63 {
+                        castlesAvailable.remove("k")
+                    }
+                default:
                     break
                 }
+                
             }
-
-            #warning("add move data")
             
+            #warning("handle castling and promotion into data")
+            gameProgress.append(MoveData(piece: pieceValue, turn: fullMoves, color: currentTurnColor, move: move, capturedPiece: toBoardArrayRepresentation()[target] > 0 ? toBoardArrayRepresentation()[target] : nil))
             
-            bitboards = bitboardsCopy
-
             let boardPrinter = BoardPrinter()
-            print("Engine board:")
             boardPrinter.printBoard(board: toBoardArrayRepresentation(), emojiMode: true, perspectiveColor: .white)
-
+            
             toggleColor()
-            print("\(currentTurnColor) to move")
-
             generateAllPossibleMoves(game: self, moves: &currentValidMoves)
         }
     }
     
+    
     func undoneMove() {
-        #warning("using move data")
-
+        
+        guard let moveData = gameProgress.last else { return }
+        let move = moveData.move
+        let pieceValue = moveData.piece
+        let capturedPiece = moveData.capturedPiece
+        
+        guard let from = move.fromSquare else { return }
+        guard let target = move.targetSquare else { return }
+        
+        var bitboardsCopy = bitboards
+        guard var bitboard = bitboardsCopy[pieceValue] else { return }
+        
+        bitboard = bitboard & ~(Bitboard(1) << Bitboard(target))
+        bitboard = bitboard | (Bitboard(1) << Bitboard(from))
+        bitboardsCopy[pieceValue] = bitboard
+        
+        if let capturedPieceValue = capturedPiece {
+            bitboardsCopy[capturedPieceValue] = bitboardsCopy[capturedPieceValue]! | (Bitboard(1) << Bitboard(target))
+        }
+        
+        bitboards = bitboardsCopy
+        
+        gameProgress.removeLast()
+        toggleColor()
+        print("\(currentTurnColor) to move")
+        
+        generateAllPossibleMoves(game: self, moves: &currentValidMoves)
     }
+    
     
     func toggleColor() {
         if currentTurnColor == .white {
@@ -122,31 +208,6 @@ class Game {
             currentTurnColor = .white
         }
     }
-    
-    static let squaresToEdge: [Int: [Int]] = {
-        var dict = [Int: [Int]]()
-        for file in 0..<8 {
-            for rank in 0..<8 {
-                let numNorth = 7 - rank
-                let numSouth = rank
-                let numWest = file
-                let numEast = 7 - file
-                let indexOfSquare = 8 * rank + file
-                
-                dict[indexOfSquare] = [
-                    numNorth,
-                    numSouth,
-                    numWest,
-                    numEast,
-                    min(numNorth, numWest),
-                    min(numSouth, numEast),
-                    min(numNorth, numEast),
-                    min(numSouth, numWest),
-                ]
-            }
-        }
-        return dict
-    }()
     
     func toBoardArrayRepresentation() -> [Int] {
         var array = Array(repeating: 0, count: 64)

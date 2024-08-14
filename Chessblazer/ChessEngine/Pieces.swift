@@ -24,7 +24,7 @@ class Piece {
         case black = 16
     }
     
-    enum ColoredPieces: Int {
+    enum ColoredPieces: Int, CaseIterable {
         case empty = 0
         case blackKing = 17
         case blackPawn = 18
@@ -88,6 +88,24 @@ class Piece {
         "b": PieceType.bishop,
         "r": PieceType.rook,
         "q": PieceType.queen
+    ]
+    
+    static let ColoredPiecesDict: [String: ColoredPieces] = [
+        "0": ColoredPieces.empty,
+        "k": ColoredPieces.blackKing,
+        "p": ColoredPieces.blackPawn,
+        "n": ColoredPieces.blackKnight,
+        "b": ColoredPieces.blackBishop,
+        "r": ColoredPieces.blackRook,
+        "q": ColoredPieces.blackQueen,
+        
+        "K": ColoredPieces.whiteKing,
+        "P": ColoredPieces.whitePawn,
+        "N": ColoredPieces.whiteKnight,
+        "B": ColoredPieces.whiteBishop,
+        "R": ColoredPieces.whiteRook,
+        "Q": ColoredPieces.whiteQueen
+        
     ]
     
     static var ValueToPieceDict: [Int: Character] = [

@@ -7,7 +7,34 @@
 
 import Foundation
 
+extension Array where Element == Int {
+    func mirrored() -> [Int] {
+        var mirroredTable = [Int]()
+        for i in stride(from: 56, through: 0, by: -8) {
+            mirroredTable.append(contentsOf: self[i..<i+8])
+        }
+        return mirroredTable
+    }
+}
+
 class PieceSquareTables {
+    
+    
+    static let tables: [Piece.ColoredPieces: [Int]] = [
+        .whiteKing: kingMidgameTable,
+        .whitePawn: pawnTable,
+        .whiteKnight: knightTable,
+        .whiteRook: rookTable,
+        .whiteQueen: queenTable,
+        .whiteBishop: bishopTable,
+        
+        .blackKing: kingMidgameTable.mirrored(),
+        .blackPawn: pawnTable.mirrored(),
+        .blackKnight: knightTable,
+        .blackRook: rookTable,
+        .blackQueen: queenTable,
+        .blackBishop: bishopTable,
+    ]
     
     static let pawnTable: [Int] = [
         0,  0,  0,  0,  0,  0,  0,  0,
@@ -53,43 +80,27 @@ class PieceSquareTables {
         0,  0,  0,  0,  0,  0,  0,  0,
     ]
     
-    /*
-     
-     -20,-10,-10, -5, -5,-10,-10,-20,
-     -10,  0,  0,  0,  0,  0,  0,-10,
-     -10,  0,  5,  5,  5,  5,  0,-10,
-      -5,  0,  5,  5,  5,  5,  0, -5,
-       0,  0,  5,  5,  5,  5,  0, -5,
-     -10,  5,  5,  5,  5,  5,  0,-10,
-     -10,  0,  5,  0,  0,  0,  0,-10,
-     -20,-10,-10, -5, -5,-10,-10,-20
-     
-     */
     static let queenTable: [Int] = [
-    
-    
-    
+        -20,-10,-10, -5, -5,-10,-10,-20,
+         -10,  0,  5,  0,  0,  0,  0,-10,
+         -10,  5,  5,  5,  5,  5,  0,-10,
+         0,  0,  5,  5,  5,  5,  0, -5,
+         -5,  0,  5,  5,  5,  5,  0, -5,
+         -10,  0,  5,  5,  5,  5,  0,-10,
+         -10,  0,  0,  0,  0,  0,  0,-10,
+         -20,-10,-10, -5, -5,-10,-10,-20,
     ]
     
-    
-    
-#warning("to check for blacks")
-    static func getKnightTable(color: Piece.PieceColor) -> [Int] {
-        if color == .white {
-            return knightTable
-        } else {
-            
-            return knightTable.reversed()
-        }
-    }
-    
-        
-    static func getPawnTable(color: Piece.PieceColor) -> [Int] {
-        if color == .white {
-            return pawnTable
-        } else {
-            return pawnTable.reversed()
-        }
-    }
-    
+
+#warning("add also king endgame table")
+    static let kingMidgameTable: [Int] = [
+        20, 30, 10,  0,  0, 10, 30, 20,
+        20, 20,  0,  0,  0,  0, 20, 20,
+        -10,-20,-20,-20,-20,-20,-20,-10,
+        -20,-30,-30,-40,-40,-30,-30,-20,
+        -30,-40,-40,-50,-50,-40,-40,-30,
+        -30,-40,-40,-50,-50,-40,-40,-30,
+        -30,-40,-40,-50,-50,-40,-40,-30,
+        -30,-40,-40,-50,-50,-40,-40,-30,
+    ]
 }
