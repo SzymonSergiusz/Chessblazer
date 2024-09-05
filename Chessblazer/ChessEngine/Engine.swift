@@ -80,14 +80,21 @@ class Engine {
             print("")
         
         case .main:
-            let game = Game()
+            var game = Game()
             game.startNewGame()
 //            game.loadBoardFromFen(fen: "rnbqkbnr/1ppp1ppp/8/4p3/4P3/8/1PPPQPPP/RNB1KBNR w KQk - 0 3")
 //            game.loadBoardFromFen(fen: "8/8/8/8/3B4/8/8/8 w - - 0 1")
             print(evaluate(game: game))
-        
+
+        case .perft:
+            print(perftTest(depth: 1))
+            print(perftTest(depth: 2))
+            print(perftTest(depth: 3))
+            print(perftTest(depth: 4))
+//            print(perft(depth: 4))
+            
         case .promotion:
-            let game = Game()
+            var game = Game()
             let bp = BoardPrinter()
             
             
@@ -124,6 +131,7 @@ enum CommandsGUItoEngine: String {
     case pve
     case main
     case promotion
+    case perft
 }
 
 enum CommandsEnginetoGUI {
