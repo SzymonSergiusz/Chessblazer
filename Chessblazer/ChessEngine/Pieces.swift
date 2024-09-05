@@ -22,6 +22,15 @@ class Piece {
     enum PieceColor: Int {
         case white = 8
         case black = 16
+        
+        
+        func getOppositeColor() -> PieceColor {
+            if self == .white {
+                return .black
+            } else {
+                return .white
+            }
+        }
     }
     
     enum ColoredPieces: Int, CaseIterable {
@@ -56,6 +65,7 @@ class Piece {
         return PieceType(rawValue: noColorPiece) ?? PieceType.empty
         
     }
+    
     
     static func checkColor(piece: Int) -> Piece.PieceColor {
         if piece / Piece.PieceColor.black.rawValue == 1 {

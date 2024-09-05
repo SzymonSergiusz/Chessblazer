@@ -6,3 +6,94 @@
 //
 
 import Foundation
+
+// Moves
+func whitePawnOnePush(whitePawns: Bitboard, emptySquares: Bitboard) -> Bitboard {
+    return (whitePawns << 8) & emptySquares
+}
+
+func whitePawnDoublePush(whitePawns: Bitboard, emptySquares: Bitboard) -> Bitboard {
+    let singlePush = whitePawnOnePush(whitePawns: whitePawns, emptySquares: emptySquares)
+    return (singlePush << 8) & emptySquares & Bitboard.Masks.rank4
+}
+
+func blackPawnOnePush(blackPawns: Bitboard, emptySquares: Bitboard) -> Bitboard{
+    return (blackPawns >> 8) & emptySquares
+}
+
+func blackPawnDoublePush(blackPawns: Bitboard, emptySquares: Bitboard) -> Bitboard {
+    let singlePush = blackPawnOnePush(blackPawns: blackPawns, emptySquares: emptySquares)
+    return (singlePush >> 8) & emptySquares & Bitboard.Masks.rank5
+}
+
+// Attacks
+func generateWhitePawnAttacks(whitePawns: Bitboard) -> Bitboard {
+    let whitePawnAttacks = ((whitePawns << 9) & ~Bitboard.Masks.fileA) |
+        ((whitePawns << 7) & ~Bitboard.Masks.fileH)
+    return whitePawnAttacks
+}
+
+func generateBlackPawnAttacks(blackPawns: Bitboard) -> Bitboard {
+    let blackPawnAttacks = ((blackPawns >> 7) & ~Bitboard.Masks.fileA) | ((blackPawns >> 9) & ~Bitboard.Masks.fileH)
+    return blackPawnAttacks
+}
+
+
+func generateWhitePawnMoves(game: Game, square: Int, moves: inout [Move]) {
+    let empty = emptySquaresBitboard(bitboards: game.bitboards)
+    
+    let pawn = Bitboard(1 << square)
+    var movesBitboard = whitePawnOnePush(whitePawns: pawn, emptySquares: empty) | whitePawnDoublePush(whitePawns: pawn, emptySquares: empty) | (generateWhitePawnAttacks(whitePawns: pawn) & Magic.blackPiecesBitboards(bitboards: game.bitboards))
+    while movesBitboard != 0 {
+        let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
+        moves.append(Move(fromSquare: square, targetSquare: targetSquare))
+    }
+}
+
+func generateWhitePawnAttacks(game: Game, square: Int, moves: inout [Move]) {
+    let pawn = Bitboard(1 << square)
+    var movesBitboard = generateWhitePawnAttacks(whitePawns: pawn)
+    while movesBitboard != 0 {
+        let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
+        moves.append(Move(fromSquare: square, targetSquare: targetSquare))
+    }
+}
+
+func generateBlackPawnAttacks(game: Game, square: Int, moves: inout [Move]) {
+    let pawn = Bitboard(1 << square)
+    var movesBitboard = generateBlackPawnAttacks(blackPawns: pawn)
+    while movesBitboard != 0 {
+        let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
+        moves.append(Move(fromSquare: square, targetSquare: targetSquare))
+    }
+}
+
+
+func generateBlackPawnMoves(game: Game, square: Int, moves: inout [Move]) {
+    
+    let empty = emptySquaresBitboard(bitboards: game.bitboards)
+    
+    let pawn = Bitboard(1 << square)
+    var movesBitboard = blackPawnOnePush(blackPawns: pawn, emptySquares: empty) | blackPawnDoublePush(blackPawns: pawn, emptySquares: empty) | (generateBlackPawnAttacks(blackPawns: pawn) & Magic.whitePiecesBitboards(bitboards: game.bitboards))
+    while movesBitboard != 0 {
+        let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
+        moves.append(Move(fromSquare: square, targetSquare: targetSquare))
+    }
+}
+
+func generatePawnMoves(game: Game, square: Int, moves: inout [Move]) {
+
+    if game.currentTurnColor == .white {
+        generateWhitePawnMoves(game: game, square: square, moves: &moves)
+    } else {
+        generateBlackPawnMoves(game: game, square: square, moves: &moves)
+    }
+}
+func generatePawnAttacks(game: Game, square: Int, moves: inout [Move]) {
+
+    if game.currentTurnColor.getOppositeColor() == .white {
+        generateWhitePawnAttacks(game: game, square: square, moves: &moves)
+    } else {
+        generateBlackPawnAttacks(game: game, square: square, moves: &moves)
+    }
+}

@@ -13,11 +13,17 @@ struct MoveData {
     var color: Piece.PieceColor
     var move: Move
     var capturedPiece: Int?
+    var bitboards: [Piece.ColoredPieces.RawValue : Bitboard]
+    var castles: Set<Character>
 }
 
 
 
-class Move: Equatable {
+class Move: Equatable, Hashable {
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(fromSquare!+targetSquare!)
+    }
     
     var castling = false
     
