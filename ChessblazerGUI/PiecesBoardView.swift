@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct PiecesBoardView: View {
-    @State var gameState: GameState
+    @Bindable var gameState: GameState
+    @State var geometry: GeometryProxy
+
     var body: some View {
         
-        
-        GeometryReader { geometry in
-            
+                    
             let squareSize = min(geometry.size.width, geometry.size.height - (geometry.size.height / 9)) / 8
             
             VStack(spacing: 0) {
@@ -61,12 +61,12 @@ struct PiecesBoardView: View {
                 .aspectRatio(1, contentMode: .fit)
                 .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
         }
-    }
+    
 }
 
-
-#Preview {
-    let gameState = GameState()
-    gameState.startNewGame()
-    return PiecesBoardView(gameState: gameState)
-}
+//
+//#Preview {
+//    let gameState = GameState()
+//    gameState.startNewGame()
+//    return PiecesBoardView(gameState: gameState)
+//}

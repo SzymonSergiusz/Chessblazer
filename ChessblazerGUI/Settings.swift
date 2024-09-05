@@ -19,4 +19,9 @@ class Settings {
     static var blackSquaresColor = brown
     static let letters = ["A", "B", "C", "D", "E", "F", "G", "H"]
     
+    
+    // debugging
+    static var attackDebugMode = false
+    
+    
 }

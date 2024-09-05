@@ -18,7 +18,9 @@ struct SquareView: View {
     var body: some View {
         ZStack() {
             Rectangle()
+                
                 .fill(gameState.tappedPieceTargets.contains(index) ? Color.green : color)
+                .fill(Settings.attackDebugMode && gameState.attackTable.contains(index) ? Color.red.opacity(0.7) : Color.white.opacity(0))
                 .frame(width: size, height: size)
                 .overlay(alignment: .center, content: {
                     Text(String(index)).font(.title3)

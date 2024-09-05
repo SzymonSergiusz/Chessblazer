@@ -8,11 +8,20 @@
 import SwiftUI
 
 struct ChessView: View {
+    @Bindable var gameState: GameState
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            GeometryReader { geometry in
+                BoardView(gameState: gameState, geometry: geometry)
+                PiecesBoardView(gameState: gameState, geometry: geometry)
+            }
+
+        }
+
     }
 }
 
 #Preview {
-    ChessView()
+    
+    ChessView(gameState: GameState())
 }

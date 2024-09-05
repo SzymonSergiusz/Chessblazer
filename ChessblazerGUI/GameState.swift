@@ -9,18 +9,19 @@ import Foundation
 
 @Observable
 class GameState {
-    let game = Game()
-    
+    var game = Game()
+    var evaluation = 0
     var boardState: [Int] = Array(repeating: 0, count: 64)
     var indexOfTappedPiece: Int = -1
     var tappedPieceTargets = [Int]()
-    
+    var attackTable = [Int]()
     var validMoves = [Move]()
     var currentColorToMove = Piece.PieceColor.white
     
     var vsEngine = false
     
     func startNewGame() {
+        game = Game()
         boardState.removeAll()
         validMoves.removeAll()
         currentColorToMove = Piece.PieceColor.white
@@ -54,10 +55,16 @@ class GameState {
 
     func makeMove(_ from: Int, _ to: Int) {
         tappedPieceTargets.removeAll()
-        game.makeMove(pieceValue: boardState[from], move: Move(fromSquare: from, targetSquare: to))
+        
+        guard let move = validMoves.first(where: {$0 == Move(fromSquare: from, targetSquare: to)}) else { return }
+        
+        game.makeMove(move: move)
         boardState = game.toBoardArrayRepresentation()
         validMoves = game.currentValidMoves
         currentColorToMove = game.currentTurnColor
+        attackTable = generateAllAttackedSquares(game: game, color: currentColorToMove.getOppositeColor())
+        print(attackTable)
+        
         
         let bp = BoardPrinter()
         bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true, perspectiveColor: .white)
@@ -69,7 +76,7 @@ class GameState {
         }
         
         
-        
+        evaluation = evaluate(game: game)
     }
     
     func validTargetSquares(fromSquare: Int) -> [Int] {
@@ -78,5 +85,17 @@ class GameState {
             targets.append(move.targetSquare!)
         }
         return targets
+    }
+    
+    func undoneMove() {
+        game.undoMove()
+        
+        boardState.removeAll()
+        validMoves.removeAll()
+        currentColorToMove = game.currentTurnColor
+        tappedPieceTargets.removeAll()
+        validMoves = game.currentValidMoves
+        boardState = game.toBoardArrayRepresentation()
+        evaluation = evaluate(game: game)
     }
 }
