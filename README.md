@@ -54,8 +54,8 @@
 - playing against engine (random moves as the engine is not yet completed)
 - loading game from fen notation
 - undoing moves
-- choosing piece for pawn's promotion
 ### Not yet implemented
+- choosing piece for pawn's promotion
 - switching pov
 - choosing player's color
 - making custom positions
