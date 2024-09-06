@@ -1,7 +1,15 @@
-# UCI-compatible Chess Engine fully written in Swift
-## Implemented
-
-## Perft tests results
+# UCI-compatible Chess Engine fully written in Swift with dedicated GUI in SwiftUI
+## Game logic
+### Implemented
+- generating moves using bitboard
+- checks
+- xrays
+- castling
+- pawn promotions
+### Not implemented yet
+- en passant
+- hashing magic bitboards
+## Perft test results
 <table>
    <tr>
     <th>Depth</th>
