@@ -3,13 +3,14 @@
 ## Game logic
 ### Implemented
 - generating moves using bitboard
+- hashing magic bitboards
 - checks
 - xrays
 - castling
 - pawn promotions
 ### Not implemented yet
 - en passant
-- hashing magic bitboards
+
 ## AI
 - not implemented
 ## Perft test results
