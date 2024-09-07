@@ -83,11 +83,10 @@ class Engine {
             generateMagics()
 
         case .perft:
-            print(perftTest(depth: 1))
-            print(perftTest(depth: 2))
-            print(perftTest(depth: 3))
-            print(perftTest(depth: 4))
-//            print(perft(depth: 4))
+            print(perftParallel(depth: 1))
+            print(perftParallel(depth: 2))
+            print(perftParallel(depth: 3))
+            print(perftParallel(depth: 4))
             
         case .promotion:
             var game = Game()

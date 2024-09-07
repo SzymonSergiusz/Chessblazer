@@ -7,15 +7,19 @@
 
 import Foundation
 
-func generateKnightAttacks(bitboard: Bitboard) -> Bitboard {
-    let knightAttackBitboard: Bitboard =
-    ((bitboard << 6) | (bitboard >> 10)) & ~Bitboard.Masks.fileGH |
-    ((bitboard << 10) | (bitboard >> 6)) & ~Bitboard.Masks.fileAB |
-    ((bitboard << 15) | (bitboard >> 17)) & ~Bitboard.Masks.fileH |
-    ((bitboard << 17) | (bitboard >> 15)) & ~Bitboard.Masks.fileA
+func generateKnightAttacks(bitboard: UInt64) -> UInt64 {
+
+    let half1: UInt64 = ((bitboard << 15) | (bitboard >> 17)) & ~Bitboard.Masks.fileH |
+                       ((bitboard << 17) | (bitboard >> 15)) & ~Bitboard.Masks.fileA
     
-    return knightAttackBitboard
+    let half2: UInt64 = ((bitboard << 6) | (bitboard >> 10)) & ~Bitboard.Masks.fileGH |
+                      ((bitboard << 10) | (bitboard >> 6)) & ~Bitboard.Masks.fileAB
+    
+    let moves = half1 | half2
+    
+    return moves
 }
+
 
 func emptySquaresBitboard(bitboards: [Int: Bitboard]) -> Bitboard {
     var notEmpty = Bitboard(0)
@@ -290,7 +294,7 @@ func generateAllAttackedSquares(game: Game, color: Piece.PieceColor) -> Bitboard
                 case .rook:
                     attackBitboard = attackBitboard | generateRookAttacks(game: game, square: square, friendlyBitboard: friendlyBitboard)
                 case .pawn:
-                    attackBitboard = attackBitboard | generatePawnAttacks(game: game, square: square, color: currentColor)
+                    attackBitboard = attackBitboard | generatePawnAttacks(game: game, square: square, color: currentColor.getOppositeColor())
                 case .king:
                     attackBitboard = attackBitboard | generateKingAttacks(game: game, square: square, friendlyBitboard: friendlyBitboard)
                     

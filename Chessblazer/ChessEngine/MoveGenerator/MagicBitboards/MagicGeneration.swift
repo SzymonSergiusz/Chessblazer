@@ -11,7 +11,7 @@ func findMagic<S: Slider>(slider: S.Type, magics: inout [UInt64], shifts: inout 
     for square in 0...63 {
         let mask = slider.masks[square]
         let blockers = Magic.createAllBlockers(movementMask: mask)
-        let bits = mask.rawValue.nonzeroBitCount
+        let bits = mask.nonzeroBitCount
         let shift = 64 - bits
         
         while true {
@@ -46,7 +46,7 @@ func testMagic<S: Slider>(slider: S.Type, square: Int, shift: Int, magic: UInt64
 }
 
 func magicIndex(magic: UInt64, shift: Int, blocker: Bitboard) -> UInt64 {
-    let hash = blocker.rawValue.multipliedReportingOverflow(by: magic)
+    let hash = blocker.multipliedReportingOverflow(by: magic)
     return hash.0 >> shift
 }
 

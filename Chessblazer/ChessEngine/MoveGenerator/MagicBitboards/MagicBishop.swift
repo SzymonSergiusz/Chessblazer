@@ -52,7 +52,7 @@ class Bishop: Slider {
     static func hashKeyBishop(blockerBitboard: Bitboard, square: Int) -> UInt64 {
         let magic = bishopMagics[square]
         let shift = bishopShifts[square]
-        let of = blockerBitboard.rawValue.multipliedReportingOverflow(by: magic)
+        let of = blockerBitboard.multipliedReportingOverflow(by: magic)
         return (of.0) >> shift
     }
     
@@ -93,10 +93,9 @@ class Bishop: Slider {
                 }
                 
                 let newSquare = currentRow * 8 + currentCol
-                legalMoves = Bitboard(legalMoves.rawValue | 1 << newSquare)
+                legalMoves = Bitboard(legalMoves | 1 << newSquare)
                 
-                // Stop if there's a blocker at this square
-                if (blocker.rawValue & (1 << newSquare)) != 0 {
+                if (blocker & (1 << newSquare)) != 0 {
                     break
                 }
             }

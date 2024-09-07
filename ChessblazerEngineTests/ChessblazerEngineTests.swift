@@ -24,15 +24,21 @@ final class ChessblazerEngineTests: XCTestCase {
         // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
         // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
     }
-    
-    func perfTest() throws {
-        
-    }
 
+    func testPerftTime() {
+        measure {
+            assert(perftParallel(depth: 0) == 1)
+            assert(perftParallel(depth: 1) == 20)
+            assert(perftParallel(depth: 2) == 400)
+            assert(perftParallel(depth: 3) == 8902)
+            assert(perftParallel(depth: 4) == 197281)
+        }
+    }
+    
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         measure {
-            // Put the code you want to measure the time of here.
+            
         }
     }
 

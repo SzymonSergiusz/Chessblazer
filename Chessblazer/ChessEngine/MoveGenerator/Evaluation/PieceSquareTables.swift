@@ -17,7 +17,7 @@ extension Array where Element == Int {
     }
 }
 
-class PieceSquareTables {
+struct PieceSquareTables {
     
     
     static let tables: [Piece.ColoredPieces: [Int]] = [

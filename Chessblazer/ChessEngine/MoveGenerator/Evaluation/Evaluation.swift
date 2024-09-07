@@ -23,38 +23,98 @@ let evalPiecesValue: [Piece.ColoredPieces: Int] = [
     .blackKing : -20000,
 ]
 
-func evaluate(game: Game) -> Int {
-    var eval = countMaterial(board: game.toBoardArrayRepresentation())
-
-    return eval
+func evaluate(board: [Int]) -> Int {
+    return countMaterial(board: board)
 }
 
-func search(depth: Int, game: Game, alpha: Int, beta: Int) -> Int {
+func alphabeta(game: Game, moves: [Move], depth: Int, alpha: Int, beta: Int, maximizingPlayer: Bool) -> Int {
+    var game = game
     var alpha = alpha
-    var moves = [Move]()
-    if depth == 0 {
-        return evaluate(game: game)
+    var beta = beta
+
+    if depth == 0 || moves.isEmpty {
+        return evaluate(board: game.toBoardArrayRepresentation())
     }
-    generateAllPossibleMoves(game: game, moves: &moves)
     
-    if moves.count == 0 {
-        #warning("check for checkmate or draw")
-        return 0
-    }
-    var gameCopy = game
-    for move in moves {
+    if maximizingPlayer {
+        var maxEval = Int.min
         
-        gameCopy.makeMove(move: move)
-        let eval = -search(depth: depth-1, game: game, alpha: -alpha, beta: -beta)
-        gameCopy.undoMove()
-        
-        if eval >= beta {
-            return beta
+        for move in moves {
+            game.makeMove(move: move)
+            let eval = alphabeta(game: game, moves: game.currentValidMoves, depth: depth-1, alpha: alpha, beta: beta, maximizingPlayer: false)
+            game.undoMove()
+            
+            maxEval = max(maxEval, eval)
+            alpha = max(alpha, maxEval)
+            
+            if beta <= alpha {
+                break
+            }
         }
-        alpha = max(alpha, eval)
+        return maxEval
+        
+    } else {
+        var minEval = Int.max
+        
+        for move in moves {
+            game.makeMove(move: move)
+            let eval = alphabeta(game: game, moves: game.currentValidMoves, depth: depth-1, alpha: alpha, beta: beta, maximizingPlayer: true)
+            game.undoMove()
+            
+            minEval = min(minEval, eval)
+            beta = min(beta, minEval)
+            
+            if beta <= alpha {
+                break
+            }
+        }
+        return minEval
     }
-    return alpha
 }
+func findBestMove(game: Game, depth: Int, maximizingPlayer: Bool) -> Move? {
+    let legalMoves = generateAllLegalMoves(game: game)
+    var bestMove: Move? = nil
+    
+    var alpha = Int.min
+    var beta = Int.max
+    
+    if maximizingPlayer {
+        var maxEval = Int.min
+        
+        for move in legalMoves {
+            var gameCopy = game
+            gameCopy.makeMove(move: move)
+            
+            let eval = alphabeta(game: gameCopy, moves: gameCopy.currentValidMoves, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
+            
+            if eval > maxEval {
+                maxEval = eval
+                bestMove = move
+            }
+            
+            alpha = max(alpha, maxEval)
+        }
+    } else {
+        var minEval = Int.max
+        
+        for move in legalMoves {
+            var gameCopy = game
+            gameCopy.makeMove(move: move)
+            
+            let eval = alphabeta(game: gameCopy, moves: gameCopy.currentValidMoves, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)
+            
+            if eval < minEval {
+                minEval = eval
+                bestMove = move
+            }
+            
+            beta = min(beta, minEval)
+        }
+    }
+    
+    return bestMove
+}
+
 
 
 func countMaterial(board: [Int]) -> Int {
@@ -74,9 +134,3 @@ func countMaterial(board: [Int]) -> Int {
     }
     return whiteSum + blackSum
 }
-
-/*
-Evaluation ideas:
- - use simplified eval func
- - endgame when both players' board value is below smth
- */

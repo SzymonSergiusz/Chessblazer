@@ -41,7 +41,7 @@ class Rook: Slider {
         let maskedBlockers = blockerBitboard & mask
         let magic = rookMagics[square]
         let shift = rookShifts[square]
-        let of = maskedBlockers.rawValue.multipliedReportingOverflow(by: magic)
+        let of = maskedBlockers.multipliedReportingOverflow(by: magic)
         return (of.0) >> shift
     }
 
@@ -56,7 +56,7 @@ class Rook: Slider {
         for r in (0..<rank).reversed() {
             let targetSquare = r * 8 + file
             legalMoves = legalMoves | Bitboard(1) << Bitboard(targetSquare)
-            if (blocker.rawValue & (1 << targetSquare)) != 0 {
+            if (blocker & (1 << targetSquare)) != 0 {
                 break
             }
         }
@@ -65,7 +65,7 @@ class Rook: Slider {
         for r in (rank+1..<8) {
             let targetSquare = r * 8 + file
             legalMoves = legalMoves | Bitboard(1) << Bitboard(targetSquare)
-            if (blocker.rawValue & (1 << targetSquare)) != 0 {
+            if (blocker & (1 << targetSquare)) != 0 {
                 break
             }
         }
@@ -74,7 +74,7 @@ class Rook: Slider {
         for f in (0..<file).reversed() {
             let targetSquare = rank * 8 + f
             legalMoves = legalMoves | Bitboard(1) << Bitboard(targetSquare)
-            if (blocker.rawValue & (1 << targetSquare)) != 0 {
+            if (blocker & (1 << targetSquare)) != 0 {
                 break
             }
         }
@@ -83,7 +83,7 @@ class Rook: Slider {
         for f in (file+1..<8) {
             let targetSquare = rank * 8 + f
             legalMoves = legalMoves | Bitboard(1) << Bitboard(targetSquare)
-            if (blocker.rawValue & (1 << targetSquare)) != 0 {
+            if (blocker & (1 << targetSquare)) != 0 {
                 break
             }
         }
