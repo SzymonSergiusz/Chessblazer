@@ -10,7 +10,7 @@ import Foundation
 extension Bitboard {
     func toBoardString() -> String {
         var boardString = ""
-        let binaryString = String(rawValue, radix: 2)
+        let binaryString = String(self, radix: 2)
         let paddedBinaryString = String(repeating: "0", count: 64 - binaryString.count) + binaryString
         
         for row in 0..<8 {
@@ -36,7 +36,7 @@ extension Bitboard {
             for col in 0..<8 {
                 let bitIndex = row * 8 + col
                 let bitMask: UInt64 = 1 << bitIndex
-                let pieceValue = (rawValue & bitMask) != 0 ? 1 : 0
+                let pieceValue = (self & bitMask) != 0 ? 1 : 0
                 
                 
                 print(" \(pieceValue)", terminator: " ")
