@@ -61,7 +61,7 @@ func generateWhitePawnAttacks(game: Game, square: Int, moves: inout [Move]) {
 }
 
 func generateWhitePawnAttacks(game: Game, square: Int) -> Bitboard {
-    let pawn = Bitboard(1 << square)
+    let pawn = UInt64(1) << square
     return generateWhitePawnAttacks(whitePawns: pawn)
 }
 

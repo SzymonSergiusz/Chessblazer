@@ -1,5 +1,8 @@
 # UCI-compatible Chess Engine fully written in Swift with dedicated GUI in SwiftUI
 # Engine
+## Current state showcase (engine vs engine)
+<img src = "https://github.com/SzymonSergiusz/Chessblazer/tree/main/Chessblazer/res/showcase.gif" alt="showcase">
+<i>it's not really smart yet</i>
 ## Game logic
 ### Implemented
 - generating moves using bitboard
@@ -12,7 +15,7 @@
 - en passant
 
 ## AI
-- not implemented
+- 
 ## Perft test results
 <table>
    <tr>
@@ -52,7 +55,7 @@
 ### Implemented
 - basic game (based on engine)
 - starting new game
-- playing against engine (random moves as the engine is not yet completed)
+- engine vs engine [check engine in left corner]
 - loading game from fen notation
 - undoing moves
 ### Not yet implemented
