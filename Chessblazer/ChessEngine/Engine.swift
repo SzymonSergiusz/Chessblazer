@@ -80,11 +80,7 @@ class Engine {
             print("")
         
         case .main:
-            var game = Game()
-            game.startNewGame()
-//            game.loadBoardFromFen(fen: "rnbqkbnr/1ppp1ppp/8/4p3/4P3/8/1PPPQPPP/RNB1KBNR w KQk - 0 3")
-//            game.loadBoardFromFen(fen: "8/8/8/8/3B4/8/8/8 w - - 0 1")
-            print(evaluate(game: game))
+            generateMagics()
 
         case .perft:
             print(perftTest(depth: 1))

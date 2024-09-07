@@ -238,12 +238,7 @@ struct Game {
 
     mutating func undoMove() {
         guard let moveData = gameProgress.last else { return }
-        let move = moveData.move
-        let pieceValue = moveData.piece
-        let capturedPiece = moveData.capturedPiece
-        
-        guard let from = move.fromSquare, let target = move.targetSquare else { return }
-        
+        let move = moveData.move        
         
         bitboards = moveData.bitboards
         castlesAvailable = moveData.castles
@@ -288,7 +283,6 @@ struct Game {
                 bitboards[piece] = (bitboards[piece] ?? Bitboard(0)) | (Bitboard(1) << Bitboard(UInt64(index)))
             }
         }
-        
         return bitboards
     }
 }

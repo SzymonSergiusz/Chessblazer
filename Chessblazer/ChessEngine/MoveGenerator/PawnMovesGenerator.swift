@@ -39,6 +39,7 @@ func generateBlackPawnAttacks(blackPawns: Bitboard) -> Bitboard {
 }
 
 
+
 func generateWhitePawnMoves(game: Game, square: Int, moves: inout [Move]) {
     let empty = emptySquaresBitboard(bitboards: game.bitboards)
     
@@ -59,6 +60,11 @@ func generateWhitePawnAttacks(game: Game, square: Int, moves: inout [Move]) {
     }
 }
 
+func generateWhitePawnAttacks(game: Game, square: Int) -> Bitboard {
+    let pawn = Bitboard(1 << square)
+    return generateWhitePawnAttacks(whitePawns: pawn)
+}
+
 func generateBlackPawnAttacks(game: Game, square: Int, moves: inout [Move]) {
     let pawn = Bitboard(1 << square)
     var movesBitboard = generateBlackPawnAttacks(blackPawns: pawn)
@@ -67,6 +73,13 @@ func generateBlackPawnAttacks(game: Game, square: Int, moves: inout [Move]) {
         moves.append(Move(fromSquare: square, targetSquare: targetSquare))
     }
 }
+
+func generateBlackPawnAttacks(game: Game, square: Int) -> Bitboard {
+    let pawn = Bitboard(1 << square)
+    return generateBlackPawnAttacks(blackPawns: pawn)
+    
+}
+
 
 
 func generateBlackPawnMoves(game: Game, square: Int, moves: inout [Move]) {
@@ -95,5 +108,15 @@ func generatePawnAttacks(game: Game, square: Int, moves: inout [Move]) {
         generateWhitePawnAttacks(game: game, square: square, moves: &moves)
     } else {
         generateBlackPawnAttacks(game: game, square: square, moves: &moves)
+    }
+}
+
+func generatePawnAttacks(game: Game, square: Int, color: Piece.PieceColor) -> Bitboard {
+
+    if color == .white {
+        return generateWhitePawnAttacks(game: game, square: square)
+    } else {
+        return generateBlackPawnAttacks(game: game, square: square)
+
     }
 }

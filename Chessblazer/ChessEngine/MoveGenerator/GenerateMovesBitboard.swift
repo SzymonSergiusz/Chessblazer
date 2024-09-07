@@ -9,15 +9,14 @@ import Foundation
 
 func generateKnightAttacks(bitboard: Bitboard) -> Bitboard {
     let knightAttackBitboard: Bitboard =
-        ((bitboard << 6) | (bitboard >> 10)) & ~Bitboard.Masks.fileGH |
-        ((bitboard << 10) | (bitboard >> 6)) & ~Bitboard.Masks.fileAB |
-        ((bitboard << 15) | (bitboard >> 17)) & ~Bitboard.Masks.fileH |
-        ((bitboard << 17) | (bitboard >> 15)) & ~Bitboard.Masks.fileA
+    ((bitboard << 6) | (bitboard >> 10)) & ~Bitboard.Masks.fileGH |
+    ((bitboard << 10) | (bitboard >> 6)) & ~Bitboard.Masks.fileAB |
+    ((bitboard << 15) | (bitboard >> 17)) & ~Bitboard.Masks.fileH |
+    ((bitboard << 17) | (bitboard >> 15)) & ~Bitboard.Masks.fileA
     
     return knightAttackBitboard
 }
 
-// # Pawns moves#
 func emptySquaresBitboard(bitboards: [Int: Bitboard]) -> Bitboard {
     var notEmpty = Bitboard(0)
     for bitboard in bitboards {
@@ -26,9 +25,6 @@ func emptySquaresBitboard(bitboards: [Int: Bitboard]) -> Bitboard {
     
     return ~notEmpty
 }
-
-
-
 
 func generateKingAttacks(king: Bitboard) -> Bitboard {
     var attacks = king.eastOne() | king.westOne()
@@ -39,33 +35,62 @@ func generateKingAttacks(king: Bitboard) -> Bitboard {
 
 // # rooks #
 
-
 func generateRookMoves(game: Game, square: Int, moves: inout [Move]) {
     let whitePieces = Magic.whitePiecesBitboards(bitboards: game.bitboards)
     let blackPieces = Magic.blackPiecesBitboards(bitboards: game.bitboards)
     let allPieces = whitePieces | blackPieces
-    #warning("no check xray mask")
-    let blockerBitboard = allPieces & Magic.rookMasks[square] // & checkRayMask
-//    let key: UInt64 = Magic.hashKeyRook(blockerBitboard: blockerBitboard, square: square)
-
-//    var movesBitboard = Magic.rookLookupTable[square]![key]!
-    var movesBitboard = Magic.rookLookupTable[Magic.KeyTuple(square, blockerBitboard.rawValue)]!
-
+#warning("no check xray mask")
+    let blockerBitboard = allPieces & Rook.masks[square] // & checkRayMask
+    var movesBitboard = Rook.lookUpTable[square]![magicIndex(magic: rookMagics[square], shift: rookShifts[square], blocker: blockerBitboard)]!
+    
     // seems useless
     if game.currentTurnColor == .white {
         movesBitboard = movesBitboard & ~whitePieces
     } else {
         movesBitboard = movesBitboard & ~blackPieces
     }
-    
-    #warning("no pin mask check yet")
-    //movesBitboard = movesBitboard & getPinMask()
-
     while movesBitboard != 0 {
         let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
         moves.append(Move(fromSquare: square, targetSquare: targetSquare))
     }
 }
+
+
+func generateRookAttacks(game: Game, square: Int, friendlyBitboard: Bitboard) -> Bitboard {
+    let whitePieces = Magic.whitePiecesBitboards(bitboards: game.bitboards)
+    let blackPieces = Magic.blackPiecesBitboards(bitboards: game.bitboards)
+    let allPieces = whitePieces | blackPieces
+    let blockerBitboard = allPieces & Rook.masks[square] // & checkRayMask
+    var movesBitboard = Rook.lookUpTable[square]![magicIndex(magic: rookMagics[square], shift: rookShifts[square], blocker: blockerBitboard)]!
+    movesBitboard = movesBitboard & ~friendlyBitboard
+    return movesBitboard
+}
+
+func generateBishopAttacks(game: Game, square: Int, friendlyBitboard: Bitboard) -> Bitboard {
+    let whitePieces = Magic.whitePiecesBitboards(bitboards: game.bitboards)
+    let blackPieces = Magic.blackPiecesBitboards(bitboards: game.bitboards)
+    let allPieces = whitePieces | blackPieces
+    let blockerBitboard = allPieces & Bishop.masks[square]
+    var movesBitboard = Bishop.lookUpTable[square]![magicIndex(magic: bishopMagics[square], shift: bishopShifts[square], blocker: blockerBitboard)]!
+    movesBitboard = movesBitboard & ~friendlyBitboard
+    return movesBitboard
+}
+
+func generateQueenAttacks(game: Game, square: Int, friendlyBitboard: Bitboard) -> Bitboard {
+    return generateBishopAttacks(game: game, square: square, friendlyBitboard: friendlyBitboard) | generateRookAttacks(game: game, square: square, friendlyBitboard: friendlyBitboard)
+}
+
+func generateKingAttacks(game: Game, square: Int, friendlyBitboard: Bitboard) -> Bitboard {
+    
+    var kingBitboard = Bitboard(1 << square)
+    
+        let square = Bitboard.popLSB(&kingBitboard)
+        let king = Bitboard(1 << square)
+        let movesBitboard = generateKingAttacks(king: king) & ~friendlyBitboard
+        return movesBitboard
+    
+}
+
 
 func generateBishopMoves(game: Game, square: Int, moves: inout [Move]) {
     
@@ -73,12 +98,10 @@ func generateBishopMoves(game: Game, square: Int, moves: inout [Move]) {
     let blackPieces = Magic.blackPiecesBitboards(bitboards: game.bitboards)
     let allPieces = whitePieces | blackPieces
     
-    let blockerBitboard = allPieces & Magic.bishopMasks[square] // & checkRayMask
+    let blockerBitboard = allPieces & Bishop.masks[square] // & checkRayMask
     
-//    let key: UInt64 = Magic.hashKeyBishop(blockerBitboard: blockerBitboard, square: square)
-//    var movesBitboard = Magic.bishopLookupTable[square]![key]!
-        
-    var movesBitboard = Magic.bishopLookupTable[Magic.KeyTuple(square, blockerBitboard.rawValue)]!
+    var movesBitboard = Bishop.lookUpTable[square]![magicIndex(magic: bishopMagics[square], shift: bishopShifts[square], blocker: blockerBitboard)]!
+    
     
     if game.currentTurnColor == .white {
         movesBitboard = movesBitboard & ~whitePieces
@@ -86,9 +109,6 @@ func generateBishopMoves(game: Game, square: Int, moves: inout [Move]) {
         movesBitboard = movesBitboard & ~blackPieces
     }
     
-    #warning("no pin mask check yet")
-    //movesBitboard = movesBitboard & getPinMask()
-
     while movesBitboard != 0 {
         
         let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
@@ -97,10 +117,8 @@ func generateBishopMoves(game: Game, square: Int, moves: inout [Move]) {
 }
 
 func generateQueenMoves(game: Game, square: Int, moves: inout [Move]) {
-
     generateRookMoves(game: game, square: square, moves: &moves)
     generateBishopMoves(game: game, square: square, moves: &moves)
-
 }
 
 
@@ -117,10 +135,10 @@ func generateKingMoves(game: Game, square: Int, moves: inout [Move], attackedSqu
             let rightCastle = [9, 0, 0, 13]
             let isRightPossible = board[4...7].elementsEqual(rightCastle) && !attackedSquares.contains(board[4...6])
             if isRightPossible {
-//                print("right is possible")
+                //                print("right is possible")
                 let move = CastlingMove(fromSquare: 4, targetSquare: 7, rookDestination: 5, kingDestination: 6)
                 moves.append(move)
-//                print(move.self)
+                //                print(move.self)
             }
         }
         
@@ -136,7 +154,7 @@ func generateKingMoves(game: Game, square: Int, moves: inout [Move], attackedSqu
     } else {
         friendlyMask = Magic.blackPiecesBitboards(bitboards: game.bitboards)
         let board = game.toBoardArrayRepresentation()
-
+        
         if game.castlesAvailable.contains("k") {
             let rightCastle = [17, 0, 0, 21]
             let isRightPossible = board[60...63].elementsEqual(rightCastle) && !attackedSquares.contains(60...62)
@@ -175,6 +193,13 @@ func generateKingMoves(game: Game, square: Int, moves: inout [Move], attackedSqu
     }
     
 }
+func generateKnightAttacks(game: Game, square: Int, friendlyBitboard: Bitboard) -> Bitboard {
+    var knightBitboard = Bitboard(1) << Bitboard(square)
+        let square = Bitboard.popLSB(&knightBitboard)
+        let knight = Bitboard(1) << Bitboard(square)
+        let movesBitboard = generateKnightAttacks(bitboard: knight) & ~friendlyBitboard
+        return movesBitboard
+}
 
 func generateKnightMoves(game: Game, square: Int, moves: inout [Move]) {
     var friendlyMask = Bitboard(0)
@@ -207,19 +232,19 @@ func generateAllPossibleMoves(game: Game, moves: inout [Move]) {
                 pieceSquares.append(Bitboard.popLSB(&copyBitboard))
             }
             let pieceType = Piece.getType(piece: bitboard.key)
-
+            
             for square in pieceSquares {
                 switch pieceType {
                 case .queen:
                     generateQueenMoves(game: game, square: square, moves: &moves)
-                
+                    
                 case .bishop:
                     generateBishopMoves(game: game, square: square, moves: &moves)
                     
                 case .rook:
                     generateRookMoves(game: game, square: square, moves: &moves)
                 case .pawn:
-                    #warning("no en passant yet, no promotion yet")
+#warning("no en passant yet, no promotion yet")
                     /*
                      for en passant 1. check fen's string if in fly is possible 2. if pawn "jumps" over attacked square by enemy pawn (?)
                      */
@@ -229,7 +254,7 @@ func generateAllPossibleMoves(game: Game, moves: inout [Move]) {
                     
                 case .knight:
                     generateKnightMoves(game: game, square: square, moves: &moves)
-
+                    
                 default:
                     print("not found")
                     
@@ -238,13 +263,12 @@ func generateAllPossibleMoves(game: Game, moves: inout [Move]) {
         }
     }
 }
-func generateAllAttackedSquares(game: Game, color: Piece.PieceColor) -> [Int] {
-    var toggledColorGame = game
-    toggledColorGame.toggleColor()
-    // this is cause of in function checking if piece is enemy or friendly, todo refactor this but toggling color should be enough for now
-    
-    var attackedSquares = [Int]()
-    var attackedSquaresMoves = [Move]()
+
+func generateAllAttackedSquares(game: Game, color: Piece.PieceColor) -> Bitboard {
+    var attackBitboard = Bitboard(0)
+    let currentColor = game.currentTurnColor
+    let friendlyBitboard = currentColor == .black ? Magic.whitePiecesBitboards(bitboards: game.bitboards) : Magic.blackPiecesBitboards(bitboards: game.bitboards)
+
     for bitboard in game.bitboards {
         if Piece.checkColor(piece: bitboard.key) == color {
             var pieceSquares = [Int]()
@@ -254,29 +278,25 @@ func generateAllAttackedSquares(game: Game, color: Piece.PieceColor) -> [Int] {
                 pieceSquares.append(Bitboard.popLSB(&copyBitboard))
             }
             let pieceType = Piece.getType(piece: bitboard.key)
-
+            
             for square in pieceSquares {
                 switch pieceType {
                 case .queen:
-                    generateQueenMoves(game: toggledColorGame, square: square, moves: &attackedSquaresMoves)
-                
-                case .bishop:
-                    generateBishopMoves(game: toggledColorGame, square: square, moves: &attackedSquaresMoves)
+                    attackBitboard = attackBitboard | generateQueenAttacks(game: game, square: square, friendlyBitboard: friendlyBitboard)
                     
+                case .bishop:
+                    attackBitboard = attackBitboard | generateBishopAttacks(game: game, square: square, friendlyBitboard: friendlyBitboard)
+
                 case .rook:
-                    generateRookMoves(game: toggledColorGame, square: square, moves: &attackedSquaresMoves)
+                    attackBitboard = attackBitboard | generateRookAttacks(game: game, square: square, friendlyBitboard: friendlyBitboard)
                 case .pawn:
-                    #warning("no en passant yet, no promotion yet")
-                    /*
-                     for en passant 1. check fen's string if in fly is possible 2. if pawn "jumps" over attacked square by enemy pawn (?)
-                     */
-                    generatePawnAttacks(game: game, square: square, moves: &attackedSquaresMoves)
+                    attackBitboard = attackBitboard | generatePawnAttacks(game: game, square: square, color: currentColor)
                 case .king:
-                    generateKingMoves(game: toggledColorGame, square: square, moves: &attackedSquaresMoves)
+                    attackBitboard = attackBitboard | generateKingAttacks(game: game, square: square, friendlyBitboard: friendlyBitboard)
                     
                 case .knight:
-                    generateKnightMoves(game: toggledColorGame, square: square, moves: &attackedSquaresMoves)
-
+                    attackBitboard = attackBitboard | generateKnightAttacks(game: game, square: square, friendlyBitboard: friendlyBitboard)
+                    
                 default:
                     print("not found")
                     
@@ -284,12 +304,9 @@ func generateAllAttackedSquares(game: Game, color: Piece.PieceColor) -> [Int] {
             }
         }
     }
-    
-    for move in attackedSquaresMoves {
-        attackedSquares.append(move.targetSquare!)
-    }
-    return attackedSquares
+    return attackBitboard
 }
+
 func getKingPosition(game: Game, color: Piece.PieceColor) -> Int {
     
     if color == .white {
@@ -303,44 +320,39 @@ func getKingPosition(game: Game, color: Piece.PieceColor) -> Int {
     }
 }
 
+func getKingBitboard(game: Game, color: Piece.PieceColor) -> Bitboard {
+    
+    if color == .white {
+        return game.bitboards[Piece.ColoredPieces.whiteKing.rawValue]!
+    } else {
+        return game.bitboards[Piece.ColoredPieces.blackKing.rawValue]!
+    }
+    
+}
+
 func checkIfCheck(game: Game) -> Bool {
     let attackTable = generateAllAttackedSquares(game: game, color: game.currentTurnColor.getOppositeColor())
-    
-    
-    let kingPosition = getKingPosition(game: game, color: game.currentTurnColor)
-    return attackTable.contains(kingPosition)
+    let kingBitboard = getKingBitboard(game: game, color: game.currentTurnColor)
+    return (attackTable & kingBitboard) != 0
 }
 
 func generateAllLegalMoves(game: Game) -> [Move] {
-    var moves = [Move]()
+    var possibleMoves = [Move]()
     var legalMoves = [Move]()
-    generateAllPossibleMoves(game: game, moves: &moves)
-//    print("king's checked")
     
-    // to avoid check
-    if checkIfCheck(game: game) {
-        for move in moves {
-            var gameCopy = game
-            gameCopy.makeMoveOnly(move: move)
-            if checkIfCheck(game: gameCopy) {
-//                print("still check")
-            } else {
-                legalMoves.append(move)
-            }
-        }
-    }
-    // xrays
-    for move in moves {
+    generateAllPossibleMoves(game: game, moves: &possibleMoves)
+    
+    for move in possibleMoves {
+        // Simulate the move on the game state
         var gameCopy = game
         gameCopy.makeMoveOnly(move: move)
-        if checkIfCheck(game: gameCopy) {
-//            print("check")
-        } else {
+        
+        
+        if !checkIfCheck(game: gameCopy) {
             legalMoves.append(move)
         }
     }
-    
-    
-    
-    return Array(Set(legalMoves))
+
+    return legalMoves
 }
+
