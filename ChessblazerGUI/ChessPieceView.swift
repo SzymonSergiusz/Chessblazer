@@ -26,7 +26,10 @@ struct ChessPieceView: View {
                 .position(piecePosition)
                 .offset(dragAmount)
                 .onTapGesture {
-                    gameState.onPieceTap(square: indexOfSquare)
+                    
+                    Task.init {
+                        await gameState.onPieceTap(square: indexOfSquare)
+                    }
                 }
             
                 .gesture(
@@ -34,7 +37,10 @@ struct ChessPieceView: View {
                         .onChanged { value in
                             if Piece.checkColor(piece: pieceValue) == gameState.currentColorToMove {
                                 dragAmount = value.translation
-                                gameState.onPieceTap(square: indexOfSquare)
+                                Task.init {
+                                    await gameState.onPieceTap(square: indexOfSquare)
+                                    
+                                }
                             }
                             
                         }
@@ -52,7 +58,7 @@ struct ChessPieceView: View {
                             newIndex = indexOfSquare + (rows*8)+(-columns)
                             
                             print("new square: \(BoardUtils.squareToNotation(square: newIndex)) \(newIndex)")
-
+                            
                             if (0...63).contains(newIndex) {
                                 let validTargetSquares = gameState.validTargetSquares(fromSquare: indexOfSquare)
                                 
@@ -60,9 +66,9 @@ struct ChessPieceView: View {
                                 if validTargetSquares.contains(newIndex) {
                                     // make a move
                                     print("correct move")
-                                    
-                                    
                                     gameState.makeMove(indexOfSquare, newIndex)
+                                    
+                                    
                                     indexOfSquare = newIndex
                                     
                                     return

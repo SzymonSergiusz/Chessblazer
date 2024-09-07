@@ -29,6 +29,7 @@ struct SquareView: View {
                     let square = BoardUtils.squareToNotation(square: index)
                     print("Square tapped: \(square)")
                     gameState.onPieceTap(square: index)
+                    
                 }
                 
         }

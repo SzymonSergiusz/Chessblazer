@@ -14,6 +14,11 @@ struct ContentView: View {
             Button("Start new game") {
                 gameState.vsEngine = vsEngine
                 gameState.startNewGame()
+                if vsEngine {
+                    Task.init {
+                        await gameState.engines()
+                    }
+                }
             }
             TextField(text: $fen) {
                 Text("Input FEN here and submit (enter)")

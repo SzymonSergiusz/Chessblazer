@@ -59,24 +59,47 @@ class GameState {
         guard let move = validMoves.first(where: {$0 == Move(fromSquare: from, targetSquare: to)}) else { return }
         
         game.makeMove(move: move)
-        boardState = game.toBoardArrayRepresentation()
-        validMoves = game.currentValidMoves
-        currentColorToMove = game.currentTurnColor
-        attackTable = generateAllAttackedSquares(game: game, color: currentColorToMove.getOppositeColor())
-        print(attackTable)
         
-        
-        let bp = BoardPrinter()
-        bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true, perspectiveColor: .white)
-        
-        #warning("to refactor, fast check")
-        if vsEngine && currentColorToMove == .black {
-            let move = validMoves.randomElement()!
-            makeMove(move.fromSquare!, move.targetSquare!)
+        DispatchQueue.main.async {
+            self.boardState = self.game.toBoardArrayRepresentation()
+            self.validMoves = self.game.currentValidMoves
+            self.currentColorToMove = self.game.currentTurnColor
         }
         
+        var bits = generateAllAttackedSquares(game: game, color: currentColorToMove.getOppositeColor())
+        attackTable.removeAll()
+        while bits != 0 {
+            let x = UInt64.popLSB(&bits)
+            attackTable.append(x)
+        }
+
+        let bp = BoardPrinter()
+        bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true, perspectiveColor: .white)
+       
+        DispatchQueue.main.async {
+            self.evaluation = evaluate(board: self.game.toBoardArrayRepresentation())
+        }
+    }
+
+    
+    func engines() async {
         
-        evaluation = evaluate(game: game)
+        while !game.currentValidMoves.isEmpty {
+            if vsEngine && currentColorToMove == .black {
+                let move = findBestMove(game: game, depth: 3, maximizingPlayer: false)
+                if let move = move {
+                    makeMove(move.fromSquare!, move.targetSquare!)
+                }
+            }
+
+            if vsEngine && currentColorToMove == .white {
+                let move = findBestMove(game: game, depth: 3, maximizingPlayer: true)
+                if let move = move {
+                    makeMove(move.fromSquare!, move.targetSquare!)
+                }
+            }
+        }
+
     }
     
     func validTargetSquares(fromSquare: Int) -> [Int] {
@@ -96,6 +119,6 @@ class GameState {
         tappedPieceTargets.removeAll()
         validMoves = game.currentValidMoves
         boardState = game.toBoardArrayRepresentation()
-        evaluation = evaluate(game: game)
+        evaluation = evaluate(board: game.toBoardArrayRepresentation())
     }
 }
