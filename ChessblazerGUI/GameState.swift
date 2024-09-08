@@ -83,7 +83,7 @@ class GameState {
 
     
     func engines() async {
-        
+        print("engine is starting")
         while !game.currentValidMoves.isEmpty {
             if vsEngine && currentColorToMove == .black {
                 let move = findBestMove(game: game, depth: 3, maximizingPlayer: false)

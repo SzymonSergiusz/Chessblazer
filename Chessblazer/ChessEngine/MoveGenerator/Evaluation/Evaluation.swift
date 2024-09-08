@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Dispatch
 
 let evalPiecesValue: [Piece.ColoredPieces: Int] = [
     .whitePawn : 100,
@@ -74,44 +75,59 @@ func alphabeta(game: Game, moves: [Move], depth: Int, alpha: Int, beta: Int, max
 func findBestMove(game: Game, depth: Int, maximizingPlayer: Bool) -> Move? {
     let legalMoves = generateAllLegalMoves(game: game)
     var bestMove: Move? = nil
-    
     var alpha = Int.min
     var beta = Int.max
+    
+    let queue = DispatchQueue(label: "eval", attributes: .concurrent)
+    let group = DispatchGroup()
     
     if maximizingPlayer {
         var maxEval = Int.min
         
         for move in legalMoves {
-            var gameCopy = game
-            gameCopy.makeMove(move: move)
+            group.enter()
+            queue.async {
+                var gameCopy = game
+                gameCopy.makeMove(move: move)
+                
+                let eval = alphabeta(game: gameCopy, moves: gameCopy.currentValidMoves, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
             
-            let eval = alphabeta(game: gameCopy, moves: gameCopy.currentValidMoves, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
-            
-            if eval > maxEval {
-                maxEval = eval
-                bestMove = move
+                DispatchQueue.global().sync {
+                if eval > maxEval {
+                    maxEval = eval
+                    bestMove = move
+                }
+
+                    alpha = max(alpha, maxEval)
+                }
+                group.leave()
             }
-            
-            alpha = max(alpha, maxEval)
+
         }
     } else {
         var minEval = Int.max
-        
+
         for move in legalMoves {
-            var gameCopy = game
-            gameCopy.makeMove(move: move)
-            
-            let eval = alphabeta(game: gameCopy, moves: gameCopy.currentValidMoves, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)
-            
-            if eval < minEval {
-                minEval = eval
-                bestMove = move
+            group.enter()
+            queue.async {
+                var gameCopy = game
+                gameCopy.makeMove(move: move)
+                
+                let eval = alphabeta(game: gameCopy, moves: gameCopy.currentValidMoves, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)
+                DispatchQueue.global().sync {
+                    if eval < minEval {
+                        minEval = eval
+                        bestMove = move
+                    }
+                    
+                    beta = min(beta, minEval)
+                }
+                group.leave()
             }
-            
-            beta = min(beta, minEval)
+
         }
     }
-    
+    group.wait()
     return bestMove
 }
 

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Dispatch
 
 func perftTest(depth: Int) -> Int {
     var game = Game()
@@ -30,7 +31,6 @@ func perftTest(depth: Int) -> Int {
     return perft(depth: depth, game: &game)
 }
 
-import Dispatch
 
 func perftParallel(depth: Int) -> Int {
     var game = Game()
