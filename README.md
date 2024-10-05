@@ -12,8 +12,9 @@
 - xrays
 - castling
 - pawn promotions
-### Not implemented yet
 - en passant
+
+### Not implemented yet
 
 ## AI
 - 
