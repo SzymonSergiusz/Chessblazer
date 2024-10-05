@@ -30,12 +30,17 @@ class Move: Equatable, Hashable {
     var fromSquare: Int?
     var targetSquare: Int?
     var promotionPiece: String = ""
+    var enPasssantCapture = 0
     
     var asString: String {
         "\(fromSquare!) \(targetSquare!)"
     }
     
-    
+    init(fromSquare: Int, targetSquare: Int, enPasssantCapture: Int) {
+        self.fromSquare = fromSquare
+        self.targetSquare = targetSquare
+        self.enPasssantCapture = enPasssantCapture
+    }
     
     init(fromSquare: Int, targetSquare: Int) {
         self.fromSquare = fromSquare

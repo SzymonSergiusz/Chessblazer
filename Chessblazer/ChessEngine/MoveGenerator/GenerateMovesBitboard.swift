@@ -231,7 +231,7 @@ func generateAllPossibleMoves(game: Game, moves: inout [Move]) {
                 pieceSquares.append(Bitboard.popLSB(&copyBitboard))
             }
             let pieceType = Piece.getType(piece: bitboard.key)
-            
+            moves.append(contentsOf: enPassantCheck(game: game))
             for square in pieceSquares {
                 switch pieceType {
                 case .queen:
@@ -359,3 +359,34 @@ func generateAllLegalMoves(game: Game) -> [Move] {
     return legalMoves
 }
 
+func enPassantCheck(game: Game) -> [Move] {
+    var moves = [Move]()
+    guard let lastMove = game.performedMovesList.last else { return moves }
+    let from = lastMove.move.fromSquare!
+    let target = lastMove.move.targetSquare!
+    if lastMove.piece == Piece.ColoredPieces.whitePawn.rawValue {
+        if (8...15).contains(from) && (24...31).contains(target) {
+            let rank4 = Bitboard(4278190080)
+            var blackPawns = game.bitboards[Piece.ColoredPieces.blackPawn.rawValue]! & rank4
+            while (blackPawns != 0) {
+                let blackPawn = Bitboard.popLSB(&blackPawns)
+                if blackPawn-1 == target || blackPawn+1 == target {
+                    moves.append(Move(fromSquare: blackPawn, targetSquare: target - 8, enPasssantCapture: target))
+                }
+            }
+        }
+    } else if lastMove.piece == Piece.ColoredPieces.blackPawn.rawValue {
+        if (48...55).contains(from) && (32...39).contains(target) {
+            let rank5 = Bitboard(1095216660480)
+            var whitePawns = game.bitboards[Piece.ColoredPieces.whitePawn.rawValue]! & rank5
+            while (whitePawns != 0) {
+                let whitePawn = Bitboard.popLSB(&whitePawns)
+                if whitePawn-1 == target || whitePawn+1 == target {
+                    moves.append(Move(fromSquare: whitePawn, targetSquare: target+8, enPasssantCapture: target))
+                }
+            }
+            
+        }
+    }
+    return moves
+}

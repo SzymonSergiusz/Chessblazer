@@ -14,7 +14,7 @@ struct Game {
         startNewGame()
     }
     
-    var gameProgress = [MoveData]()
+    var performedMovesList = [MoveData]()
     var castlesAvailable: Set<Character> = []
     var enPassant = "-"
     var currentTurnColor: Piece.PieceColor = .white
@@ -190,6 +190,13 @@ struct Game {
                 
                 bitboards = bitboardsCopy
                 
+            } else if move.enPasssantCapture != 0 {
+                makeMoveOperations(pieceValue: pieceValue, from: from, target: target)
+                var bitboardsCopy = bitboards
+                let enPassantCapture = move.enPasssantCapture
+                let captured = board[enPassantCapture]
+                bitboardsCopy[captured] = bitboardsCopy[captured]! & ~Bitboard(1 << enPassantCapture)
+                bitboards = bitboardsCopy
             } else {
                 makeMoveOperations(pieceValue: pieceValue, from: from, target: target)
                 
@@ -219,7 +226,7 @@ struct Game {
                 }
             }
             
-            gameProgress.append(MoveData(
+            performedMovesList.append(MoveData(
                 piece: pieceValue,
                 turn: getFullMoves(),
                 color: currentTurnColor,
@@ -237,12 +244,12 @@ struct Game {
     
 
     mutating func undoMove() {
-        guard let moveData = gameProgress.last else { return }
+        guard let moveData = performedMovesList.last else { return }
         let move = moveData.move        
         
         bitboards = moveData.bitboards
         castlesAvailable = moveData.castles
-        gameProgress.removeLast()
+        performedMovesList.removeLast()
         
         toggleColor()
         
