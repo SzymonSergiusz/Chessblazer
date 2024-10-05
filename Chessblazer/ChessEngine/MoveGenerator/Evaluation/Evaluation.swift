@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Dispatch
 
 let evalPiecesValue: [Piece.ColoredPieces: Int] = [
     .whitePawn : 100,
@@ -24,6 +23,24 @@ let evalPiecesValue: [Piece.ColoredPieces: Int] = [
     .blackKing : -20000,
 ]
 
+func countMaterial(board: [Int]) -> Int {
+    var whiteSum = 0
+    var blackSum = 0
+    for (index, piece) in board.enumerated() where piece > 0 {
+        let coloredPiece = Piece.ColoredPieces(rawValue: piece)!
+        let pieceValue = evalPiecesValue[coloredPiece]!
+        let positionValue = PieceSquareTables.tables[coloredPiece]![index]
+        if Piece.checkColor(piece: coloredPiece.rawValue) == .white {
+            whiteSum += pieceValue + positionValue
+            
+        } else {
+            blackSum += pieceValue - positionValue
+        }
+    }
+    return whiteSum + blackSum
+}
+
+
 func evaluate(board: [Int]) -> Int {
     return countMaterial(board: board)
 }
@@ -32,7 +49,7 @@ func alphabeta(game: Game, moves: [Move], depth: Int, alpha: Int, beta: Int, max
     var game = game
     var alpha = alpha
     var beta = beta
-
+    
     if depth == 0 || moves.isEmpty {
         return evaluate(board: game.toBoardArrayRepresentation())
     }
@@ -72,81 +89,50 @@ func alphabeta(game: Game, moves: [Move], depth: Int, alpha: Int, beta: Int, max
         return minEval
     }
 }
-func findBestMove(game: Game, depth: Int, maximizingPlayer: Bool) -> Move? {
+func findBestMove(game: Game, depth: Int, maximizingPlayer: Bool) async -> Move? {
     let legalMoves = generateAllLegalMoves(game: game)
     var bestMove: Move? = nil
     var alpha = Int.min
     var beta = Int.max
     
-    let queue = DispatchQueue(label: "eval", attributes: .concurrent)
-    let group = DispatchGroup()
-    
     if maximizingPlayer {
         var maxEval = Int.min
         
         for move in legalMoves {
-            group.enter()
-            queue.async {
-                var gameCopy = game
-                gameCopy.makeMove(move: move)
-                
-                let eval = alphabeta(game: gameCopy, moves: gameCopy.currentValidMoves, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
             
-                DispatchQueue.global().sync {
-                if eval > maxEval {
-                    maxEval = eval
-                    bestMove = move
-                }
-
-                    alpha = max(alpha, maxEval)
-                }
-                group.leave()
+            var gameCopy = game
+            gameCopy.makeMove(move: move)
+            
+            let eval = alphabeta(game: gameCopy, moves: gameCopy.currentValidMoves, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
+            
+            if eval > maxEval {
+                maxEval = eval
+                bestMove = move
+                
+                
+                alpha = max(alpha, maxEval)
             }
-
         }
     } else {
         var minEval = Int.max
-
+        
         for move in legalMoves {
-            group.enter()
-            queue.async {
-                var gameCopy = game
-                gameCopy.makeMove(move: move)
-                
-                let eval = alphabeta(game: gameCopy, moves: gameCopy.currentValidMoves, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)
-                DispatchQueue.global().sync {
-                    if eval < minEval {
-                        minEval = eval
-                        bestMove = move
-                    }
-                    
-                    beta = min(beta, minEval)
+            
+            var gameCopy = game
+            gameCopy.makeMove(move: move)
+            
+            let eval = alphabeta(game: gameCopy, moves: gameCopy.currentValidMoves, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)
+            DispatchQueue.global().sync {
+                if eval < minEval {
+                    minEval = eval
+                    bestMove = move
                 }
-                group.leave()
+                
+                beta = min(beta, minEval)
             }
-
+            
         }
     }
-    group.wait()
     return bestMove
 }
 
-
-
-func countMaterial(board: [Int]) -> Int {
-    var whiteSum = 0
-    var blackSum = 0
-    for (index, piece) in board.enumerated() where piece > 0 {
-        let coloredPiece = Piece.ColoredPieces(rawValue: piece)!
-        let pieceValue = evalPiecesValue[coloredPiece]!
-        let positionValue = PieceSquareTables.tables[coloredPiece]![index]
-        if Piece.checkColor(piece: coloredPiece.rawValue) == .white {
-            whiteSum += pieceValue + positionValue
-
-        } else {
-            blackSum += pieceValue - positionValue
-
-        }
-    }
-    return whiteSum + blackSum
-}

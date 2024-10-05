@@ -17,10 +17,6 @@ class Engine {
     
     var game = Game()
     
-    func start(white player1: Player, black player2: Player) -> Bool {
-        
-        return true
-    }
     func getInput(command input: String) {
         let args = input.components(separatedBy: .whitespaces)
         guard let command = CommandsGUItoEngine(rawValue: args[0]) else { return }
@@ -30,6 +26,7 @@ class Engine {
             sendOutput(output: engineId)
             sendOutput(output: "uciok")
         case .isready:
+            // loadEngine first 
             sendOutput(output: "readyok")
         case .ucinewgame:
             game.startNewGame()
@@ -83,10 +80,10 @@ class Engine {
             generateMagics()
 
         case .perft:
-            print(perftParallel(depth: 1))
-            print(perftParallel(depth: 2))
-            print(perftParallel(depth: 3))
-            print(perftParallel(depth: 4))
+            print(perftParallel(depth: 1), ", expected: 20")
+            print(perftParallel(depth: 2), ", expected: 400")
+            print(perftParallel(depth: 3), ", expected: 8902")
+            print(perftParallel(depth: 4), ", expected: 197281")
             
         case .promotion:
             var game = Game()
@@ -144,9 +141,4 @@ enum CommandsEnginetoGUI {
  The engine should boot and wait for input from the GUI,
    the engine should wait for the "isready" or "setoption" command to set up its internal parameters
    as the boot process should be as quick as possible
- 
- 
- 
- 
- 
  */

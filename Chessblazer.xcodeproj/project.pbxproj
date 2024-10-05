@@ -34,7 +34,6 @@
 		316E7E1F2C8CE4C40028CC16 /* Pieces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3181291A2C51B3EC002F1E40 /* Pieces.swift */; };
 		316E7E202C8CE4C40028CC16 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3181291E2C51B803002F1E40 /* Game.swift */; };
 		316E7E212C8CE4C40028CC16 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129202C5277FA002F1E40 /* Engine.swift */; };
-		316E7E222C8CE4C40028CC16 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129222C529FD9002F1E40 /* Players.swift */; };
 		316E7E232C8CE4C40028CC16 /* Perft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3147A5F42C893D1B007E132F /* Perft.swift */; };
 		316E7E242C8CE4C40028CC16 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129122C51B369002F1E40 /* main.swift */; };
 		317F008A2C57DA4D000E4AD6 /* Bitboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317F00892C57DA4D000E4AD6 /* Bitboard.swift */; };
@@ -46,7 +45,6 @@
 		3181291B2C51B3EC002F1E40 /* Pieces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3181291A2C51B3EC002F1E40 /* Pieces.swift */; };
 		3181291F2C51B803002F1E40 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3181291E2C51B803002F1E40 /* Game.swift */; };
 		318129212C5277FA002F1E40 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129202C5277FA002F1E40 /* Engine.swift */; };
-		318129232C529FD9002F1E40 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129222C529FD9002F1E40 /* Players.swift */; };
 		318129252C530BB0002F1E40 /* Move.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129242C530BB0002F1E40 /* Move.swift */; };
 		318129272C5440A0002F1E40 /* BoardPrinter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129262C5440A0002F1E40 /* BoardPrinter.swift */; };
 		318129302C55B0C4002F1E40 /* ChessblazerGUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3181292F2C55B0C4002F1E40 /* ChessblazerGUIApp.swift */; };
@@ -56,7 +54,6 @@
 		3181293E2C56DAA4002F1E40 /* BoardPrinter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129262C5440A0002F1E40 /* BoardPrinter.swift */; };
 		3181293F2C56DAA4002F1E40 /* Pieces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3181291A2C51B3EC002F1E40 /* Pieces.swift */; };
 		318129402C56DAA4002F1E40 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3181291E2C51B803002F1E40 /* Game.swift */; };
-		318129422C56DAA4002F1E40 /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129222C529FD9002F1E40 /* Players.swift */; };
 		318129432C56DAA4002F1E40 /* Move.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129242C530BB0002F1E40 /* Move.swift */; };
 		31ADBF392C5B05F600A97097 /* Bitboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317F00892C57DA4D000E4AD6 /* Bitboard.swift */; };
 		31ADBF3A2C5B05F600A97097 /* BitboardPrinters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317F008B2C58460E000E4AD6 /* BitboardPrinters.swift */; };
@@ -107,7 +104,6 @@
 		3181291A2C51B3EC002F1E40 /* Pieces.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pieces.swift; sourceTree = "<group>"; };
 		3181291E2C51B803002F1E40 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		318129202C5277FA002F1E40 /* Engine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
-		318129222C529FD9002F1E40 /* Players.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
 		318129242C530BB0002F1E40 /* Move.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Move.swift; sourceTree = "<group>"; };
 		318129262C5440A0002F1E40 /* BoardPrinter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardPrinter.swift; sourceTree = "<group>"; };
 		3181292D2C55B0C4002F1E40 /* ChessblazerGUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChessblazerGUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -233,7 +229,6 @@
 				3181291A2C51B3EC002F1E40 /* Pieces.swift */,
 				3181291E2C51B803002F1E40 /* Game.swift */,
 				318129202C5277FA002F1E40 /* Engine.swift */,
-				318129222C529FD9002F1E40 /* Players.swift */,
 				3147A5F42C893D1B007E132F /* Perft.swift */,
 			);
 			path = ChessEngine;
@@ -425,7 +420,6 @@
 				316E7E0A2C8CE0540028CC16 /* MagicRook.swift in Sources */,
 				317F008A2C57DA4D000E4AD6 /* Bitboard.swift in Sources */,
 				316E7E0D2C8CE0540028CC16 /* MagicBishop.swift in Sources */,
-				318129232C529FD9002F1E40 /* Players.swift in Sources */,
 				316E7E102C8CE0540028CC16 /* MagicGeneration.swift in Sources */,
 				318129212C5277FA002F1E40 /* Engine.swift in Sources */,
 				31EF3B682C622DE300DF07A3 /* PieceSquareTables.swift in Sources */,
@@ -460,7 +454,6 @@
 				3181293F2C56DAA4002F1E40 /* Pieces.swift in Sources */,
 				31ADBF3F2C5BF63D00A97097 /* ChessPieceView.swift in Sources */,
 				318129402C56DAA4002F1E40 /* Game.swift in Sources */,
-				318129422C56DAA4002F1E40 /* Players.swift in Sources */,
 				318129432C56DAA4002F1E40 /* Move.swift in Sources */,
 				316E7E112C8CE0540028CC16 /* MagicGeneration.swift in Sources */,
 				31ADBF432C5C148300A97097 /* BoardView.swift in Sources */,
@@ -495,7 +488,6 @@
 				316E7E1F2C8CE4C40028CC16 /* Pieces.swift in Sources */,
 				316E7E202C8CE4C40028CC16 /* Game.swift in Sources */,
 				316E7E212C8CE4C40028CC16 /* Engine.swift in Sources */,
-				316E7E222C8CE4C40028CC16 /* Players.swift in Sources */,
 				316E7E232C8CE4C40028CC16 /* Perft.swift in Sources */,
 				316E7E242C8CE4C40028CC16 /* main.swift in Sources */,
 				31EF3B612C61873300DF07A3 /* Evaluation.swift in Sources */,

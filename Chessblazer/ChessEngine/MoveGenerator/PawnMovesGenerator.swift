@@ -39,7 +39,6 @@ func generateBlackPawnAttacks(blackPawns: Bitboard) -> Bitboard {
 }
 
 
-
 func generateWhitePawnMoves(game: Game, square: Int, moves: inout [Move]) {
     let empty = emptySquaresBitboard(bitboards: game.bitboards)
     

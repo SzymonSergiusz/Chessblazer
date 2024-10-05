@@ -15,15 +15,14 @@ class Piece {
         case knight = 3
         case bishop = 4
         case rook = 5
-        case queen = 6 //hetman
+        case queen = 6
     }
     
     
     enum PieceColor: Int {
         case white = 8
         case black = 16
-        
-        
+
         func getOppositeColor() -> PieceColor {
             if self == .white {
                 return .black

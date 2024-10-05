@@ -8,14 +8,10 @@
 import Foundation
 class BoardPrinter {
     
-//    func printPossibleMoves(game: Game) {
-//        let moves = generateAllPossibleMoves(game: game, mo)
-//        for move in moves {
-//            let piece = Piece.ValueToPieceDict[game.board[move.fromSquare!]]
-//            
-//            print("\(piece!) :  \(move.moveToNotation())")
-//        }
-//    }
+    func printBoard(board: [Int], emojiMode: Bool = false, perspectiveColor: Piece.PieceColor = .white) {
+        perspectiveColor == .white ? printBoardFromWhitePerspective(board: board, emojiMode: emojiMode) : printBoardBlackPerspective(board: board, emojiMode: emojiMode)
+        
+    }
     
     func printBoard(board: [Int]) {
         for (index, value) in board.enumerated() {
@@ -35,7 +31,6 @@ class BoardPrinter {
         }
         print()
     }
-    
     
     private func printBoardBlackPerspective(board: [Int], emojiMode: Bool = false) {
         let letters = (65...72).map { String(UnicodeScalar($0)!) }
@@ -63,11 +58,7 @@ class BoardPrinter {
         print("")
     }
     
-    func printBoard(board: [Int], emojiMode: Bool = false, perspectiveColor: Piece.PieceColor = .white) {
-        
-        perspectiveColor == .white ? printBoardFromWhitePerspective(board: board, emojiMode: emojiMode) : printBoardBlackPerspective(board: board, emojiMode: emojiMode)
-        
-    }
+
     
     private func printBoardFromWhitePerspective(board: [Int], emojiMode: Bool = false) {
         let letters = (65...72).map { String(UnicodeScalar($0)!) }
