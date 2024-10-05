@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 class Engine {
     let engineName = "Chessblazer"
     let engineVersion = "very alpha 0.00001"
@@ -64,20 +65,31 @@ class Engine {
 //            }
 
         case .go:
-//            let randomMove = game.generatePseudoLegalMoves(forColor: game.currentTurnColor).randomElement() ?? Move(notation: "e2e4")
-//            let toNotation = randomMove.moveToNotation()
-//            sendOutput(output: "bestmove \(toNotation)")
-            sendOutput(output: "")
+            //            let command = "go searchmoves e2e4 d2d4 ponder wtime 300000 btime 300000 winc 5000 binc 5000 movestogo 30 depth 20 nodes 1000000 mate 2 movetime 60000 infinite"
+
+            let parsedParams = UciGoInput.parse(from: input)
+            print("Parsed UCI Go Input:", parsedParams)
+            
+            // so go for dsl regex to capture all possible params and then handle it
+            // if no depth then lets say depth = 50 and make it async so you can send signal to stop with .stop
+            
+            
         case .stop:
+            // here should be sent signal to stop searching for best move
+            
             print("")
         case .quit:
             quit = true
+        
             
+            
+            
+        // custom commands
         case .printBoard:
             print("")
         
         case .main:
-            generateMagics()
+            print()
 
         case .perft:
             print(perftParallel(depth: 1), ", expected: 20")
@@ -142,3 +154,4 @@ enum CommandsEnginetoGUI {
    the engine should wait for the "isready" or "setoption" command to set up its internal parameters
    as the boot process should be as quick as possible
  */
+

@@ -46,10 +46,9 @@ class Move: Equatable, Hashable {
         return (lhs.fromSquare == rhs.fromSquare) && (lhs.targetSquare == rhs.targetSquare)
     }
     
-    
     init(notation: String) {
         // think about it
-        
+        print(notation)
         if notation.count == 4 {
             self.fromSquare = Move.translateFromNotationToSquare(String(notation.prefix(2)))
             self.targetSquare = Move.translateFromNotationToSquare(String(notation.suffix(2)))
