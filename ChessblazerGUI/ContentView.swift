@@ -14,10 +14,9 @@ struct ContentView: View {
             Button("Start new game") {
                 gameState.vsEngine = vsEngine
                 gameState.startNewGame()
-                if vsEngine {
-                    Task.init {
-                        await gameState.engines()
-                    }
+                
+                Task.init {
+                    await gameState.engineMove()
                 }
             }
             TextField(text: $fen) {
@@ -26,7 +25,7 @@ struct ContentView: View {
                 gameState.loadFenGame(fen: fen)
             }
         }
-
+        
         HStack {
             VStack(alignment: .leading) {
                 Button("Undone move") {
@@ -38,62 +37,62 @@ struct ContentView: View {
                 }
             }
             ChessView(gameState: gameState)
-
             
-            .popover(isPresented: $promotionAlert) {
-                Button {
-                } label: {
-                    
-                    if gameState.currentColorToMove == .white {
-                        Image(.whiterook)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 150, height: 150)
+            
+                .popover(isPresented: $promotionAlert) {
+                    Button {
+                    } label: {
                         
-                        Image(.whitequeen)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 150, height: 150)
+                        if gameState.currentColorToMove == .white {
+                            Image(.whiterook)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 150, height: 150)
+                            
+                            Image(.whitequeen)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 150, height: 150)
+                            
+                            Image(.whitebishop)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 150, height: 150)
+                            
+                            Image(.whiteknight)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 150, height: 150)
+                        } else {
+                            Image(.blackrook)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 150, height: 150)
+                            
+                            Image(.blackqueen)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 150, height: 150)
+                            
+                            Image(.blackbishop)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 150, height: 150)
+                            
+                            Image(.blackknight)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 150, height: 150)
+                        }
                         
-                        Image(.whitebishop)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 150, height: 150)
                         
-                        Image(.whiteknight)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 150, height: 150)
-                    } else {
-                        Image(.blackrook)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 150, height: 150)
                         
-                        Image(.blackqueen)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 150, height: 150)
-                        
-                        Image(.blackbishop)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 150, height: 150)
-                        
-                        Image(.blackknight)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 150, height: 150)
                     }
-                
-                    
- 
                 }
-            }
             
-
+            
         }
-
+        
     }
 }
 

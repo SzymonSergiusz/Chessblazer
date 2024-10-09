@@ -59,13 +59,13 @@ class GameState {
         guard let move = validMoves.first(where: {$0 == Move(fromSquare: from, targetSquare: to)}) else { return }
         
         game.makeMove(move: move)
+        self.currentColorToMove = game.currentTurnColor
+        self.validMoves = self.game.currentValidMoves
+        
         
         DispatchQueue.main.async {
             self.boardState = self.game.toBoardArrayRepresentation()
-            self.validMoves = self.game.currentValidMoves
-            self.currentColorToMove = self.game.currentTurnColor
         }
-        
         var bits = generateAllAttackedSquares(game: game, color: currentColorToMove.getOppositeColor())
         attackTable.removeAll()
         while bits != 0 {
@@ -73,31 +73,28 @@ class GameState {
             attackTable.append(x)
         }
 
-        let bp = BoardPrinter()
-        bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true, perspectiveColor: .white)
+//        let bp = BoardPrinter()
+//        bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true, perspectiveColor: .white)
        
-        DispatchQueue.main.async {
-            self.evaluation = evaluate(board: self.game.toBoardArrayRepresentation())
-        }
     }
 
     
-    func engines() async {
+    func engineMove() async {
         print("engine is starting")
         while !game.currentValidMoves.isEmpty {
             if vsEngine && currentColorToMove == .black {
-                let move = await findBestMove(game: game, depth: 3, maximizingPlayer: false)
+                let move = findBestMove(game: game, depth: 3, maximizingPlayer: false)
                 if let move = move {
                     makeMove(move.fromSquare!, move.targetSquare!)
                 }
             }
 
-            if vsEngine && currentColorToMove == .white {
-                let move = await findBestMove(game: game, depth: 3, maximizingPlayer: true)
-                if let move = move {
-                    makeMove(move.fromSquare!, move.targetSquare!)
-                }
-            }
+//            if vsEngine && currentColorToMove == .white {
+//                let move = await findBestMove(game: game, depth: 3, maximizingPlayer: true)
+//                if let move = move {
+//                    makeMove(move.fromSquare!, move.targetSquare!)
+//                }
+//            }
         }
 
     }
