@@ -57,7 +57,7 @@
 ### Implemented
 - basic game (based on engine)
 - starting new game
-- engine vs engine [check engine in left corner]
+- player vs engine [check engine in left corner]
 - loading game from fen notation
 - undoing moves
 ### Not yet implemented
