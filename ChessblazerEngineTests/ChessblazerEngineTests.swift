@@ -27,11 +27,11 @@ final class ChessblazerEngineTests: XCTestCase {
 
     func testPerftTime() {
         measure {
-            assert(perftParallel(depth: 0) == 1)
-            assert(perftParallel(depth: 1) == 20)
-            assert(perftParallel(depth: 2) == 400)
-            assert(perftParallel(depth: 3) == 8902)
-            assert(perftParallel(depth: 4) == 197281)
+            assert(perftTest(depth: 0) == 1)
+            assert(perftTest(depth: 1) == 20)
+            assert(perftTest(depth: 2) == 400)
+            assert(perftTest(depth: 3) == 8902)
+            assert(perftTest(depth: 4) == 197281)
         }
     }
     

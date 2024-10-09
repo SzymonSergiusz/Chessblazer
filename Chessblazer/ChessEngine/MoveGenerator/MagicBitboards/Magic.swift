@@ -61,11 +61,15 @@ class Magic {
 
 
 }
-protocol Slider {
-    static var lookUpTable: [Int: [UInt64: Bitboard]] {get set}
-    static var masks: [Bitboard] {get set}
-    static func createLegalMoves(square: Int, blocker: Bitboard) -> Bitboard
-}
+//protocol Slider {
+//    static var lookUpTable: [Int: [UInt64: Bitboard]] {get set}
+//    static var masks: [Bitboard] {get set}
+//    static func createLegalMoves(square: Int, blocker: Bitboard) -> Bitboard
+//}
 
+enum Slider {
+    case rook(Rook)
+    case bishop(Bishop)
+}
 
 

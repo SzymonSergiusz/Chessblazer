@@ -15,6 +15,8 @@ extension UInt64 {
         static let fileAB: Bitboard = 0x0303030303030303
         static let fileGH: Bitboard = 0xC0C0C0C0C0C0C0C0
         static let rank1: Bitboard = 0x00000000000000FF
+        static let rank2: Bitboard = 0x000000000000FF00
+        static let rank7: Bitboard = 0x00FF000000000000
         static let rank8: Bitboard = 0xFF00000000000000
         static let diagonalA1H8: Bitboard = 0x8040201008040201
         static let diagonalH1A8: Bitboard = 0x0102040810204080

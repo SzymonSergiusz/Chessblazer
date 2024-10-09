@@ -93,16 +93,15 @@ struct Game {
     mutating func makeMoveOnly(move: Move) {
         guard let from = move.fromSquare else { return }
         guard let target = move.targetSquare else { return }
-        let board = toBoardArrayRepresentation()
-        let pieceValue = board[from]
+        let pieceValue = move.pieceValue
         if let castlingMove = move as? CastlingMove {
-            makeMoveOperations(pieceValue: board[from], from: from, target: castlingMove.kingDestination)
-            makeMoveOperations(pieceValue: board[target], from: target, target: castlingMove.rookDestination)
+            makeMoveOperations(pieceValue: pieceValue, from: from, target: castlingMove.kingDestination)
+            makeMoveOperations(pieceValue: move.captureValue, from: target, target: castlingMove.rookDestination)
             
-            if board[from] == Piece.ColoredPieces.whiteKing.rawValue {
+            if pieceValue == Piece.ColoredPieces.whiteKing.rawValue {
                 castlesAvailable.remove("K")
                 castlesAvailable.remove("Q")
-            } else if board[from] == Piece.ColoredPieces.blackKing.rawValue {
+            } else if pieceValue == Piece.ColoredPieces.blackKing.rawValue {
                 castlesAvailable.remove("k")
                 castlesAvailable.remove("q")
             }
@@ -114,12 +113,11 @@ struct Game {
             guard var newPieceBitboard = bitboardsCopy[newPiece] else { return }
             newPieceBitboard = newPieceBitboard | Bitboard(1) << Bitboard(target)
             
-            let pawn = board[from]
-            guard var pawnBitboard = bitboardsCopy[pawn] else { return }
+            guard var pawnBitboard = bitboardsCopy[pieceValue] else { return }
             pawnBitboard = pawnBitboard & ~(Bitboard(1) << Bitboard(from))
             
             bitboardsCopy[newPiece] = newPieceBitboard
-            bitboardsCopy[pawn] = pawnBitboard
+            bitboardsCopy[pieceValue] = pawnBitboard
             
             bitboards = bitboardsCopy
             

@@ -57,6 +57,14 @@ class Move: Equatable, Hashable, Comparable {
         self.pieceValue = pieceValue
     }
     
+    init(fromSquare: Int, targetSquare: Int, pieceValue: Int,  captureValue: Int, promotionPiece: Int) {
+        self.fromSquare = fromSquare
+        self.targetSquare = targetSquare
+        self.captureValue = captureValue
+        self.pieceValue = pieceValue
+        self.promotionPiece = promotionPiece
+    }
+    
     init(fromSquare: Int, targetSquare: Int) {
         self.fromSquare = fromSquare
         self.targetSquare = targetSquare
@@ -130,7 +138,7 @@ class Move: Equatable, Hashable, Comparable {
         return "\(squareToNotation(square: fromSquare!))\(squareToNotation(square: targetSquare!))"
     }
     
-    static var letterToNumber: [String : Int] = [
+    static let letterToNumber: [String : Int] = [
         "A" : 0,
         "B" : 1,
         "C" : 2,

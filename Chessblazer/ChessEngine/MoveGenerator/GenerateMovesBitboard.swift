@@ -126,7 +126,7 @@ func generateBishopMoves(game: Game, square: Int, moves: inout [Move]) {
 
 func generateQueenMoves(game: Game, square: Int, moves: inout [Move]) {
     var queenMoves = [Move]()
-    var queen: Piece.ColoredPieces = game.currentTurnColor == .white ? .whiteQueen : .blackQueen
+    let queen: Piece.ColoredPieces = game.currentTurnColor == .white ? .whiteQueen : .blackQueen
     generateRookMoves(game: game, square: square, moves: &queenMoves)
     generateBishopMoves(game: game, square: square, moves: &queenMoves)
     queenMoves = queenMoves.map { move in

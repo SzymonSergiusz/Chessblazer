@@ -48,6 +48,15 @@ class Piece {
         case whiteKnight = 11
         case whiteBishop = 12
         case whiteRook = 13
+        
+        static func possibleWhitePromotions() -> [ColoredPieces] {
+            return [.whiteQueen, .whiteRook, .whiteKnight, .whiteBishop]
+        }
+        
+        static func possibleBlackPromotions() -> [ColoredPieces] {
+            return [.blackQueen, .blackRook, .blackKnight, .blackBishop]
+        }
+        
     }
     
     static func combine(type: PieceType, color: PieceColor) -> Int {
@@ -117,7 +126,7 @@ class Piece {
         
     ]
     
-    static var ValueToPieceDict: [Int: Character] = [
+    static let ValueToPieceDict: [Int: Character] = [
         0: ".",
         combine(type: .king, color: .black): "k",
         combine(type: .pawn, color: .black): "p",
@@ -136,7 +145,7 @@ class Piece {
     // ♚ ♛ ♝ ♞ ♟ ♜
     // ♔ ♕ ♗ ♘ ♙ ♖
     
-    static var ValueToPieceEmojiDict: [Int: Character] = [
+    static let ValueToPieceEmojiDict: [Int: Character] = [
         0: ".",
         combine(type: .king, color: .black): "♚",
         combine(type: .pawn, color: .black): "♟",

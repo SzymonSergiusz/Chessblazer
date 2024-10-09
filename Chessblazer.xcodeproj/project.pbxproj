@@ -3,12 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		310C84912C6C029400E5566A /* Evaluation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF3B5F2C61873300DF07A3 /* Evaluation.swift */; };
 		310C84922C6C029400E5566A /* PieceSquareTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF3B672C622DE300DF07A3 /* PieceSquareTables.swift */; };
+		3121DD022CB1E53900EA5A8A /* UciUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3121DD012CB1E53900EA5A8A /* UciUtils.swift */; };
+		3121DD032CB1E53900EA5A8A /* UciUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3121DD012CB1E53900EA5A8A /* UciUtils.swift */; };
+		3121DD042CB1E53900EA5A8A /* UciUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3121DD012CB1E53900EA5A8A /* UciUtils.swift */; };
 		3147A5F02C890A1E007E132F /* ChessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3147A5EF2C890A1E007E132F /* ChessView.swift */; };
 		3147A5F22C8911DD007E132F /* PawnMovesGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3147A5F12C8911DD007E132F /* PawnMovesGenerator.swift */; };
 		3147A5F32C8915F9007E132F /* PawnMovesGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3147A5F12C8911DD007E132F /* PawnMovesGenerator.swift */; };
@@ -87,6 +90,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3121DD012CB1E53900EA5A8A /* UciUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UciUtils.swift; sourceTree = "<group>"; };
 		3147A5EF2C890A1E007E132F /* ChessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessView.swift; sourceTree = "<group>"; };
 		3147A5F12C8911DD007E132F /* PawnMovesGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PawnMovesGenerator.swift; sourceTree = "<group>"; };
 		3147A5F42C893D1B007E132F /* Perft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Perft.swift; sourceTree = "<group>"; };
@@ -129,10 +133,6 @@
 		31EF3B672C622DE300DF07A3 /* PieceSquareTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieceSquareTables.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		3121DD002CB1E50B00EA5A8A /* Utils */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Utils; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFrameworksBuildPhase section */
 		3181290C2C51B369002F1E40 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -158,6 +158,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3121DD052CB207B200EA5A8A /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				3121DD012CB1E53900EA5A8A /* UciUtils.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		317F00882C57DA34000E4AD6 /* MoveGenerator */ = {
 			isa = PBXGroup;
 			children = (
@@ -228,7 +236,7 @@
 		318129192C51B389002F1E40 /* ChessEngine */ = {
 			isa = PBXGroup;
 			children = (
-				3121DD002CB1E50B00EA5A8A /* Utils */,
+				3121DD052CB207B200EA5A8A /* Utils */,
 				317F00882C57DA34000E4AD6 /* MoveGenerator */,
 				318129262C5440A0002F1E40 /* BoardPrinter.swift */,
 				3181291A2C51B3EC002F1E40 /* Pieces.swift */,
@@ -316,9 +324,6 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				3121DD002CB1E50B00EA5A8A /* Utils */,
-			);
 			name = Chessblazer;
 			productName = Chessblazer;
 			productReference = 3181290F2C51B369002F1E40 /* Chessblazer */;
@@ -336,9 +341,6 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				3121DD002CB1E50B00EA5A8A /* Utils */,
-			);
 			name = ChessblazerGUI;
 			productName = ChessblazerGUI;
 			productReference = 3181292D2C55B0C4002F1E40 /* ChessblazerGUI.app */;
@@ -355,9 +357,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				3121DD002CB1E50B00EA5A8A /* Utils */,
 			);
 			name = ChessblazerEngineTests;
 			productName = ChessblazerEngineTests;
@@ -433,6 +432,7 @@
 				318129272C5440A0002F1E40 /* BoardPrinter.swift in Sources */,
 				316E7E0A2C8CE0540028CC16 /* MagicRook.swift in Sources */,
 				317F008A2C57DA4D000E4AD6 /* Bitboard.swift in Sources */,
+				3121DD032CB1E53900EA5A8A /* UciUtils.swift in Sources */,
 				316E7E0D2C8CE0540028CC16 /* MagicBishop.swift in Sources */,
 				316E7E102C8CE0540028CC16 /* MagicGeneration.swift in Sources */,
 				318129212C5277FA002F1E40 /* Engine.swift in Sources */,
@@ -473,6 +473,7 @@
 				31ADBF432C5C148300A97097 /* BoardView.swift in Sources */,
 				31ADBF412C5BF68900A97097 /* ChessPiece.swift in Sources */,
 				31ADBF452C5C14C800A97097 /* SquareView.swift in Sources */,
+				3121DD022CB1E53900EA5A8A /* UciUtils.swift in Sources */,
 				31EF3B632C62269900DF07A3 /* PiecesBoardView.swift in Sources */,
 				316E7E0B2C8CE0540028CC16 /* MagicRook.swift in Sources */,
 				318129322C55B0C4002F1E40 /* ContentView.swift in Sources */,
@@ -502,6 +503,7 @@
 				316E7E1F2C8CE4C40028CC16 /* Pieces.swift in Sources */,
 				316E7E202C8CE4C40028CC16 /* Game.swift in Sources */,
 				316E7E212C8CE4C40028CC16 /* Engine.swift in Sources */,
+				3121DD042CB1E53900EA5A8A /* UciUtils.swift in Sources */,
 				316E7E232C8CE4C40028CC16 /* Perft.swift in Sources */,
 				316E7E242C8CE4C40028CC16 /* main.swift in Sources */,
 				31EF3B612C61873300DF07A3 /* Evaluation.swift in Sources */,
@@ -573,6 +575,7 @@
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -630,6 +633,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -641,7 +645,7 @@
 				DEVELOPMENT_TEAM = M24BUWBX5F;
 				ENABLE_HARDENED_RUNTIME = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -653,7 +657,7 @@
 				DEVELOPMENT_TEAM = M24BUWBX5F;
 				ENABLE_HARDENED_RUNTIME = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
