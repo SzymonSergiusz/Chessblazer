@@ -35,7 +35,9 @@ struct Game {
     mutating func loadBoardFromFen(fen: String) {
         
         for piece in Piece.ColoredPieces.allCases {
-            bitboards[piece.rawValue] = Bitboard(0)
+            if piece.rawValue != 0 {
+                bitboards[piece.rawValue] = Bitboard(0)
+            }
         }
         
         let args = fen.components(separatedBy: " ")
@@ -106,23 +108,23 @@ struct Game {
             }
             
             
-        }  else if move.promotionPiece.count > 0 {
-            
-            guard let newPiece = Piece.ColoredPiecesDict[move.promotionPiece] else { return }
+        }  else if move.promotionPiece != 0 {
+            let newPiece = move.promotionPiece
             var bitboardsCopy = bitboards
-            guard var newPieceBitboard = bitboardsCopy[newPiece.rawValue] else { return }
+            guard var newPieceBitboard = bitboardsCopy[newPiece] else { return }
             newPieceBitboard = newPieceBitboard | Bitboard(1) << Bitboard(target)
             
             let pawn = board[from]
             guard var pawnBitboard = bitboardsCopy[pawn] else { return }
             pawnBitboard = pawnBitboard & ~(Bitboard(1) << Bitboard(from))
             
-            bitboardsCopy[newPiece.rawValue] = newPieceBitboard
+            bitboardsCopy[newPiece] = newPieceBitboard
             bitboardsCopy[pawn] = pawnBitboard
             
             bitboards = bitboardsCopy
             
         } else {
+
             makeMoveOperations(pieceValue: pieceValue, from: from, target: target)
             
             switch pieceValue {
@@ -155,15 +157,15 @@ struct Game {
     mutating func makeMove(move: Move) {
         guard let from = move.fromSquare, let target = move.targetSquare else { return }
         
-        let board = toBoardArrayRepresentation()
-        let pieceValue = board[from]
+        let pieceValue = move.pieceValue
         let bitboardsBefore = bitboards
         let castlesAvailableBefore = castlesAvailable
         if currentValidMoves.contains(move) {
             
             if let castlingMove = move as? CastlingMove {
-                makeMoveOperations(pieceValue: board[from], from: from, target: castlingMove.kingDestination)
-                makeMoveOperations(pieceValue: board[target], from: target, target: castlingMove.rookDestination)
+                #warning("to examine later")
+                makeMoveOperations(pieceValue: move.pieceValue, from: from, target: castlingMove.kingDestination)
+                makeMoveOperations(pieceValue: move.captureValue, from: target, target: castlingMove.rookDestination)
                 
                 if pieceValue == Piece.ColoredPieces.whiteKing.rawValue {
                     castlesAvailable.remove("K")
@@ -173,20 +175,20 @@ struct Game {
                     castlesAvailable.remove("q")
                 }
                 
-            } else if !move.promotionPiece.isEmpty {
-                guard let newPiece = Piece.ColoredPiecesDict[move.promotionPiece] else { return }
+            } else if move.promotionPiece != 0 {
+
+                guard let newPiece = Piece.ColoredPieces(rawValue: move.promotionPiece) else { return }
                 
                 var bitboardsCopy = bitboards
                 
                 guard var newPieceBitboard = bitboardsCopy[newPiece.rawValue] else { return }
                 newPieceBitboard = newPieceBitboard | (Bitboard(1) << Bitboard(target))
                 
-                let pawn = board[from]
-                guard var pawnBitboard = bitboardsCopy[pawn] else { return }
+                guard var pawnBitboard = bitboardsCopy[pieceValue] else { return }
                 pawnBitboard = pawnBitboard & (~(Bitboard(1) << Bitboard(from)))
                 
                 bitboardsCopy[newPiece.rawValue] = newPieceBitboard
-                bitboardsCopy[pawn] = pawnBitboard
+                bitboardsCopy[pieceValue] = pawnBitboard
                 
                 bitboards = bitboardsCopy
                 
@@ -194,11 +196,11 @@ struct Game {
                 makeMoveOperations(pieceValue: pieceValue, from: from, target: target)
                 var bitboardsCopy = bitboards
                 let enPassantCapture = move.enPasssantCapture
-                let captured = board[enPassantCapture]
+                let captured = move.captureValue
                 bitboardsCopy[captured] = bitboardsCopy[captured]! & ~Bitboard(1 << enPassantCapture)
                 bitboards = bitboardsCopy
             } else {
-                makeMoveOperations(pieceValue: pieceValue, from: from, target: target)
+                makeMoveOperations(pieceValue: move.pieceValue, from: from, target: target)
                 
                 switch pieceValue {
                 case Piece.ColoredPieces.whiteKing.rawValue:
@@ -226,12 +228,13 @@ struct Game {
                 }
             }
             
-            performedMovesList.append(MoveData(
+            performedMovesList.append(
+            MoveData(
                 piece: pieceValue,
                 turn: getFullMoves(),
                 color: currentTurnColor,
                 move: move,
-                capturedPiece: toBoardArrayRepresentation()[target] > 0 ? toBoardArrayRepresentation()[target] : nil,
+                capturedPiece: move.captureValue,
                 bitboards: bitboardsBefore,
                 castles: castlesAvailableBefore
             ))

@@ -46,7 +46,7 @@ func generateWhitePawnMoves(game: Game, square: Int, moves: inout [Move]) {
     var movesBitboard = whitePawnOnePush(whitePawns: pawn, emptySquares: empty) | whitePawnDoublePush(whitePawns: pawn, emptySquares: empty) | (generateWhitePawnAttacks(whitePawns: pawn) & Magic.blackPiecesBitboards(bitboards: game.bitboards))
     while movesBitboard != 0 {
         let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
-        moves.append(Move(fromSquare: square, targetSquare: targetSquare))
+        moves.append(Move(fromSquare: square, targetSquare: targetSquare, pieceValue: Piece.ColoredPieces.whitePawn.rawValue, captureValue: getPieceValueFromField(at: targetSquare, bitboards: game.bitboards)))
     }
 }
 
@@ -55,7 +55,7 @@ func generateWhitePawnAttacks(game: Game, square: Int, moves: inout [Move]) {
     var movesBitboard = generateWhitePawnAttacks(whitePawns: pawn)
     while movesBitboard != 0 {
         let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
-        moves.append(Move(fromSquare: square, targetSquare: targetSquare))
+        moves.append(Move(fromSquare: square, targetSquare: targetSquare, pieceValue: Piece.ColoredPieces.whitePawn.rawValue, captureValue: getPieceValueFromField(at: targetSquare, bitboards: game.bitboards)))
     }
 }
 
@@ -69,7 +69,7 @@ func generateBlackPawnAttacks(game: Game, square: Int, moves: inout [Move]) {
     var movesBitboard = generateBlackPawnAttacks(blackPawns: pawn)
     while movesBitboard != 0 {
         let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
-        moves.append(Move(fromSquare: square, targetSquare: targetSquare))
+        moves.append(Move(fromSquare: square, targetSquare: targetSquare, pieceValue: Piece.ColoredPieces.blackPawn.rawValue, captureValue: getPieceValueFromField(at: targetSquare, bitboards: game.bitboards)))
     }
 }
 
@@ -89,7 +89,7 @@ func generateBlackPawnMoves(game: Game, square: Int, moves: inout [Move]) {
     var movesBitboard = blackPawnOnePush(blackPawns: pawn, emptySquares: empty) | blackPawnDoublePush(blackPawns: pawn, emptySquares: empty) | (generateBlackPawnAttacks(blackPawns: pawn) & Magic.whitePiecesBitboards(bitboards: game.bitboards))
     while movesBitboard != 0 {
         let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
-        moves.append(Move(fromSquare: square, targetSquare: targetSquare))
+        moves.append(Move(fromSquare: square, targetSquare: targetSquare, pieceValue: Piece.ColoredPieces.blackPawn.rawValue, captureValue: getPieceValueFromField(at: targetSquare, bitboards: game.bitboards)))
     }
 }
 

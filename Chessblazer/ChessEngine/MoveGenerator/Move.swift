@@ -19,7 +19,7 @@ struct MoveData {
 
 
 
-class Move: Equatable, Hashable {
+class Move: Equatable, Hashable, Comparable {
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(fromSquare!+targetSquare!)
@@ -29,9 +29,15 @@ class Move: Equatable, Hashable {
     
     var fromSquare: Int?
     var targetSquare: Int?
-    var promotionPiece: String = ""
+    var promotionPiece: Int = 0
     var enPasssantCapture = 0
     
+    var pieceValue = 0
+    var captureValue = 0
+
+#warning("add logic for this")
+    var isAttackedByPawn = false
+
     var asString: String {
         "\(fromSquare!) \(targetSquare!)"
     }
@@ -40,6 +46,15 @@ class Move: Equatable, Hashable {
         self.fromSquare = fromSquare
         self.targetSquare = targetSquare
         self.enPasssantCapture = enPasssantCapture
+        #warning("reconsider this but should be ok for now")
+        self.captureValue = Piece.ColoredPieces.whitePawn.rawValue
+    }
+    
+    init(fromSquare: Int, targetSquare: Int, pieceValue: Int,  captureValue: Int) {
+        self.fromSquare = fromSquare
+        self.targetSquare = targetSquare
+        self.captureValue = captureValue
+        self.pieceValue = pieceValue
     }
     
     init(fromSquare: Int, targetSquare: Int) {
@@ -51,9 +66,38 @@ class Move: Equatable, Hashable {
         return (lhs.fromSquare == rhs.fromSquare) && (lhs.targetSquare == rhs.targetSquare)
     }
     
+    func moveValue() -> Int {
+        var score = 0
+        let pieceRealValue = evalPiecesValue[Piece.ColoredPieces(rawValue: pieceValue)!]!
+        let captureRealValue = evalPiecesValue[Piece.ColoredPieces(rawValue: captureValue)!]!
+
+        
+        
+        if Piece.getType(piece: captureValue) == .king {
+            score += 50
+        } else if captureValue != 0 {
+            score += abs(captureRealValue) * 10 - abs(pieceRealValue)
+        }
+        
+        if promotionPiece != 0 {
+        #warning("lets say promotion is hetman for now")
+            score += 900
+        }
+        
+        if isAttackedByPawn {
+            score -= abs(pieceRealValue)
+        }
+        return score
+    }
+    
+    static func < (lhs: Move, rhs: Move) -> Bool {
+        return lhs.moveValue() < rhs.moveValue()
+    }
+    
     init(notation: String) {
-        // think about it
-        print(notation)
+        
+        #warning("think about it")
+        
         if notation.count == 4 {
             self.fromSquare = Move.translateFromNotationToSquare(String(notation.prefix(2)))
             self.targetSquare = Move.translateFromNotationToSquare(String(notation.suffix(2)))
@@ -63,7 +107,9 @@ class Move: Equatable, Hashable {
             let start = notation.index(notation.startIndex, offsetBy: 2)
             let end = notation.index(notation.startIndex, offsetBy: 4)
             self.targetSquare = Move.translateFromNotationToSquare(String(notation[start..<end]))
-            self.promotionPiece = String(notation.suffix(1))
+            if let pp = Piece.ColoredPiecesDict[String(notation.suffix(1))] {
+                self.promotionPiece = pp.rawValue
+            }
         }
     }
     
@@ -112,7 +158,7 @@ class CastlingMove: Move {
     init(fromSquare: Int, targetSquare: Int, rookDestination: Int, kingDestination: Int) {
         self.rookDestination = rookDestination
         self.kingDestination = kingDestination
-        super.init(fromSquare: fromSquare, targetSquare: targetSquare)
+        super.init(fromSquare: fromSquare, targetSquare: targetSquare, pieceValue: 0, captureValue: 0)
         self.castling = true
 
     }

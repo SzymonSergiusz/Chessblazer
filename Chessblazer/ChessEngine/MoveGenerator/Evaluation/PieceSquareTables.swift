@@ -30,10 +30,10 @@ struct PieceSquareTables {
         
         .blackKing: kingMidgameTable.mirrored(),
         .blackPawn: pawnTable.mirrored(),
-        .blackKnight: knightTable,
-        .blackRook: rookTable,
-        .blackQueen: queenTable,
-        .blackBishop: bishopTable,
+        .blackKnight: knightTable.mirrored(),
+        .blackRook: rookTable.mirrored(),
+        .blackQueen: queenTable.mirrored(),
+        .blackBishop: bishopTable.mirrored(),
     ]
     
     static let pawnTable: [Int] = [

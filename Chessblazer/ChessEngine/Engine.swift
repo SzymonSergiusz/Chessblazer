@@ -96,6 +96,11 @@ class Engine {
             print(perftParallel(depth: 2), ", expected: 400")
             print(perftParallel(depth: 3), ", expected: 8902")
             print(perftParallel(depth: 4), ", expected: 197281")
+//            
+//            print(perftParallel(depth: 5), ", expected: 4,865,609")
+            // 4 866 899 , expected: 4,865,609
+            // 1290
+            // 10 minutes
             
         case .promotion:
             var game = Game()
