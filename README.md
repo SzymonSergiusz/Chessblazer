@@ -17,7 +17,14 @@
 ### Not implemented yet
 
 ## AI
-- 
+### Implemented
+- Alpha-Beta Pruning
+- Move Ordering
+- Iterative deepening
+### Not implemented yet
+- Transposition Table
+- Opening book
+
 ## Perft test results
 <table>
    <tr>
