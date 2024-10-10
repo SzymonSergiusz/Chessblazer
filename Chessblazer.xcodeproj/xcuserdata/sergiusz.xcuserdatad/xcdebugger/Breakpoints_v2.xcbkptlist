@@ -24,15 +24,15 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "A6B2F5FD-9527-46D9-9B00-4B959F3B3781"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Chessblazer/ChessEngine/MoveGenerator/GenerateMovesBitboard.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "327"
-            endingLineNumber = "327"
-            landmarkName = "generateAllAttackedSquares(game:color:)"
+            startingLineNumber = "112"
+            endingLineNumber = "112"
+            landmarkName = "generateAllAttackedSquares(game:enemyColor:)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

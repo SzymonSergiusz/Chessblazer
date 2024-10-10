@@ -7,49 +7,49 @@
 
 import Foundation
 
-let timeLimit: TimeInterval = 3
+let timeLimit: TimeInterval = 2
 
 func isTimeLimitExceeded(searchStartTime: TimeInterval) -> Bool {
     return Date().timeIntervalSince1970 - searchStartTime >= timeLimit
 }
 
-let evalPiecesValue: [Piece.ColoredPieces: Int] = [
-    .empty : 0,
-    .whitePawn : 100,
-    .whiteKnight : 320,
-    .whiteBishop : 330,
-    .whiteRook : 500,
-    .whiteQueen : 900,
-    .whiteKing : 20000,
+let PieceValueTable: [Int: Int] = [
+    Piece.ColoredPieces.empty.rawValue : 0,
+    Piece.ColoredPieces.whitePawn.rawValue : 100,
+    Piece.ColoredPieces.whiteKnight.rawValue : 320,
+    Piece.ColoredPieces.whiteBishop.rawValue : 330,
+    Piece.ColoredPieces.whiteRook.rawValue : 500,
+    Piece.ColoredPieces.whiteQueen.rawValue : 900,
+    Piece.ColoredPieces.whiteKing.rawValue : 20000,
     
-    .blackPawn : -100,
-    .blackKnight : -320,
-    .blackBishop : -330,
-    .blackRook : -500,
-    .blackQueen : -900,
-    .blackKing : -20000,
+    Piece.ColoredPieces.blackPawn.rawValue : -100,
+    Piece.ColoredPieces.blackKnight.rawValue : -320,
+    Piece.ColoredPieces.blackBishop.rawValue : -330,
+    Piece.ColoredPieces.blackRook.rawValue : -500,
+    Piece.ColoredPieces.blackQueen.rawValue : -900,
+    Piece.ColoredPieces.blackKing.rawValue : -20000,
 ]
-
-func countMaterial(board: [Int]) -> Int {
+func countMaterial(bitboards: [Int: Bitboard]) -> Int {
     var whiteSum = 0
     var blackSum = 0
-    for (index, piece) in board.enumerated() where piece > 0 {
-        let coloredPiece = Piece.ColoredPieces(rawValue: piece)!
-        let pieceValue = evalPiecesValue[coloredPiece]!
-        let positionValue = PieceSquareTables.tables[coloredPiece]![index]
-        if Piece.checkColor(piece: coloredPiece.rawValue) == .white {
-            whiteSum += pieceValue + positionValue
-            
-        } else {
-            blackSum += pieceValue - positionValue
+    for (piece, bitboard) in bitboards where piece > 0 {
+        let table = PieceSquareTables.getTable(piece: piece)
+        let pieceValue = PieceValueTable[piece] ?? 0
+        var bitboardCopy = bitboard
+        while bitboardCopy != 0 {
+            let position = Bitboard.popLSB(&bitboardCopy)
+            if Piece.checkColor(piece: piece) == .white {
+                whiteSum += pieceValue + table[position]
+            } else {
+                blackSum += pieceValue - table[position]
+            }
         }
     }
     return whiteSum + blackSum
 }
 
-
-func evaluate(board: [Int]) -> Int {
-    return countMaterial(board: board)
+func evaluate(bitboards: [Int: Bitboard]) -> Int {
+    return countMaterial(bitboards: bitboards)
 }
 
 func alphabeta(game: Game, depth: Int, alpha: Int, beta: Int, maximizingPlayer: Bool) -> Int {
@@ -58,7 +58,7 @@ func alphabeta(game: Game, depth: Int, alpha: Int, beta: Int, maximizingPlayer: 
     var beta = beta
 
     if depth == 0 || game.currentValidMoves.isEmpty {
-        return evaluate(board: game.toBoardArrayRepresentation())
+        return evaluate(bitboards: game.bitboards)
     }
     let moves = generateAllLegalMoves(game: game).sorted(by: >)
 
@@ -98,7 +98,7 @@ func findBestMove(game: Game, depth: Int, maximizingPlayer: Bool) -> Move? {
 }
 
 func iterativeDeepening(game: Game, initialDepth: Int, maximizingPlayer: Bool) -> Move? {
-    var searchStartTime = Date().timeIntervalSince1970
+    let searchStartTime = Date().timeIntervalSince1970
     var bestMove: Move? = nil
     var bestEval = maximizingPlayer ? Int.min : Int.max
 

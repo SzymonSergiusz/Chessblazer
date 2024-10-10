@@ -7,18 +7,6 @@
 
 import Foundation
 
-struct MoveData {
-    var piece: Int
-    var turn: Int
-    var color: Piece.PieceColor
-    var move: Move
-    var capturedPiece: Int?
-    var bitboards: [Piece.ColoredPieces.RawValue : Bitboard]
-    var castles: Set<Character>
-}
-
-
-
 class Move: Equatable, Hashable, Comparable {
     
     func hash(into hasher: inout Hasher) {
@@ -35,7 +23,7 @@ class Move: Equatable, Hashable, Comparable {
     var pieceValue = 0
     var captureValue = 0
 
-#warning("add logic for this")
+    #warning("add logic for this")
     var isAttackedByPawn = false
 
     var asString: String {
@@ -74,13 +62,11 @@ class Move: Equatable, Hashable, Comparable {
         return (lhs.fromSquare == rhs.fromSquare) && (lhs.targetSquare == rhs.targetSquare)
     }
     
-    func moveValue() -> Int {
+    func moveValue(attackPawnTable: Bitboard = Bitboard(0)) -> Int {
         var score = 0
-        let pieceRealValue = evalPiecesValue[Piece.ColoredPieces(rawValue: pieceValue)!]!
-        let captureRealValue = evalPiecesValue[Piece.ColoredPieces(rawValue: captureValue)!]!
+        let pieceRealValue = PieceValueTable[pieceValue]!
+        let captureRealValue = PieceValueTable[pieceValue]!
 
-        
-        
         if Piece.getType(piece: captureValue) == .king {
             score += 50
         } else if captureValue != 0 {
@@ -91,8 +77,9 @@ class Move: Equatable, Hashable, Comparable {
         #warning("lets say promotion is hetman for now")
             score += 900
         }
-        
-        if isAttackedByPawn {
+        //isAttackedByPawn
+        let b = (Bitboard(1) << Bitboard(targetSquare!))
+        if b & attackPawnTable == b {
             score -= abs(pieceRealValue)
         }
         return score
@@ -101,6 +88,8 @@ class Move: Equatable, Hashable, Comparable {
     static func < (lhs: Move, rhs: Move) -> Bool {
         return lhs.moveValue() < rhs.moveValue()
     }
+    
+    init(){}
     
     init(notation: String) {
         

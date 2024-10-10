@@ -85,6 +85,18 @@ class Engine {
             
             
         // custom commands
+            
+        case .eve:
+            var game = Game()
+            game.startNewGame()
+            let bp = BoardPrinter()
+            while !game.currentValidMoves.isEmpty {
+                let bestMove = game.boardState.currentTurnColor == .white ? findBestMove(game: game, depth: 3, maximizingPlayer: true) : findBestMove(game: game, depth: 3, maximizingPlayer: false)
+                game.makeMove(move: bestMove!)
+                bp.printBoard(board: game.toBoardArrayRepresentation())
+                
+            }
+            
         case .printBoard:
             print("")
         
@@ -141,6 +153,7 @@ enum CommandsGUItoEngine: String {
     case main
     case promotion
     case perft
+    case eve // Engine vs Engine
 }
 
 enum CommandsEnginetoGUI {

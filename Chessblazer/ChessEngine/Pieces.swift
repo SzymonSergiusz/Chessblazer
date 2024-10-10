@@ -19,11 +19,11 @@ class Piece {
     }
     
     
-    enum PieceColor: Int {
+    enum Color: Int {
         case white = 8
         case black = 16
 
-        func getOppositeColor() -> PieceColor {
+        func getOppositeColor() -> Color {
             if self == .white {
                 return .black
             } else {
@@ -59,7 +59,7 @@ class Piece {
         
     }
     
-    static func combine(type: PieceType, color: PieceColor) -> Int {
+    static func combine(type: PieceType, color: Color) -> Int {
         return type.rawValue | color.rawValue
     }
     
@@ -69,15 +69,15 @@ class Piece {
     }
     
     static func getType(piece: Int) -> PieceType {
-        let colorValue = checkColor(piece: piece) == .white ? PieceColor.white.rawValue : PieceColor.black.rawValue
+        let colorValue = checkColor(piece: piece) == .white ? Color.white.rawValue : Color.black.rawValue
         let noColorPiece = piece - colorValue
         return PieceType(rawValue: noColorPiece) ?? PieceType.empty
         
     }
     
     
-    static func checkColor(piece: Int) -> Piece.PieceColor {
-        if piece / Piece.PieceColor.black.rawValue == 1 {
+    static func checkColor(piece: Int) -> Piece.Color {
+        if piece / Piece.Color.black.rawValue == 1 {
             return .black
         } else {
             return .white

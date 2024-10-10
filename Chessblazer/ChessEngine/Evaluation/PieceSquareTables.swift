@@ -18,23 +18,41 @@ extension Array where Element == Int {
 }
 
 struct PieceSquareTables {
-    
-    
-    static let tables: [Piece.ColoredPieces: [Int]] = [
-        .whiteKing: kingMidgameTable,
-        .whitePawn: pawnTable,
-        .whiteKnight: knightTable,
-        .whiteRook: rookTable,
-        .whiteQueen: queenTable,
-        .whiteBishop: bishopTable,
+    static func getTable(piece: Int, eval: Int = 0) -> [Int] {
         
-        .blackKing: kingMidgameTable.mirrored(),
-        .blackPawn: pawnTable.mirrored(),
-        .blackKnight: knightTable.mirrored(),
-        .blackRook: rookTable.mirrored(),
-        .blackQueen: queenTable.mirrored(),
-        .blackBishop: bishopTable.mirrored(),
-    ]
+        switch Piece.ColoredPieces(rawValue: piece) {
+
+        case .some(.empty):
+            return [Int]()
+        case .some(.blackKing):
+            return getKingTable(currentBoardEval: eval).mirrored()
+        case .some(.blackPawn):
+            return pawnTable.mirrored()
+        case .some(.blackQueen):
+            return queenTable.mirrored()
+        case .some(.blackKnight):
+            return knightTable.mirrored()
+        case .some(.blackBishop):
+            return bishopTable.mirrored()
+        case .some(.blackRook):
+            return rookTable.mirrored()
+        case .some(.whiteKing):
+            return getKingTable(currentBoardEval: eval)
+        case .some(.whitePawn):
+            return pawnTable
+        case .some(.whiteQueen):
+            return queenTable
+        case .some(.whiteKnight):
+            return knightTable
+        case .some(.whiteBishop):
+            return bishopTable
+        case .some(.whiteRook):
+            return rookTable
+        case .none:
+            return [Int]()
+        }
+        
+    }
     
     static let pawnTable: [Int] = [
         0,  0,  0,  0,  0,  0,  0,  0,
@@ -91,8 +109,6 @@ struct PieceSquareTables {
          -20,-10,-10, -5, -5,-10,-10,-20,
     ]
     
-
-#warning("add also king endgame table")
     static let kingMidgameTable: [Int] = [
         20, 30, 10,  0,  0, 10, 30, 20,
         20, 20,  0,  0,  0,  0, 20, 20,
@@ -103,4 +119,25 @@ struct PieceSquareTables {
         -30,-40,-40,-50,-50,-40,-40,-30,
         -30,-40,-40,-50,-50,-40,-40,-30,
     ]
+    
+    static let kingEndgameTable: [Int] = [
+        0,  10,  20,  30,  30,  20,  10,   0,
+       10,  20,  30,  40,  40,  30,  20,  10,
+       20,  30,  40,  50,  50,  40,  30,  20,
+       30,  40,  50,  60,  60,  50,  40,  30,
+       30,  40,  50,  60,  60,  50,  40,  30,
+       20,  30,  40,  50,  50,  40,  30,  20,
+       10,  20,  30,  40,  40,  30,  20,  10,
+        0,  10,  20,  30,  30,  20,  10,   0
+    ]
+    
+    static func getKingTable(currentBoardEval: Int) -> [Int] {
+//        for now 2000 should be enogh
+        if abs(currentBoardEval) < 2000 {
+            return kingEndgameTable
+        } else {
+            return kingMidgameTable
+        }
+    }
+    
 }

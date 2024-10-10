@@ -8,28 +8,9 @@
 import Foundation
 class BoardPrinter {
     
-    func printBoard(board: [Int], emojiMode: Bool = false, perspectiveColor: Piece.PieceColor = .white) {
+    func printBoard(board: [Int], emojiMode: Bool = true, perspectiveColor: Piece.Color = .white) {
         perspectiveColor == .white ? printBoardFromWhitePerspective(board: board, emojiMode: emojiMode) : printBoardBlackPerspective(board: board, emojiMode: emojiMode)
         
-    }
-    
-    func printBoard(board: [Int]) {
-        for (index, value) in board.enumerated() {
-            if index % 8 == 0 {
-                print("")
-            }
-            if value == 0 {
-                print(" \(value)", terminator: " ")
-            } else {
-                if value / 10 == 0 {
-                    print(" \(value)", terminator: " ")
-                } else {
-                    print("\(value)", terminator: " ")
-                }
-                
-            }
-        }
-        print()
     }
     
     private func printBoardBlackPerspective(board: [Int], emojiMode: Bool = false) {

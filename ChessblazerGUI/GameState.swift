@@ -16,7 +16,7 @@ class GameState {
     var tappedPieceTargets = [Int]()
     var attackTable = [Int]()
     var validMoves = [Move]()
-    var currentColorToMove = Piece.PieceColor.white
+    var currentColorToMove = Piece.Color.white
     
     var vsEngine = false
     
@@ -24,7 +24,7 @@ class GameState {
         game = Game()
         boardState.removeAll()
         validMoves.removeAll()
-        currentColorToMove = Piece.PieceColor.white
+        currentColorToMove = Piece.Color.white
         tappedPieceTargets.removeAll()
         validMoves = game.currentValidMoves
         game.startNewGame()
@@ -38,7 +38,7 @@ class GameState {
         game.loadBoardFromFen(fen: fen)
         boardState = game.toBoardArrayRepresentation()
         validMoves = game.currentValidMoves
-        currentColorToMove = game.currentTurnColor
+        currentColorToMove = game.boardState.currentTurnColor
     }
     
     func onPieceTap(square: Int) {
@@ -59,14 +59,14 @@ class GameState {
         guard let move = validMoves.first(where: {$0 == Move(fromSquare: from, targetSquare: to)}) else { return }
         
         game.makeMove(move: move)
-        self.currentColorToMove = game.currentTurnColor
         self.validMoves = self.game.currentValidMoves
-        
+        self.currentColorToMove = game.boardState.currentTurnColor
+
         
         DispatchQueue.main.async {
             self.boardState = self.game.toBoardArrayRepresentation()
         }
-        var bits = generateAllAttackedSquares(game: game, color: currentColorToMove.getOppositeColor())
+        var bits = generateAllAttackedSquares(bitboards: game.bitboards, currentColor: currentColorToMove.getOppositeColor())
         attackTable.removeAll()
         while bits != 0 {
             let x = UInt64.popLSB(&bits)
@@ -75,13 +75,12 @@ class GameState {
 
 //        let bp = BoardPrinter()
 //        bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true, perspectiveColor: .white)
-       
+
     }
 
-    
     func engineMove() async {
         print("engine is starting")
-        while !game.currentValidMoves.isEmpty {
+        while !game.boardState.hasGameEnded {
             if vsEngine && currentColorToMove == .black {
                 let move = findBestMove(game: game, depth: 3, maximizingPlayer: false)
                 if let move = move {
@@ -112,10 +111,10 @@ class GameState {
         
         boardState.removeAll()
         validMoves.removeAll()
-        currentColorToMove = game.currentTurnColor
+        currentColorToMove = game.boardState.currentTurnColor
         tappedPieceTargets.removeAll()
         validMoves = game.currentValidMoves
         boardState = game.toBoardArrayRepresentation()
-        evaluation = evaluate(board: game.toBoardArrayRepresentation())
+        evaluation = evaluate(bitboards: game.bitboards)
     }
 }

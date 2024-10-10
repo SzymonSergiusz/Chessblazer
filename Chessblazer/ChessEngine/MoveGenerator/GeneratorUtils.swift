@@ -1,0 +1,49 @@
+//
+//  GeneratorUtils.swift
+//  Chessblazer
+//
+//  Created by sergiusz on 10/10/2024.
+//
+
+import Foundation
+func emptySquaresBitboard(bitboards: [Int: Bitboard]) -> Bitboard {
+    var notEmpty = Bitboard(0)
+    for bitboard in bitboards {
+        notEmpty = notEmpty | bitboard.value
+    }
+    
+    return ~notEmpty
+}
+
+func getKingPosition(bitboards: [Int: Bitboard], color: Piece.Color) -> Int {
+    
+    if color == .white {
+        var b = bitboards[Piece.ColoredPieces.whiteKing.rawValue]!
+        let square = Bitboard.popLSB(&b)
+        return square
+    } else {
+        var b = bitboards[Piece.ColoredPieces.blackKing.rawValue]!
+        let square = Bitboard.popLSB(&b)
+        return square
+    }
+}
+
+func getKingBitboard(bitboards: [Int: Bitboard], color: Piece.Color) -> Bitboard {
+    
+    if color == .white {
+        return bitboards[Piece.ColoredPieces.whiteKing.rawValue]!
+    } else {
+        return bitboards[Piece.ColoredPieces.blackKing.rawValue]!
+    }
+    
+}
+
+func getPieceValueFromField(at field: Int, bitboards: [Piece.ColoredPieces.RawValue: Bitboard]) -> Piece.ColoredPieces.RawValue {
+    let b = Bitboard(1) << Bitboard(field)
+    for bitboard in bitboards {
+        if b & bitboard.value == b {
+            return bitboard.key
+        }
+    }
+    return 0 // no capture
+}
