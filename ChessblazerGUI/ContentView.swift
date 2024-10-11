@@ -16,7 +16,7 @@ struct ContentView: View {
             Button("Start") {
                 gameState.startNewGame()
                 if engineVsEngine {
-                    while !gameState.game.boardState.hasGameEnded {
+                    while !gameState.game.boardData.hasGameEnded {
                         let bestMove = gameState.game.boardState.currentTurnColor == .white ? findBestMove(game: gameState.game, depth: 3, maximizingPlayer: true) : findBestMove(game: gameState.game, depth: 3, maximizingPlayer: false)
                         if let from = bestMove?.fromSquare, let target = bestMove?.targetSquare {
                             gameState.makeMove(from, target)

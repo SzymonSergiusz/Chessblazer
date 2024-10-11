@@ -119,10 +119,11 @@ struct UciGoInput {
         }
         
         if let match = from.firstMatch(of: searchMovesRegex) {
-  
-            result.searchMoves = match.1.split(separator: " ").map {
-                Move(notation: String($0))
-            }
+#warning("to handle")
+
+//            result.searchMoves = match.1.split(separator: " ").map {
+//                Move(notation: String($0))
+//            }
         }
         
         if from.contains(ponderRegex) {

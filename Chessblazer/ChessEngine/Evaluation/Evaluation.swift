@@ -53,19 +53,19 @@ func evaluate(bitboards: [Int: Bitboard]) -> Int {
 }
 
 func alphabeta(game: Game, depth: Int, alpha: Int, beta: Int, maximizingPlayer: Bool) -> Int {
-    var game = game
+//    var game = game
     var alpha = alpha
     var beta = beta
 
-    if depth == 0 || game.currentValidMoves.isEmpty {
-        return evaluate(bitboards: game.bitboards)
+    if depth == 0 || game.boardState.currentValidMoves.isEmpty {
+        return evaluate(bitboards: game.boardState.bitboards)
     }
-    let moves = generateAllLegalMoves(game: game).sorted(by: >)
+    let moves = generateAllLegalMoves(boardState: game.boardState).sorted(by: >)
 
     if maximizingPlayer {
         var maxEval = Int.min
         for move in moves {
-            game.makeMove(move: move)
+            game.boardState = GameEngine.makeMove(boardState: game.boardState, move: move)
             let eval = alphabeta(game: game, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
             game.undoMove()
 
@@ -79,7 +79,7 @@ func alphabeta(game: Game, depth: Int, alpha: Int, beta: Int, maximizingPlayer: 
     } else {
         var minEval = Int.max
         for move in moves {
-            game.makeMove(move: move)
+            game.boardState = GameEngine.makeMove(boardState: game.boardState, move: move)
             let eval = alphabeta(game: game, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)
             game.undoMove()
 
@@ -126,7 +126,7 @@ func iterativeDeepening(game: Game, initialDepth: Int, maximizingPlayer: Bool) -
 }
 
 func performSearch(game: Game, depth: Int, maximizingPlayer: Bool) -> (Move?, Int) {
-    let legalMoves = generateAllLegalMoves(game: game).sorted(by: >)
+    let legalMoves = generateAllLegalMoves(boardState: game.boardState).sorted(by: >)
     
     
     var bestMove: Move? = nil
@@ -137,7 +137,7 @@ func performSearch(game: Game, depth: Int, maximizingPlayer: Bool) -> (Move?, In
     if maximizingPlayer {
         for move in legalMoves {
             var gameCopy = game
-            gameCopy.makeMove(move: move)
+            gameCopy.boardState = GameEngine.makeMove(boardState: game.boardState, move: move)
 
             let eval = alphabeta(game: gameCopy, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
             gameCopy.undoMove()
@@ -155,7 +155,7 @@ func performSearch(game: Game, depth: Int, maximizingPlayer: Bool) -> (Move?, In
     } else {
         for move in legalMoves {
             var gameCopy = game
-            gameCopy.makeMove(move: move)
+            gameCopy.boardState = GameEngine.makeMove(boardState: game.boardState, move: move)
 
             let eval = alphabeta(game: gameCopy, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)
             gameCopy.undoMove()

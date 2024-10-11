@@ -39,16 +39,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "EE0DFFA4-0CDD-4849-9561-8F8CF14390C9"
+            uuid = "B7D66A67-85CF-4CCA-8D6B-8D8B12751A4D"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Chessblazer/ChessEngine/Game.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "81"
-            endingLineNumber = "81"
-            landmarkName = "makeMove(move:)"
+            startingLineNumber = "23"
+            endingLineNumber = "23"
+            landmarkName = "loadFromFen(fen:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D9BB5444-5E81-4BFF-BB8B-6F6EAF113E10"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chessblazer/ChessEngine/Game.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "24"
+            endingLineNumber = "24"
+            landmarkName = "loadFromFen(fen:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

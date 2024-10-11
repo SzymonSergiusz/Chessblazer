@@ -30,6 +30,13 @@ class Piece {
                 return .white
             }
         }
+        mutating func toggleColor() {
+            if self == .white {
+                self = .black
+            } else {
+                self = .white
+            }
+        }
     }
     
     enum ColoredPieces: Int, CaseIterable {

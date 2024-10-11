@@ -9,12 +9,10 @@ import Foundation
 
 
 
-func generateAllPossibleMoves(bitboards: [Int: Bitboard], currentColor: Piece.Color, moves: inout [Move], lastMove: Move, castlesAvailable: Set<Character>) {
+func generateAllPossibleMoves(bitboards: [Int: Bitboard], currentColor: Piece.Color, moves: inout [Move], lastMove: Move?, castlesAvailable: Set<Character>) {
     
     moves.removeAll()
     for bitboard in bitboards {
-        
-        
         if Piece.checkColor(piece: bitboard.key) == currentColor {
             var pieceSquares = [Int]()
             var copyBitboard: Bitboard = bitboard.value
@@ -23,7 +21,11 @@ func generateAllPossibleMoves(bitboards: [Int: Bitboard], currentColor: Piece.Co
                 pieceSquares.append(Bitboard.popLSB(&copyBitboard))
             }
             let pieceType = Piece.getType(piece: bitboard.key)
-            moves.append(contentsOf: enPassantCheck(bitboards: bitboards, lastMove: lastMove))
+            
+            if let lastMove = lastMove {
+                moves.append(contentsOf: enPassantCheck(bitboards: bitboards, lastMove: lastMove))
+            }
+            
             for square in pieceSquares {
                 switch pieceType {
                 case .queen:
@@ -101,23 +103,25 @@ func checkIfCheck(bitboards: [Int: Bitboard], currentColor: Piece.Color) -> Bool
     return (attackTable & kingBitboard) != 0
 }
 
-func generateAllLegalMoves(game: Game) -> [Move] {
+func generateAllLegalMoves(boardState: BoardState) -> [Move] {
+    
     var possibleMoves = [Move]()
     var legalMoves = [Move]()
-    
-    generateAllPossibleMoves(bitboards: game.bitboards, currentColor: game.boardState.currentTurnColor, moves: &possibleMoves, lastMove: game.boardState.performedMovesList.last?.move ?? Move(), castlesAvailable: game.boardState.castlesAvailable)
+    let lastMove: Move? = boardState.performedMovesList.last?.move
+    generateAllPossibleMoves(bitboards: boardState.bitboards, currentColor: boardState.currentTurnColor, moves: &possibleMoves, lastMove: lastMove, castlesAvailable: boardState.castlesAvailable)
 
     for move in possibleMoves {
-        var gameCopy = game
-        gameCopy.makeMoveOnly(move: move)
-
-        if !checkIfCheck(bitboards: gameCopy.bitboards, currentColor: gameCopy.boardState.currentTurnColor) {
+        let newState = GameEngine.makeMoveOnly(boardState: boardState, move: move)
+        if !checkIfCheck(bitboards: newState.bitboards, currentColor: newState.currentTurnColor) {
             legalMoves.append(move)
         }
     }
     
     return legalMoves
 }
+
+
+
 
 func enPassantCheck(bitboards: [Int: Bitboard], lastMove: Move) -> [Move] {
     var moves = [Move]()
@@ -130,7 +134,7 @@ func enPassantCheck(bitboards: [Int: Bitboard], lastMove: Move) -> [Move] {
             while (blackPawns != 0) {
                 let blackPawn = Bitboard.popLSB(&blackPawns)
                 if blackPawn-1 == target || blackPawn+1 == target {
-                    moves.append(Move(fromSquare: blackPawn, targetSquare: target - 8, enPasssantCapture: target))
+                    moves.append(Move(fromSquare: blackPawn, targetSquare: target - 8, enPasssantCapture: target, pieceValue: Piece.ColoredPieces.whitePawn.rawValue))
                 }
             }
         }
@@ -141,7 +145,7 @@ func enPassantCheck(bitboards: [Int: Bitboard], lastMove: Move) -> [Move] {
             while (whitePawns != 0) {
                 let whitePawn = Bitboard.popLSB(&whitePawns)
                 if whitePawn-1 == target || whitePawn+1 == target {
-                    moves.append(Move(fromSquare: whitePawn, targetSquare: target+8, enPasssantCapture: target))
+                    moves.append(Move(fromSquare: whitePawn, targetSquare: target+8, enPasssantCapture: target, pieceValue: Piece.ColoredPieces.blackPawn.rawValue))
                 }
             }
             

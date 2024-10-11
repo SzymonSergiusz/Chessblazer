@@ -20,7 +20,7 @@ class Move: Equatable, Hashable, Comparable {
     var promotionPiece: Int = 0
     var enPasssantCapture = 0
     
-    var pieceValue = 0
+    var pieceValue: Int
     var captureValue = 0
 
     #warning("add logic for this")
@@ -30,12 +30,13 @@ class Move: Equatable, Hashable, Comparable {
         "\(fromSquare!) \(targetSquare!)"
     }
     
-    init(fromSquare: Int, targetSquare: Int, enPasssantCapture: Int) {
+    init(fromSquare: Int, targetSquare: Int, enPasssantCapture: Int, pieceValue: Int) {
         self.fromSquare = fromSquare
         self.targetSquare = targetSquare
         self.enPasssantCapture = enPasssantCapture
         #warning("reconsider this but should be ok for now")
         self.captureValue = Piece.ColoredPieces.whitePawn.rawValue
+        self.pieceValue = pieceValue
     }
     
     init(fromSquare: Int, targetSquare: Int, pieceValue: Int,  captureValue: Int) {
@@ -51,11 +52,6 @@ class Move: Equatable, Hashable, Comparable {
         self.captureValue = captureValue
         self.pieceValue = pieceValue
         self.promotionPiece = promotionPiece
-    }
-    
-    init(fromSquare: Int, targetSquare: Int) {
-        self.fromSquare = fromSquare
-        self.targetSquare = targetSquare
     }
     
     init(fromSquare: Int, targetSquare: Int, kingValue: Int, rookValue: Int, kingDestination: Int, rookDestination: Int) {
@@ -99,27 +95,25 @@ class Move: Equatable, Hashable, Comparable {
     static func < (lhs: Move, rhs: Move) -> Bool {
         return lhs.moveValue() < rhs.moveValue()
     }
-    
-    init(){}
-    
-    init(notation: String) {
         
-        #warning("think about it")
-        
-        if notation.count == 4 {
-            self.fromSquare = Move.translateFromNotationToSquare(String(notation.prefix(2)))
-            self.targetSquare = Move.translateFromNotationToSquare(String(notation.suffix(2)))
-        } else {
-            self.fromSquare = Move.translateFromNotationToSquare(String(notation.prefix(2)))
-            
-            let start = notation.index(notation.startIndex, offsetBy: 2)
-            let end = notation.index(notation.startIndex, offsetBy: 4)
-            self.targetSquare = Move.translateFromNotationToSquare(String(notation[start..<end]))
-            if let pp = Piece.ColoredPiecesDict[String(notation.suffix(1))] {
-                self.promotionPiece = pp.rawValue
-            }
-        }
-    }
+//    init(notation: String) {
+//        
+//        #warning("think about it")
+//        
+//        if notation.count == 4 {
+//            self.fromSquare = Move.translateFromNotationToSquare(String(notation.prefix(2)))
+//            self.targetSquare = Move.translateFromNotationToSquare(String(notation.suffix(2)))
+//        } else {
+//            self.fromSquare = Move.translateFromNotationToSquare(String(notation.prefix(2)))
+//            
+//            let start = notation.index(notation.startIndex, offsetBy: 2)
+//            let end = notation.index(notation.startIndex, offsetBy: 4)
+//            self.targetSquare = Move.translateFromNotationToSquare(String(notation[start..<end]))
+//            if let pp = Piece.ColoredPiecesDict[String(notation.suffix(1))] {
+//                self.promotionPiece = pp.rawValue
+//            }
+//        }
+//    }
     
     func squareToNotation(square: Int) -> String {
         let ranks = square / 8 + 1

@@ -36,7 +36,7 @@ class Engine {
             #warning("refactor with regex for: position fen ... | position startpos moves ...")
             
             if args[1] == "fen" {
-                game.loadBoardFromFen(fen: args[2])
+                game.loadFromFen(fen: args[2])
             } else if args[1] == "startpos" {
                 if args[2] == "moves" {
                     let moves = args[3..<args.count]
@@ -90,8 +90,11 @@ class Engine {
             var game = Game()
             game.startNewGame()
             let bp = BoardPrinter()
-            while !game.currentValidMoves.isEmpty {
+            while !game.boardData.hasGameEnded {
                 let bestMove = game.boardState.currentTurnColor == .white ? findBestMove(game: game, depth: 3, maximizingPlayer: true) : findBestMove(game: game, depth: 3, maximizingPlayer: false)
+//                game.boardState = GameEngine.makeMove(boardState: game.boardState,move: bestMove!)
+//                game.boardState.currentValidMoves = generateAllLegalMoves(boardState: game.boardState)
+                
                 game.makeMove(move: bestMove!)
                 bp.printBoard(board: game.toBoardArrayRepresentation())
                 
@@ -101,7 +104,10 @@ class Engine {
             print("")
         
         case .main:
-            print()
+            var color = Piece.Color.white
+            color.toggleColor()
+            
+            print(color)
 
         case .perft:
             print(perftTest(depth: 1), ", expected: 20")
@@ -109,7 +115,7 @@ class Engine {
             print(perftTest(depth: 3), ", expected: 8902")
             print(perftTest(depth: 4), ", expected: 197281")
 //
-//            print(perftParallel(depth: 5), ", expected: 4,865,609")
+            print(perftTest(depth: 5), ", expected: 4,865,609")
             // 4 866 899 , expected: 4,865,609
             // 1290
             // 10 minutes
@@ -119,11 +125,11 @@ class Engine {
             let bp = BoardPrinter()
             
             
-            game.loadBoardFromFen(fen: "8/PPP5/n7/Q7/3K1k2/8/1p1p1p1p/8 w - - 0 1")
+            game.loadFromFen(fen: "8/PPP5/n7/Q7/3K1k2/8/1p1p1p1p/8 w - - 0 1")
             bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true)
 
-            game.makeMove(move: Move(notation: "a7a8Q"))
-            game.makeMove(move: Move(notation: "b2b1n"))
+//            game.makeMove(move: Move(notation: "a7a8Q"))
+//            game.makeMove(move: Move(notation: "b2b1n"))
             
         default:
             return

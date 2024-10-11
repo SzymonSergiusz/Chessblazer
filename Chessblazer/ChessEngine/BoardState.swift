@@ -11,9 +11,29 @@ struct BoardState {
     var pawnAttackBitboard = Bitboard(0)
     var performedMovesList = [MoveData]()
     var castlesAvailable: Set<Character> = []
-    var currentTurnColor: Piece.Color = .white
+    var currentTurnColor: Piece.Color // = .white
+    var bitboards: [Int: Bitboard] = initBitboards()
+    var enPassant = "-"
+    var currentValidMoves: [Move] = [Move]()
+    
+}
+
+func initBitboards() -> [Int: Bitboard] {
+    var bitboards = [Piece.ColoredPieces.RawValue : Bitboard]()
+    for piece in Piece.ColoredPieces.allCases {
+        if piece.rawValue != 0 {
+            bitboards[piece.rawValue] = Bitboard(0)
+        }
+    }
+    return bitboards
+}
+
+
+
+struct BoardData {
     var halfMoves = 0
     var hasGameEnded = false
+
 }
 
 struct MoveData {
@@ -24,7 +44,7 @@ struct MoveData {
     var capturedPiece: Int?
     var bitboards: [Piece.ColoredPieces.RawValue : Bitboard]
     var castles: Set<Character>
-//    var boardState : BoardState
+    var currentValidMoves: [Move]
 }
 
 
