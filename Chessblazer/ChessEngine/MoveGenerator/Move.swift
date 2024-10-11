@@ -14,7 +14,7 @@ class Move: Equatable, Hashable, Comparable {
     }
     
     var castling = false
-    
+    var castlingDestinations: (king: Int, rook: Int) = (0, 0)
     var fromSquare: Int?
     var targetSquare: Int?
     var promotionPiece: Int = 0
@@ -56,6 +56,17 @@ class Move: Equatable, Hashable, Comparable {
     init(fromSquare: Int, targetSquare: Int) {
         self.fromSquare = fromSquare
         self.targetSquare = targetSquare
+    }
+    
+    init(fromSquare: Int, targetSquare: Int, kingValue: Int, rookValue: Int, kingDestination: Int, rookDestination: Int) {
+        self.castling = true
+        self.fromSquare = fromSquare
+        self.targetSquare = targetSquare
+        self.pieceValue = kingValue
+        self.captureValue = rookValue
+        castlingDestinations.king = kingDestination
+        castlingDestinations.rook = rookDestination
+        
     }
     
     static func == (lhs: Move, rhs: Move) -> Bool {
@@ -146,23 +157,4 @@ class Move: Equatable, Hashable, Comparable {
         let rankIndex = rankNumber - 1
         return 8 * rankIndex + fileIndex
     }
-}
-
-class CastlingMove: Move {
-    var rookDestination: Int
-    var kingDestination: Int
-
-    init(fromSquare: Int, targetSquare: Int, rookDestination: Int, kingDestination: Int) {
-        self.rookDestination = rookDestination
-        self.kingDestination = kingDestination
-        super.init(fromSquare: fromSquare, targetSquare: targetSquare, pieceValue: 0, captureValue: 0)
-        self.castling = true
-
-    }
-
-    
-}
-
-class PromotionMove: Move {
-    
 }

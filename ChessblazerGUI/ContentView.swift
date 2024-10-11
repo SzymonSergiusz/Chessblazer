@@ -7,17 +7,28 @@ struct ContentView: View {
     @State var vsEngine = false
     
     @State var promotionAlert = false
-    
+    @State var engineVsEngine = false
     var body: some View {
         HStack {
-            Toggle("Engine", isOn: $vsEngine)
-            Button("Start new game") {
-                gameState.vsEngine = vsEngine
+            Toggle("player vs engine", isOn: $vsEngine)
+            Toggle("engine vs engine", isOn: $engineVsEngine)
+            
+            Button("Start") {
                 gameState.startNewGame()
-                
-                Task.init {
-                    await gameState.engineMove()
+                if engineVsEngine {
+                    while !gameState.game.boardState.hasGameEnded {
+                        let bestMove = gameState.game.boardState.currentTurnColor == .white ? findBestMove(game: gameState.game, depth: 3, maximizingPlayer: true) : findBestMove(game: gameState.game, depth: 3, maximizingPlayer: false)
+                        if let from = bestMove?.fromSquare, let target = bestMove?.targetSquare {
+                            gameState.makeMove(from, target)
+                        }
+                    }
+                } else {
+                    gameState.vsEngine = vsEngine
+                    Task.init {
+                        await gameState.engineMove()
+                    }
                 }
+
             }
             TextField(text: $fen) {
                 Text("Input FEN here and submit (enter)")

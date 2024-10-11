@@ -76,95 +76,20 @@ struct Game {
     mutating func startNewGame() {
         loadBoardFromFen(fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     }
-    mutating func makeMoveOperations(pieceValue: Int, from: Int, target: Int) {
-        var bitboardsCopy = bitboards
-        guard var bitboard = bitboardsCopy[pieceValue] else { return }
-        bitboard = bitboard & ~(Bitboard(1) << Bitboard(from))
-        bitboard = bitboard | (Bitboard(1) << Bitboard(target))
-        bitboardsCopy[pieceValue] = bitboard
-        for (key, value) in bitboardsCopy {
-            if (key != pieceValue) && (value & (Bitboard(1) << Bitboard(target))) != 0 {
-                bitboardsCopy[key] = bitboardsCopy[key]! & ~(Bitboard(1) << Bitboard(target))
-                break
-            }
-        }
-        bitboards = bitboardsCopy
-    }
-    
-    mutating func makeMoveOnly(move: Move) {
-        guard let from = move.fromSquare else { return }
-        guard let target = move.targetSquare else { return }
-        let pieceValue = move.pieceValue
-        if let castlingMove = move as? CastlingMove {
-            makeMoveOperations(pieceValue: pieceValue, from: from, target: castlingMove.kingDestination)
-            makeMoveOperations(pieceValue: move.captureValue, from: target, target: castlingMove.rookDestination)
-            
-            if pieceValue == Piece.ColoredPieces.whiteKing.rawValue {
-                boardState.castlesAvailable.remove("K")
-                boardState.castlesAvailable.remove("Q")
-            } else if pieceValue == Piece.ColoredPieces.blackKing.rawValue {
-                boardState.castlesAvailable.remove("k")
-                boardState.castlesAvailable.remove("q")
-            }
-            
-            
-        }  else if move.promotionPiece != 0 {
-            let newPiece = move.promotionPiece
-            var bitboardsCopy = bitboards
-            guard var newPieceBitboard = bitboardsCopy[newPiece] else { return }
-            newPieceBitboard = newPieceBitboard | Bitboard(1) << Bitboard(target)
-            
-            guard var pawnBitboard = bitboardsCopy[pieceValue] else { return }
-            pawnBitboard = pawnBitboard & ~(Bitboard(1) << Bitboard(from))
-            
-            bitboardsCopy[newPiece] = newPieceBitboard
-            bitboardsCopy[pieceValue] = pawnBitboard
-            
-            bitboards = bitboardsCopy
-            
-        } else {
-
-            makeMoveOperations(pieceValue: pieceValue, from: from, target: target)
-            
-            switch pieceValue {
-            case Piece.ColoredPieces.whiteKing.rawValue:
-                boardState.castlesAvailable.remove("K")
-                boardState.castlesAvailable.remove("Q")
-                
-            case Piece.ColoredPieces.blackKing.rawValue:
-                boardState.castlesAvailable.remove("k")
-                boardState.castlesAvailable.remove("q")
-                
-            case Piece.ColoredPieces.whiteRook.rawValue:
-                if from == 0 {
-                    boardState.castlesAvailable.remove("Q")
-                } else if from == 7 {
-                    boardState.castlesAvailable.remove("K")
-                }
-            case Piece.ColoredPieces.blackRook.rawValue:
-                if from == 56 {
-                    boardState.castlesAvailable.remove("q")
-                } else if from == 63 {
-                    boardState.castlesAvailable.remove("k")
-                }
-            default:
-                break
-            }
-        }
-    }
     
     mutating func makeMove(move: Move) {
+        let bitboardsBefore = bitboards
+        
         guard let from = move.fromSquare, let target = move.targetSquare else { return }
         
         let pieceValue = move.pieceValue
-        let bitboardsBefore = bitboards
         let castlesAvailableBefore = boardState.castlesAvailable
         if currentValidMoves.contains(move) {
             
-            if let castlingMove = move as? CastlingMove {
+            if move.castling {
                 #warning("to examine later")
-                makeMoveOperations(pieceValue: move.pieceValue, from: from, target: castlingMove.kingDestination)
-                makeMoveOperations(pieceValue: move.captureValue, from: target, target: castlingMove.rookDestination)
+                bitboards = GameEngine.makeMoveOperations(bitboards: bitboards, pieceValue: move.pieceValue, from: from, target: move.castlingDestinations.king)
+                bitboards = GameEngine.makeMoveOperations(bitboards: bitboards, pieceValue: move.captureValue, from: target, target: move.castlingDestinations.rook)
                 
                 if pieceValue == Piece.ColoredPieces.whiteKing.rawValue {
                     boardState.castlesAvailable.remove("K")
@@ -192,14 +117,14 @@ struct Game {
                 bitboards = bitboardsCopy
                 
             } else if move.enPasssantCapture != 0 {
-                makeMoveOperations(pieceValue: pieceValue, from: from, target: target)
+                bitboards = GameEngine.makeMoveOperations(bitboards: bitboards, pieceValue: pieceValue, from: from, target: target)
                 var bitboardsCopy = bitboards
                 let enPassantCapture = move.enPasssantCapture
                 let captured = move.captureValue
                 bitboardsCopy[captured] = bitboardsCopy[captured]! & ~Bitboard(1 << enPassantCapture)
                 bitboards = bitboardsCopy
             } else {
-                makeMoveOperations(pieceValue: move.pieceValue, from: from, target: target)
+                bitboards = GameEngine.makeMoveOperations(bitboards: bitboards, pieceValue: move.pieceValue, from: from, target: target)
                 
                 switch pieceValue {
                 case Piece.ColoredPieces.whiteKing.rawValue:
@@ -247,7 +172,6 @@ struct Game {
 
     mutating func undoMove() {
         guard let moveData = boardState.performedMovesList.last else { return }
-        let move = moveData.move
         
         bitboards = moveData.bitboards
         boardState.castlesAvailable = moveData.castles
@@ -257,8 +181,68 @@ struct Game {
         
         currentValidMoves = generateAllLegalMoves(game: self)
     }
-
     
+    mutating func makeMoveOnly(move: Move) {
+            guard let from = move.fromSquare else { return }
+            guard let target = move.targetSquare else { return }
+            let pieceValue = move.pieceValue
+            if move.castling {
+                bitboards = GameEngine.makeMoveOperations(bitboards: bitboards, pieceValue: pieceValue, from: from, target: move.castlingDestinations.king)
+                bitboards = GameEngine.makeMoveOperations(bitboards: bitboards, pieceValue: move.captureValue, from: target, target: move.castlingDestinations.rook)
+                
+                if pieceValue == Piece.ColoredPieces.whiteKing.rawValue {
+                    boardState.castlesAvailable.remove("K")
+                    boardState.castlesAvailable.remove("Q")
+                } else if pieceValue == Piece.ColoredPieces.blackKing.rawValue {
+                    boardState.castlesAvailable.remove("k")
+                    boardState.castlesAvailable.remove("q")
+                }
+                
+                
+            }  else if move.promotionPiece != 0 {
+                let newPiece = move.promotionPiece
+                var bitboardsCopy = bitboards
+                guard var newPieceBitboard = bitboardsCopy[newPiece] else { return }
+                newPieceBitboard = newPieceBitboard | Bitboard(1) << Bitboard(target)
+                
+                guard var pawnBitboard = bitboardsCopy[pieceValue] else { return }
+                pawnBitboard = pawnBitboard & ~(Bitboard(1) << Bitboard(from))
+                
+                bitboardsCopy[newPiece] = newPieceBitboard
+                bitboardsCopy[pieceValue] = pawnBitboard
+                
+                bitboards = bitboardsCopy
+                
+            } else {
+
+                bitboards = GameEngine.makeMoveOperations(bitboards: bitboards, pieceValue: pieceValue, from: from, target: target)
+                
+                switch pieceValue {
+                case Piece.ColoredPieces.whiteKing.rawValue:
+                    boardState.castlesAvailable.remove("K")
+                    boardState.castlesAvailable.remove("Q")
+                    
+                case Piece.ColoredPieces.blackKing.rawValue:
+                    boardState.castlesAvailable.remove("k")
+                    boardState.castlesAvailable.remove("q")
+                    
+                case Piece.ColoredPieces.whiteRook.rawValue:
+                    if from == 0 {
+                        boardState.castlesAvailable.remove("Q")
+                    } else if from == 7 {
+                        boardState.castlesAvailable.remove("K")
+                    }
+                case Piece.ColoredPieces.blackRook.rawValue:
+                    if from == 56 {
+                        boardState.castlesAvailable.remove("q")
+                    } else if from == 63 {
+                        boardState.castlesAvailable.remove("k")
+                    }
+                default:
+                    break
+                }
+            }
+        }
     
     mutating func toggleColor() {
         if boardState.currentTurnColor == .white {

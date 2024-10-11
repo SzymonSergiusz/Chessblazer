@@ -8,7 +8,7 @@
 import Foundation
 
 
-func generateKingMovesBitboard(bitboards: [Int: Bitboard], currentColor: Piece.Color, square: Int, moves: inout [Move], castlesAvailable: [String] = [String]()) {
+func generateKingMovesBitboard(bitboards: [Int: Bitboard], currentColor: Piece.Color, square: Int, moves: inout [Move], castlesAvailable: Set<Character>) {
     let attackedSquares = generateAllAttackedSquares(bitboards: bitboards, currentColor: currentColor)
     var friendlyMask = Bitboard(0)
     var kingBitboard = Bitboard(1) << Bitboard(square)
@@ -31,13 +31,13 @@ func generateKingMovesBitboard(bitboards: [Int: Bitboard], currentColor: Piece.C
         
         if !isUnderAttack {
             if isRightPossible && castlesAvailable.contains("K") {
-                let move = CastlingMove(fromSquare: 4, targetSquare: 7, rookDestination: 5, kingDestination: 6)
+                let move = Move(fromSquare: 4, targetSquare: 7, kingValue: Piece.ColoredPieces.whiteKing.rawValue, rookValue: Piece.ColoredPieces.whiteRook.rawValue,kingDestination: 6, rookDestination: 5)
                 moves.append(move)
             }
             
             if isLeftPossible && castlesAvailable.contains("Q") {
                 
-                moves.append(CastlingMove(fromSquare: 4, targetSquare: 0, rookDestination: 3, kingDestination: 2))
+                moves.append(Move(fromSquare: 4, targetSquare: 0, kingValue: Piece.ColoredPieces.blackKing.rawValue, rookValue: Piece.ColoredPieces.blackRook.rawValue, kingDestination: 2, rookDestination: 3))
             }
         }
         
@@ -58,11 +58,11 @@ func generateKingMovesBitboard(bitboards: [Int: Bitboard], currentColor: Piece.C
         
         if !isUnderAttack {
             if isRightPossible && castlesAvailable.contains("k") {
-                moves.append(CastlingMove(fromSquare: 60, targetSquare: 63, rookDestination: 61, kingDestination: 62))
+                moves.append(Move(fromSquare: 60, targetSquare: 63, kingValue: Piece.ColoredPieces.blackKing.rawValue, rookValue: Piece.ColoredPieces.blackRook.rawValue, kingDestination: 62, rookDestination: 61))
             }
             
             if isLeftPossible && castlesAvailable.contains("q") {
-                moves.append(CastlingMove(fromSquare: 60, targetSquare: 56, rookDestination: 59, kingDestination: 58))
+                moves.append(Move(fromSquare: 60, targetSquare: 56, kingValue: Piece.ColoredPieces.blackKing.rawValue, rookValue: Piece.ColoredPieces.blackRook.rawValue, kingDestination: 58, rookDestination: 59))
             }
         }
         

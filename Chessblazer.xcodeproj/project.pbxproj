@@ -83,6 +83,9 @@
 		31B10B402CB848D40077E27A /* GeneratorUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B10B3F2CB848D40077E27A /* GeneratorUtils.swift */; };
 		31B10B412CB848D40077E27A /* GeneratorUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B10B3F2CB848D40077E27A /* GeneratorUtils.swift */; };
 		31B10B422CB848D40077E27A /* GeneratorUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B10B3F2CB848D40077E27A /* GeneratorUtils.swift */; };
+		31B10B482CB89B780077E27A /* GameEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B10B472CB89B780077E27A /* GameEngine.swift */; };
+		31B10B492CB89B780077E27A /* GameEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B10B472CB89B780077E27A /* GameEngine.swift */; };
+		31B10B4A2CB8A0AF0077E27A /* GameEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B10B472CB89B780077E27A /* GameEngine.swift */; };
 		31EF3B422C5E7DB600DF07A3 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF3B412C5E7DB600DF07A3 /* GameState.swift */; };
 		31EF3B442C5E810400DF07A3 /* BoardUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF3B432C5E810400DF07A3 /* BoardUtils.swift */; };
 		31EF3B592C6184DA00DF07A3 /* ChessblazerEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF3B582C6184DA00DF07A3 /* ChessblazerEngineTests.swift */; };
@@ -141,6 +144,7 @@
 		31B10B372CB846E60077E27A /* SliderMovesGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderMovesGenerator.swift; sourceTree = "<group>"; };
 		31B10B3B2CB846F90077E27A /* KnightMovesGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnightMovesGenerator.swift; sourceTree = "<group>"; };
 		31B10B3F2CB848D40077E27A /* GeneratorUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratorUtils.swift; sourceTree = "<group>"; };
+		31B10B472CB89B780077E27A /* GameEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameEngine.swift; sourceTree = "<group>"; };
 		31CB05332C8D186A007C4A1A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		31CB05352C8D1DBB007C4A1A /* showcase.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = showcase.gif; sourceTree = "<group>"; };
 		31EF3B412C5E7DB600DF07A3 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
@@ -265,6 +269,7 @@
 				318129262C5440A0002F1E40 /* BoardPrinter.swift */,
 				31B10B2B2CB83F7B0077E27A /* BoardState.swift */,
 				3181291A2C51B3EC002F1E40 /* Pieces.swift */,
+				31B10B472CB89B780077E27A /* GameEngine.swift */,
 				3181291E2C51B803002F1E40 /* Game.swift */,
 				318129202C5277FA002F1E40 /* Engine.swift */,
 				3147A5F42C893D1B007E132F /* Perft.swift */,
@@ -453,6 +458,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				31B10B482CB89B780077E27A /* GameEngine.swift in Sources */,
 				3181291B2C51B3EC002F1E40 /* Pieces.swift in Sources */,
 				318129272C5440A0002F1E40 /* BoardPrinter.swift in Sources */,
 				316E7E0A2C8CE0540028CC16 /* MagicRook.swift in Sources */,
@@ -484,6 +490,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				31B10B4A2CB8A0AF0077E27A /* GameEngine.swift in Sources */,
 				31B10B2E2CB83F7B0077E27A /* BoardState.swift in Sources */,
 				3147A5F32C8915F9007E132F /* PawnMovesGenerator.swift in Sources */,
 				310C84912C6C029400E5566A /* Evaluation.swift in Sources */,
@@ -524,6 +531,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				31B10B382CB846E60077E27A /* SliderMovesGenerator.swift in Sources */,
+				31B10B492CB89B780077E27A /* GameEngine.swift in Sources */,
 				31B10B2D2CB83F7B0077E27A /* BoardState.swift in Sources */,
 				316E7E132C8CE4C40028CC16 /* PieceSquareTables.swift in Sources */,
 				31B10B3E2CB846F90077E27A /* KnightMovesGenerator.swift in Sources */,

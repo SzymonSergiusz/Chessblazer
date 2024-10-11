@@ -9,7 +9,7 @@ import Foundation
 
 
 
-func generateAllPossibleMoves(bitboards: [Int: Bitboard], currentColor: Piece.Color, moves: inout [Move], lastMove: Move) {
+func generateAllPossibleMoves(bitboards: [Int: Bitboard], currentColor: Piece.Color, moves: inout [Move], lastMove: Move, castlesAvailable: Set<Character>) {
     
     moves.removeAll()
     for bitboard in bitboards {
@@ -35,7 +35,7 @@ func generateAllPossibleMoves(bitboards: [Int: Bitboard], currentColor: Piece.Co
                 case .pawn:
                     generatePawnMoves(bitboards: bitboards, currentColor: currentColor, square: square, moves: &moves)
                 case .king:
-                    generateKingMovesBitboard(bitboards: bitboards, currentColor: currentColor, square: square, moves: &moves)
+                    generateKingMovesBitboard(bitboards: bitboards, currentColor: currentColor, square: square, moves: &moves, castlesAvailable: castlesAvailable)
                     
                 case .knight:
                     generateKnightMoves(bitboards: bitboards, currentColor: currentColor, square: square, moves: &moves)
@@ -105,7 +105,7 @@ func generateAllLegalMoves(game: Game) -> [Move] {
     var possibleMoves = [Move]()
     var legalMoves = [Move]()
     
-    generateAllPossibleMoves(bitboards: game.bitboards, currentColor: game.boardState.currentTurnColor, moves: &possibleMoves, lastMove: game.boardState.performedMovesList.last?.move ?? Move())
+    generateAllPossibleMoves(bitboards: game.bitboards, currentColor: game.boardState.currentTurnColor, moves: &possibleMoves, lastMove: game.boardState.performedMovesList.last?.move ?? Move(), castlesAvailable: game.boardState.castlesAvailable)
 
     for move in possibleMoves {
         var gameCopy = game
