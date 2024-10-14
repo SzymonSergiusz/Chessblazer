@@ -92,8 +92,6 @@ class Engine {
             let bp = BoardPrinter()
             while !game.boardData.hasGameEnded {
                 let bestMove = game.boardState.currentTurnColor == .white ? findBestMove(game: game, depth: 3, maximizingPlayer: true) : findBestMove(game: game, depth: 3, maximizingPlayer: false)
-//                game.boardState = GameEngine.makeMove(boardState: game.boardState,move: bestMove!)
-//                game.boardState.currentValidMoves = generateAllLegalMoves(boardState: game.boardState)
                 
                 game.makeMove(move: bestMove!)
                 bp.printBoard(board: game.toBoardArrayRepresentation())
@@ -109,16 +107,50 @@ class Engine {
             
             print(color)
 
+        case .perftX:
+            var game = Game()
+            let depth = Int(args[1]) ?? 0
+            print(bulkPerftTest(depth: depth))
         case .perft:
-            print(perftTest(depth: 1), ", expected: 20")
-            print(perftTest(depth: 2), ", expected: 400")
-            print(perftTest(depth: 3), ", expected: 8902")
-            print(perftTest(depth: 4), ", expected: 197281")
-//
-            print(perftTest(depth: 5), ", expected: 4,865,609")
-            // 4 866 899 , expected: 4,865,609
-            // 1290
-            // 10 minutes
+            var position = ""
+            if args.count > 1 {
+                position = args[1]
+            }
+            switch position {
+            case "2":
+                
+//                
+                var game = Game()
+                game.loadFromFen(fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -")
+                print(perftTest(depth: 2, game: &game))
+
+                var game3 = Game()
+                game3.loadFromFen(fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -")
+                print(perftTest(depth: 3, game: &game3))
+
+
+
+//(97864, Chessblazer.PerftData(captures: 17102, enPassants: 45, castles: 3164, checks: 993, checkmates: 1))
+
+            default:
+                print(bulkPerftTest(depth: 1), ", expected: 20")
+                print(bulkPerftTest(depth: 2), ", expected: 400")
+                print(bulkPerftTest(depth: 3), ", expected: 8902")
+                print(bulkPerftTest(depth: 4), ", expected: 197281")
+    //
+                print(bulkPerftTest(depth: 5), ", expected: 4,865,609")
+                /*
+                 
+                 (20, Chessblazer.PerftData(captures: 0, enPassants: 0, castles: 0, checks: 0, checkmates: 0)) , expected: 20
+                 (400, Chessblazer.PerftData(captures: 0, enPassants: 0, castles: 0, checks: 0, checkmates: 0)) , expected: 400
+                 (8902, Chessblazer.PerftData(captures: 34, enPassants: 0, castles: 0, checks: 12, checkmates: 0)) , expected: 8902
+                 (197281, Chessblazer.PerftData(captures: 1576, enPassants: 0, castles: 0, checks: 469, checkmates: 8)) , expected: 197281
+                 // (4866899, Chessblazer.PerftData(captures: 1610, enPassants: 0, castles: 0, checks: 481, checkmates: 8)) , expected: 4,865,609
+
+                 */
+            }
+
+
             
         case .promotion:
             var game = Game()
@@ -159,6 +191,7 @@ enum CommandsGUItoEngine: String {
     case main
     case promotion
     case perft
+    case perftX
     case eve // Engine vs Engine
 }
 

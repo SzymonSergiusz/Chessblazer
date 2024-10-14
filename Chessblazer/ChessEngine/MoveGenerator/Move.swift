@@ -10,7 +10,8 @@ import Foundation
 class Move: Equatable, Hashable, Comparable {
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(fromSquare!+targetSquare!)
+        let c = castling ? 1 : 0
+        hasher.combine(fromSquare!+targetSquare!+c)
     }
     
     var castling = false
@@ -30,13 +31,12 @@ class Move: Equatable, Hashable, Comparable {
         "\(fromSquare!) \(targetSquare!)"
     }
     
-    init(fromSquare: Int, targetSquare: Int, enPasssantCapture: Int, pieceValue: Int) {
+    init(fromSquare: Int, targetSquare: Int, enPasssantCapture: Int, pieceValue: Int, captureValue: Int) {
         self.fromSquare = fromSquare
         self.targetSquare = targetSquare
         self.enPasssantCapture = enPasssantCapture
-        #warning("reconsider this but should be ok for now")
-        self.captureValue = Piece.ColoredPieces.whitePawn.rawValue
         self.pieceValue = pieceValue
+        self.captureValue = captureValue
     }
     
     init(fromSquare: Int, targetSquare: Int, pieceValue: Int,  captureValue: Int) {
@@ -81,7 +81,7 @@ class Move: Equatable, Hashable, Comparable {
         }
         
         if promotionPiece != 0 {
-        #warning("lets say promotion is hetman for now")
+        #warning("lets say promotion is hetman for now but soon to refactor this")
             score += 900
         }
         //isAttackedByPawn

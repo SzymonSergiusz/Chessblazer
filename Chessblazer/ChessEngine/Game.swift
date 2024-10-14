@@ -12,12 +12,11 @@ class Game {
     
     var boardData = BoardData()
     var boardState = BoardState(currentTurnColor: .white)
-    
     init() {
         startNewGame()
         
     }
-
+    
     func loadFromFen(fen: String) {
         boardState = GameEngine.loadBoardFromFen(fen: fen)
         boardState.currentValidMoves = generateAllLegalMoves(boardState: boardState)
@@ -29,18 +28,36 @@ class Game {
     }
     
     func makeMove(move: Move) {
+        
+        boardState.performedMovesList.append(
+            MoveData(
+                piece: move.pieceValue,
+                turn: 0,
+                color: boardState.currentTurnColor,
+                move: move,
+                capturedPiece: move.captureValue,
+                bitboards: boardState.bitboards,
+                castles: boardState.castlesAvailable,
+                currentValidMoves: boardState.currentValidMoves
+            ))
+        
+        
         boardState = GameEngine.makeMove(boardState: boardState, move: move)
         boardState.currentTurnColor = boardState.currentTurnColor.getOppositeColor()
         boardState.currentValidMoves = generateAllLegalMoves(boardState: boardState)
+        boardState.attackBitboard = generateAllAttackedSquares(bitboards: boardState.bitboards, currentColor: boardState.currentTurnColor)
     }
-
+    
     func undoMove() {
         guard let moveData = boardState.performedMovesList.popLast() else { return }
-
+        
         boardState.bitboards = moveData.bitboards
         boardState.castlesAvailable = moveData.castles
         boardState.currentTurnColor = moveData.color
         boardState.currentValidMoves = moveData.currentValidMoves
+        if !boardState.currentValidMoves.isEmpty {
+            boardData.hasGameEnded = false
+        }
     }
     
     

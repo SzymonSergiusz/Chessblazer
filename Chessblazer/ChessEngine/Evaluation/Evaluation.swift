@@ -53,7 +53,6 @@ func evaluate(bitboards: [Int: Bitboard]) -> Int {
 }
 
 func alphabeta(game: Game, depth: Int, alpha: Int, beta: Int, maximizingPlayer: Bool) -> Int {
-//    var game = game
     var alpha = alpha
     var beta = beta
 
@@ -136,7 +135,7 @@ func performSearch(game: Game, depth: Int, maximizingPlayer: Bool) -> (Move?, In
 
     if maximizingPlayer {
         for move in legalMoves {
-            var gameCopy = game
+            let gameCopy = game
             gameCopy.boardState = GameEngine.makeMove(boardState: game.boardState, move: move)
 
             let eval = alphabeta(game: gameCopy, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
@@ -154,7 +153,7 @@ func performSearch(game: Game, depth: Int, maximizingPlayer: Bool) -> (Move?, In
         }
     } else {
         for move in legalMoves {
-            var gameCopy = game
+            let gameCopy = game
             gameCopy.boardState = GameEngine.makeMove(boardState: game.boardState, move: move)
 
             let eval = alphabeta(game: gameCopy, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)

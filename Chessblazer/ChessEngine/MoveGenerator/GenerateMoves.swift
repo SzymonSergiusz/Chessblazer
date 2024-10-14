@@ -12,6 +12,13 @@ import Foundation
 func generateAllPossibleMoves(bitboards: [Int: Bitboard], currentColor: Piece.Color, moves: inout [Move], lastMove: Move?, castlesAvailable: Set<Character>) {
     
     moves.removeAll()
+    
+    
+    if let lastMove = lastMove {
+        moves.append(contentsOf: enPassantCheck(bitboards: bitboards, lastMove: lastMove))
+    }
+    
+    
     for bitboard in bitboards {
         if Piece.checkColor(piece: bitboard.key) == currentColor {
             var pieceSquares = [Int]()
@@ -22,9 +29,7 @@ func generateAllPossibleMoves(bitboards: [Int: Bitboard], currentColor: Piece.Co
             }
             let pieceType = Piece.getType(piece: bitboard.key)
             
-            if let lastMove = lastMove {
-                moves.append(contentsOf: enPassantCheck(bitboards: bitboards, lastMove: lastMove))
-            }
+
             
             for square in pieceSquares {
                 switch pieceType {
@@ -37,8 +42,8 @@ func generateAllPossibleMoves(bitboards: [Int: Bitboard], currentColor: Piece.Co
                 case .pawn:
                     generatePawnMoves(bitboards: bitboards, currentColor: currentColor, square: square, moves: &moves)
                 case .king:
-                    generateKingMovesBitboard(bitboards: bitboards, currentColor: currentColor, square: square, moves: &moves, castlesAvailable: castlesAvailable)
-                    
+                    generateKingMovesBitboard(bitboards: bitboards, currentColor: currentColor, square: square, moves: &moves)
+
                 case .knight:
                     generateKnightMoves(bitboards: bitboards, currentColor: currentColor, square: square, moves: &moves)
                     
@@ -78,8 +83,7 @@ func generateAllAttackedSquares(bitboards: [Int: Bitboard], currentColor: Piece.
                 case .pawn:
                     let pawnAttackBitboard = generatePawnAttacks(currentColor: currentColor.getOppositeColor(), square: square)
                     attackBitboard = attackBitboard | pawnAttackBitboard
-#warning("another place for that")
-//                    game.boardState.pawnAttackBitboard = pawnAttackBitboard
+                    #warning("add to return pawnattackbitb")
                 case .king:
                     attackBitboard = attackBitboard | generateKingAttacks(square: square, friendlyBitboard: friendlyBitboard)
                     
@@ -96,10 +100,9 @@ func generateAllAttackedSquares(bitboards: [Int: Bitboard], currentColor: Piece.
     return attackBitboard
 }
 
-
-func checkIfCheck(bitboards: [Int: Bitboard], currentColor: Piece.Color) -> Bool {
-    let attackTable = generateAllAttackedSquares(bitboards: bitboards, currentColor: currentColor)
-    let kingBitboard = getKingBitboard(bitboards: bitboards, color: currentColor)
+func checkIfCheck(boardState: BoardState) -> Bool {
+    let attackTable = boardState.attackBitboard
+    let kingBitboard = getKingBitboard(bitboards: boardState.bitboards, color: boardState.currentTurnColor)
     return (attackTable & kingBitboard) != 0
 }
 
@@ -109,48 +112,16 @@ func generateAllLegalMoves(boardState: BoardState) -> [Move] {
     var legalMoves = [Move]()
     let lastMove: Move? = boardState.performedMovesList.last?.move
     generateAllPossibleMoves(bitboards: boardState.bitboards, currentColor: boardState.currentTurnColor, moves: &possibleMoves, lastMove: lastMove, castlesAvailable: boardState.castlesAvailable)
+    generateCastles(bitboards: boardState.bitboards, currentColor: boardState.currentTurnColor, moves: &possibleMoves, castlesAvailable: boardState.castlesAvailable)
 
+    
     for move in possibleMoves {
         let newState = GameEngine.makeMoveOnly(boardState: boardState, move: move)
-        if !checkIfCheck(bitboards: newState.bitboards, currentColor: newState.currentTurnColor) {
+        if !checkIfCheck(boardState: newState) {
             legalMoves.append(move)
         }
     }
     
     return legalMoves
+//    return Array(Set(legalMoves))
 }
-
-
-
-
-func enPassantCheck(bitboards: [Int: Bitboard], lastMove: Move) -> [Move] {
-    var moves = [Move]()
-    guard let from = lastMove.fromSquare, let target = lastMove.targetSquare else { return [Move]() }
-    
-    if lastMove.pieceValue == Piece.ColoredPieces.whitePawn.rawValue {
-        if (8...15).contains(from) && (24...31).contains(target) {
-            let rank4 = Bitboard(4278190080)
-            var blackPawns = bitboards[Piece.ColoredPieces.blackPawn.rawValue]! & rank4
-            while (blackPawns != 0) {
-                let blackPawn = Bitboard.popLSB(&blackPawns)
-                if blackPawn-1 == target || blackPawn+1 == target {
-                    moves.append(Move(fromSquare: blackPawn, targetSquare: target - 8, enPasssantCapture: target, pieceValue: Piece.ColoredPieces.whitePawn.rawValue))
-                }
-            }
-        }
-    } else if lastMove.pieceValue == Piece.ColoredPieces.blackPawn.rawValue {
-        if (48...55).contains(from) && (32...39).contains(target) {
-            let rank5 = Bitboard(1095216660480)
-            var whitePawns = bitboards[Piece.ColoredPieces.whitePawn.rawValue]! & rank5
-            while (whitePawns != 0) {
-                let whitePawn = Bitboard.popLSB(&whitePawns)
-                if whitePawn-1 == target || whitePawn+1 == target {
-                    moves.append(Move(fromSquare: whitePawn, targetSquare: target+8, enPasssantCapture: target, pieceValue: Piece.ColoredPieces.blackPawn.rawValue))
-                }
-            }
-            
-        }
-    }
-    return moves
-}
-

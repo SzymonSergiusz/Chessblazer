@@ -184,3 +184,40 @@ func generatePawnAttacks(currentColor: Piece.Color, square: Int) -> Bitboard {
         
     }
 }
+
+
+func enPassantCheck(bitboards: [Int: Bitboard], lastMove: Move) -> [Move] {
+    var moves = [Move]()
+    guard let from = lastMove.fromSquare, let target = lastMove.targetSquare else { return [Move]() }
+    
+    if lastMove.pieceValue == Piece.ColoredPieces.whitePawn.rawValue {
+        if (8...15).contains(from) && (24...31).contains(target) {
+            var blackPawns = bitboards[Piece.ColoredPieces.blackPawn.rawValue]! & Bitboard.Masks.rank4
+            while (blackPawns != 0) {
+                let blackPawn = Bitboard.popLSB(&blackPawns)
+                if blackPawn-1 == target || blackPawn+1 == target {
+                    moves.append(Move(fromSquare: blackPawn, targetSquare: target - 8, enPasssantCapture: target, pieceValue: Piece.ColoredPieces.blackPawn.rawValue, captureValue: Piece.ColoredPieces.whitePawn.rawValue))
+                }
+            }
+        }
+    } else if lastMove.pieceValue == Piece.ColoredPieces.blackPawn.rawValue {
+        if (48...55).contains(from) && (32...39).contains(target) {
+            var whitePawns = bitboards[Piece.ColoredPieces.whitePawn.rawValue]! & Bitboard.Masks.rank5
+            while (whitePawns != 0) {
+                let whitePawn = Bitboard.popLSB(&whitePawns)
+                if whitePawn-1 == target || whitePawn+1 == target {
+                    moves.append(Move(fromSquare: whitePawn, targetSquare: target+8, enPasssantCapture: target, pieceValue: Piece.ColoredPieces.whitePawn.rawValue, captureValue: Piece.ColoredPieces.blackPawn.rawValue))
+                }
+            }
+            
+        }
+    }
+//    if !moves.isEmpty {
+//        let movesSet = Set(moves)
+//        
+//        for m in movesSet {
+//            print(m.moveToNotation())
+//        }
+//    }
+    return Array(Set(moves))
+}

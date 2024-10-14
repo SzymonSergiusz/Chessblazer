@@ -8,6 +8,7 @@
 import Foundation
 
 struct BoardState {
+    var attackBitboard = Bitboard(0)
     var pawnAttackBitboard = Bitboard(0)
     var performedMovesList = [MoveData]()
     var castlesAvailable: Set<Character> = []
@@ -33,7 +34,14 @@ func initBitboards() -> [Int: Bitboard] {
 struct BoardData {
     var halfMoves = 0
     var hasGameEnded = false
+}
 
+struct PerftData {
+    var captures: Int = 0
+    var enPassants: Int = 0
+    var castles: Int = 0
+    var checks: Int = 0
+    var checkmates: Int = 0
 }
 
 struct MoveData {

@@ -93,12 +93,12 @@ class GameState {
                 }
             }
 
-//            if vsEngine && currentColorToMove == .white {
-//                let move = await findBestMove(game: game, depth: 3, maximizingPlayer: true)
-//                if let move = move {
-//                    makeMove(move.fromSquare!, move.targetSquare!)
-//                }
-//            }
+            if vsEngine && currentColorToMove == .white {
+                let move = findBestMove(game: game, depth: 3, maximizingPlayer: true)
+                if let move = move {
+                    makeMove(move.fromSquare!, move.targetSquare!)
+                }
+            }
         }
 
     }
