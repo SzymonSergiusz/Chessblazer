@@ -26,6 +26,8 @@
 - Opening book
 
 ## Perft test results
+<a href="https://www.chessprogramming.org/Perft_Results">I use this data to compare with my results</a>
+
 ### From Initial Position
 <table>
    <tr>
@@ -63,7 +65,14 @@
     <td>4865609</td>
     <td>✅</td>
   </tr>
+    </tr>
+    <tr>
+    <td>6</td>
+    <td>119060324</td>
+    <td>✅</td>
+  </tr>
 </table>
+
 ### Position 2 (Kiwipete)
 <table>
    <tr>
@@ -93,6 +102,39 @@
   </tr>
 </table>
 
+### Position 4
+<table>
+   <tr>
+    <th>Depth</th>
+    <th>Nodes</th>
+    <th>Passed</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>6</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>264</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>9467</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>422333</td>
+    <td>✅</td>
+  </tr>
+    <tr>
+    <td>5</td>
+    <td>15833292</td>
+    <td>✅</td>
+  </tr>
+</table>
 # GUI
 ## UI
 ### Implemented
