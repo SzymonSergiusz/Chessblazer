@@ -1,8 +1,8 @@
 # UCI-compatible Chess Engine fully written in Swift with dedicated GUI in SwiftUI
 # Engine
 ## Current state showcase (engine vs engine)
-<img src = "https://raw.githubusercontent.com/SzymonSergiusz/Chessblazer/main/res/showcase.gif" alt="showcase">
-<i>it's not really smart yet</i>
+<img src = "https://raw.githubusercontent.com/SzymonSergiusz/Chessblazer/main/res/showcase2.gif" alt="showcase">
+<i>it's little smarter now</i>
 
 ## Game logic
 ### Implemented
