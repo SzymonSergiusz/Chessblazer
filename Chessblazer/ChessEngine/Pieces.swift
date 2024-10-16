@@ -22,7 +22,7 @@ class Piece {
     enum Color: Int {
         case white = 8
         case black = 16
-
+        case none = 0
         func getOppositeColor() -> Color {
             if self == .white {
                 return .black

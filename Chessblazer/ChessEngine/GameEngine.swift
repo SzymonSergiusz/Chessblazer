@@ -18,10 +18,9 @@ class GameEngine {
         
         let pieceValue = move.pieceValue
         
-        
         if move.castling {
-            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: pieceValue, from: from, target: move.castlingDestinations.king)
-            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: move.captureValue, from: target, target: move.castlingDestinations.rook)
+            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: pieceValue, from: from, target: move.castlingKingDestination)
+            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: move.captureValue, from: target, target: move.castlingRookDestination)
             
             if pieceValue == Piece.ColoredPieces.whiteKing.rawValue {
                 boardStateCopy.castlesAvailable.remove("K")
@@ -32,24 +31,22 @@ class GameEngine {
             }
             
         } else if move.promotionPiece != 0 {
-            
-            var newPiece = 0
+            let newPiece = move.promotionPiece
+            let captureValue = move.captureValue
 
-            if let piece = Piece.ColoredPieces(rawValue: move.promotionPiece)?.rawValue {
-                newPiece = piece
-            } else {
-                newPiece = boardStateCopy.currentTurnColor == .white ? Piece.ColoredPieces.whiteQueen.rawValue : Piece.ColoredPieces.blackQueen.rawValue
-                
-            }
-            
+            var pawnBitboard = boardStateCopy.bitboards[pieceValue]!
+            pawnBitboard = pawnBitboard & ~(Bitboard(1) << Bitboard(from))
             var newPieceBitboard = boardStateCopy.bitboards[newPiece]!
             newPieceBitboard = newPieceBitboard | (Bitboard(1) << Bitboard(target))
-            
-            var pawnBitboard = boardStateCopy.bitboards[pieceValue]!
-            pawnBitboard = pawnBitboard & (~(Bitboard(1) << Bitboard(from)))
-            
             boardStateCopy.bitboards[newPiece] = newPieceBitboard
             boardStateCopy.bitboards[pieceValue] = pawnBitboard
+
+            if captureValue != 0 {
+                var captureBitboard = boardStateCopy.bitboards[captureValue]!
+                captureBitboard = captureBitboard & ~(Bitboard(1) << Bitboard(target))
+                boardStateCopy.bitboards[captureValue] = captureBitboard
+            }
+
             
             
         } else if move.enPasssantCapture != 0 {
@@ -102,8 +99,8 @@ class GameEngine {
         
         if move.castling {
             
-            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: pieceValue, from: from, target: move.castlingDestinations.king)
-            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: move.captureValue, from: target, target: move.castlingDestinations.rook)
+            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: pieceValue, from: from, target: move.castlingKingDestination)
+            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: move.captureValue, from: target, target: move.castlingRookDestination)
             
             if pieceValue == Piece.ColoredPieces.whiteKing.rawValue {
                 boardStateCopy.castlesAvailable.remove("K")
@@ -114,17 +111,22 @@ class GameEngine {
             }
         }  else if move.promotionPiece != 0 {
             let newPiece = move.promotionPiece
-            var bitboardsCopy = boardStateCopy.bitboards
-            var newPieceBitboard = bitboardsCopy[newPiece]!
-            newPieceBitboard = newPieceBitboard | Bitboard(1) << Bitboard(target)
-            
-            var pawnBitboard = bitboardsCopy[pieceValue]!
+            let captureValue = move.captureValue
+
+            var pawnBitboard = boardStateCopy.bitboards[pieceValue]!
             pawnBitboard = pawnBitboard & ~(Bitboard(1) << Bitboard(from))
+            var newPieceBitboard = boardStateCopy.bitboards[newPiece]!
+            newPieceBitboard = newPieceBitboard | (Bitboard(1) << Bitboard(target))
+            boardStateCopy.bitboards[newPiece] = newPieceBitboard
+            boardStateCopy.bitboards[pieceValue] = pawnBitboard
+
+            if captureValue != 0 {
+                var captureBitboard = boardStateCopy.bitboards[captureValue]!
+                captureBitboard = captureBitboard & ~(Bitboard(1) << Bitboard(target))
+                boardStateCopy.bitboards[captureValue] = captureBitboard
+            }
+
             
-            bitboardsCopy[newPiece] = newPieceBitboard
-            bitboardsCopy[pieceValue] = pawnBitboard
-            
-            boardStateCopy.bitboards = bitboardsCopy
         } else if move.enPasssantCapture != 0 {
             boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: pieceValue, from: from, target: target)
             let enPassantCapture = move.enPasssantCapture

@@ -12,7 +12,7 @@ let timeLimit: TimeInterval = 1
 func isTimeLimitExceeded(searchStartTime: TimeInterval) -> Bool {
     return Date().timeIntervalSince1970 - searchStartTime >= timeLimit
 }
-
+let MATE_VALUE = 50000
 let PieceValueTable: [Int: Int] = [
     Piece.ColoredPieces.empty.rawValue : 0,
     Piece.ColoredPieces.whitePawn.rawValue : 100,
@@ -56,15 +56,25 @@ func alphabeta(game: Game, depth: Int, alpha: Int, beta: Int, maximizingPlayer: 
     var alpha = alpha
     var beta = beta
 
-    if depth == 0 || game.boardState.currentValidMoves.isEmpty {
+    if depth == 0 {
+        
+        if game.boardState.currentValidMoves.isEmpty {
+            if isWhiteKingChecked(boardState: game.boardState) {
+                return MATE_VALUE
+            } else if isBlackKingChecked(boardState: game.boardState) {
+                return -MATE_VALUE
+            } else {
+                return 0 //draw
+            }
+        }
         return evaluate(bitboards: game.boardState.bitboards)
     }
-    let moves = generateAllLegalMoves(boardState: game.boardState).sorted(by: >)
-
+//    let moves = generateAllLegalMoves(boardState: game.boardState).sorted(by: >)
+    let moves = game.boardState.currentValidMoves
     if maximizingPlayer {
         var maxEval = Int.min
         for move in moves {
-            game.boardState = GameEngine.makeMove(boardState: game.boardState, move: move)
+            game.makeMove(move: move)
             let eval = alphabeta(game: game, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
             game.undoMove()
 
@@ -78,7 +88,7 @@ func alphabeta(game: Game, depth: Int, alpha: Int, beta: Int, maximizingPlayer: 
     } else {
         var minEval = Int.max
         for move in moves {
-            game.boardState = GameEngine.makeMove(boardState: game.boardState, move: move)
+            game.makeMove(move: move)
             let eval = alphabeta(game: game, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)
             game.undoMove()
 
@@ -135,11 +145,10 @@ func performSearch(game: Game, depth: Int, maximizingPlayer: Bool) -> (Move?, In
 
     if maximizingPlayer {
         for move in legalMoves {
-            let gameCopy = game
-            gameCopy.boardState = GameEngine.makeMove(boardState: game.boardState, move: move)
+            game.makeMove(move: move)
 
-            let eval = alphabeta(game: gameCopy, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
-            gameCopy.undoMove()
+            let eval = alphabeta(game: game, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: false)
+            game.undoMove()
 
             if eval > bestEval {
                 bestEval = eval
@@ -153,11 +162,10 @@ func performSearch(game: Game, depth: Int, maximizingPlayer: Bool) -> (Move?, In
         }
     } else {
         for move in legalMoves {
-            let gameCopy = game
-            gameCopy.boardState = GameEngine.makeMove(boardState: game.boardState, move: move)
+            game.makeMove(move: move)
 
-            let eval = alphabeta(game: gameCopy, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)
-            gameCopy.undoMove()
+            let eval = alphabeta(game: game, depth: depth - 1, alpha: alpha, beta: beta, maximizingPlayer: true)
+            game.undoMove()
 
             if eval < bestEval {
                 bestEval = eval

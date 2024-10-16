@@ -12,9 +12,9 @@ class Game {
     
     var boardData = BoardData()
     var boardState = BoardState(currentTurnColor: .white)
+    
     init() {
         startNewGame()
-        
     }
     
     func loadFromFen(fen: String) {
@@ -50,14 +50,18 @@ class Game {
         
         
         if boardState.currentValidMoves.isEmpty {
-            boardData.hasGameEnded = true
+            if isWhiteKingChecked(boardState: boardState) {
+                boardData.gameResult = .black
+            } else if isBlackKingChecked(boardState: boardState) {
+                boardData.gameResult = .white
+            } else {
+                boardData.gameResult = .none
+            }
         }
-        
     }
     
     func undoMove() {
         guard let moveData = boardState.performedMovesList.popLast() else { return }
-
         boardState.bitboards = moveData.bitboards
         boardState.castlesAvailable = moveData.castles
         boardState.currentTurnColor = moveData.color
@@ -67,9 +71,20 @@ class Game {
         
         if !boardState.currentValidMoves.isEmpty {
             boardData.hasGameEnded = false
+            boardData.gameResult = .none
         }
     }
-    
+        
+    private func toBitboardsRepresentation(array: [Int]) -> [Piece.ColoredPieces.RawValue : Bitboard] {
+        var bitboards = [Piece.ColoredPieces.RawValue : Bitboard]()
+        
+        for (index, piece) in array.enumerated() {
+            if piece > 0 {
+                bitboards[piece] = (bitboards[piece] ?? Bitboard(0)) | (Bitboard(1) << Bitboard(UInt64(index)))
+            }
+        }
+        return bitboards
+    }
     
     func toBoardArrayRepresentation() -> [Int] {
         var array = Array(repeating: 0, count: 64)
@@ -85,21 +100,5 @@ class Game {
             }
         }
         return array
-    }
-    
-    
-    func hashZobrist(board: [Int]) {
-        
-    }
-    
-    private func toBitboardsRepresentation(array: [Int]) -> [Piece.ColoredPieces.RawValue : Bitboard] {
-        var bitboards = [Piece.ColoredPieces.RawValue : Bitboard]()
-        
-        for (index, piece) in array.enumerated() {
-            if piece > 0 {
-                bitboards[piece] = (bitboards[piece] ?? Bitboard(0)) | (Bitboard(1) << Bitboard(UInt64(index)))
-            }
-        }
-        return bitboards
     }
 }

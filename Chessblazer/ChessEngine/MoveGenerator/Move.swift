@@ -7,14 +7,16 @@
 
 import Foundation
 
-class Move: Equatable, Hashable, Comparable {
+class Move: Equatable, Hashable, Comparable, Codable {
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(fromSquare!+targetSquare!+enPasssantCapture)
     }
     
     var castling = false
-    var castlingDestinations: (king: Int, rook: Int) = (0, 0)
+//    var castlingDestinations: (king: Int, rook: Int) = (0, 0)
+    var castlingRookDestination = 0
+    var castlingKingDestination = 0
     var fromSquare: Int?
     var targetSquare: Int?
     var promotionPiece: Int = 0
@@ -22,9 +24,6 @@ class Move: Equatable, Hashable, Comparable {
     
     var pieceValue: Int
     var captureValue = 0
-
-    #warning("add logic for this")
-    var isAttackedByPawn = false
 
     var asString: String {
         "\(fromSquare!) \(targetSquare!)"
@@ -59,15 +58,15 @@ class Move: Equatable, Hashable, Comparable {
         self.targetSquare = targetSquare
         self.pieceValue = kingValue
         self.captureValue = rookValue
-        self.castlingDestinations.king = kingDestination
-        self.castlingDestinations.rook = rookDestination
+        self.castlingKingDestination = kingDestination
+        self.castlingRookDestination = rookDestination
         
     }
     
     static func == (lhs: Move, rhs: Move) -> Bool {
         return (lhs.fromSquare == rhs.fromSquare) && (lhs.targetSquare == rhs.targetSquare)
     }
-    
+#warning("think about it")
     func moveValue(attackPawnTable: Bitboard = Bitboard(0)) -> Int {
         var score = 0
         let pieceRealValue = PieceValueTable[pieceValue]!
@@ -80,10 +79,9 @@ class Move: Equatable, Hashable, Comparable {
         }
         
         if promotionPiece != 0 {
-        #warning("lets say promotion is hetman for now but soon to refactor this")
-            score += 900
+            score += promotionPiece
         }
-        //isAttackedByPawn
+
         let b = (Bitboard(1) << Bitboard(targetSquare!))
         if b & attackPawnTable == b {
             score -= abs(pieceRealValue)
@@ -94,7 +92,6 @@ class Move: Equatable, Hashable, Comparable {
     static func < (lhs: Move, rhs: Move) -> Bool {
         return lhs.moveValue() < rhs.moveValue()
     }
-        
 //    init(notation: String) {
 //        
 //        #warning("think about it")

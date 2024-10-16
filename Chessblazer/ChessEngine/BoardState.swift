@@ -29,11 +29,14 @@ func initBitboards() -> [Int: Bitboard] {
     return bitboards
 }
 
-
+enum GameResult {
+    case white, black, draw, none
+}
 
 struct BoardData {
     var halfMoves = 0
     var hasGameEnded = false
+    var gameResult: GameResult = .none
 }
 
 struct PerftData {

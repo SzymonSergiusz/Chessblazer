@@ -121,27 +121,7 @@ func perftTest(depth: Int, fen: String) -> (Int, PerftData) {
 }
 
 func bulkPerftTest(depth: Int) -> Int {
-    let game = Game()
-    
-    func perft(depth: Int, game: Game) -> Int {
-        var nodeCount = 0
-        
-        if depth == 1 {
-            return game.boardState.currentValidMoves.count
-        }
-        
-//        if game.boardData.hasGameEnded {
-//            return 0
-//        }
-        
-        for move in game.boardState.currentValidMoves {
-            game.makeMove(move: move)
-            nodeCount += perft(depth: depth - 1, game: game)
-            game.undoMove()
-        }
-        return nodeCount
-    }
-    return perft(depth: depth, game: game)
+    bulkPerftTest(depth: depth, fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 }
 
 func bulkPerftTest(depth: Int, fen: String) -> Int {

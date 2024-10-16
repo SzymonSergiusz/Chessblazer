@@ -104,10 +104,7 @@ class Engine {
             print("")
         
         case .main:
-            var color = Piece.Color.white
-            color.toggleColor()
-            
-            print(color)
+            saveKeys()
 
         case .perftX:
             let depth = Int(args[1]) ?? 0
@@ -146,35 +143,37 @@ class Engine {
                 print(bulkPerftTest(depth: 5, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
 
             default:
-                print(bulkPerftTest(depth: 1), ", expected: 20")
-                print(bulkPerftTest(depth: 2), ", expected: 400")
-                print(bulkPerftTest(depth: 3), ", expected: 8902")
-                print(bulkPerftTest(depth: 4), ", expected: 197281")
-    //
-                print(bulkPerftTest(depth: 5), ", expected: 4,865,609")
+//                print(bulkPerftTest(depth: 1), ", expected: 20")
+//                print(bulkPerftTest(depth: 2), ", expected: 400")
+//                print(bulkPerftTest(depth: 3), ", expected: 8902")
+//                print(bulkPerftTest(depth: 4), ", expected: 197281")
+//                print(bulkPerftTest(depth: 5), ", expected: 4,865,609")
                 
-                /*
-                 
-                 (20, Chessblazer.PerftData(captures: 0, enPassants: 0, castles: 0, checks: 0, checkmates: 0)) , expected: 20
-                 (400, Chessblazer.PerftData(captures: 0, enPassants: 0, castles: 0, checks: 0, checkmates: 0)) , expected: 400
-                 (8902, Chessblazer.PerftData(captures: 34, enPassants: 0, castles: 0, checks: 12, checkmates: 0)) , expected: 8902
-                 (197281, Chessblazer.PerftData(captures: 1576, enPassants: 0, castles: 0, checks: 469, checkmates: 8)) , expected: 197281
-                 // (4866899, Chessblazer.PerftData(captures: 1610, enPassants: 0, castles: 0, checks: 481, checkmates: 8)) , expected: 4,865,609
-                 result: (423532, Chessblazer.PerftData(captures: 131725, enPassants: 0, castles: 7874, checks: 15544, checkmates: 5))
-                 */
+//                print(bulkPerftTest(depth: 6), ", expected: 119 060 324")
+                print(bulkPerftTest(depth: 7), ", expected: 3 195 901 860")
+                print(bulkPerftTest(depth: 8), ", expected: 84 998 978 956")
+                print(bulkPerftTest(depth: 9), ", expected: 2 439 530 234 167")
             }
 
-
+        case .mateInOne:
+            let bp = BoardPrinter()
+            let game = Game()
+            //rnb1k1nr/pppp1ppp/5q2/2b1p3/2B1P2P/N7/PPPP1PP1/R1BQK1NR b KQkq - 0 4
+            game.loadFromFen(fen: "rnbqkbnr/1ppp1pp1/7p/p3p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 4")
+            let bestMove = game.boardState.currentTurnColor == .white ? findBestMove(game: game, depth: 3, maximizingPlayer: true) : findBestMove(game: game, depth: 3, maximizingPlayer: false)
+            
+            game.makeMove(move: bestMove!)
+            bp.printBoard(board: game.toBoardArrayRepresentation())
+            
             
         case .promotion:
             let bp = BoardPrinter()
+            game.loadFromFen(fen: "6br/5Ppk/7p/5K2/8/8/8/8 w - - 0 1")
             
-            
-            game.loadFromFen(fen: "8/PPP5/n7/Q7/3K1k2/8/1p1p1p1p/8 w - - 0 1")
             bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true)
-
-//            game.makeMove(move: Move(notation: "a7a8Q"))
-//            game.makeMove(move: Move(notation: "b2b1n"))
+            let bestMove = game.boardState.currentTurnColor == .white ? findBestMove(game: game, depth: 3, maximizingPlayer: true) : findBestMove(game: game, depth: 3, maximizingPlayer: false)
+            game.makeMove(move: bestMove!)
+            bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true)
             
         default:
             return
@@ -206,6 +205,7 @@ enum CommandsGUItoEngine: String {
     case perft
     case perftX
     case eve // Engine vs Engine
+    case mateInOne
 }
 
 enum CommandsEnginetoGUI {
