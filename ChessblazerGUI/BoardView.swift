@@ -49,7 +49,7 @@ struct BoardView: View {
                     ForEach(0..<8) { column in
                         let index = (7 - row) * 8 + column
                         
-                        SquareView(color: (row + column).isMultiple(of: 2) ? Settings.lightBrown : Settings.brown, index: index, size: squareSize, piece: gameState.boardState[index], gameState: gameState)
+                        SquareView(color: (row + column).isMultiple(of: 2) ? Settings.lightBrown : Settings.brown, index: index, size: squareSize, piece: gameState.boardArray[index], gameState: gameState)
                         
                     }
                     

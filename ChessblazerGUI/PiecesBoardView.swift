@@ -49,7 +49,7 @@ struct PiecesBoardView: View {
                         
                         ForEach(0..<8) { column in
                             let index = (7 - row) * 8 + column
-                            ChessPieceView(pieceValue: gameState.boardState[index], indexOfSquare: index, width: squareSize, height: squareSize, gameState: gameState)
+                            ChessPieceView(pieceValue: gameState.boardArray[index], indexOfSquare: index, width: squareSize, height: squareSize, gameState: gameState)
                         }
                         
                     }

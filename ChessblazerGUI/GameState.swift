@@ -11,39 +11,31 @@ import Foundation
 class GameState {
     var game = Game()
     var evaluation = 0
-    var boardState: [Int] = Array(repeating: 0, count: 64)
+//    var boardState: [Int] = Array(repeating: 0, count: 64)
     var indexOfTappedPiece: Int = -1
     var tappedPieceTargets = [Int]()
     var attackTable = [Int]()
     var validMoves = [Move]()
     var currentColorToMove = Piece.Color.white
-    
+    var boardArray: [Int] = Array(repeating: 0, count: 64)
     var vsEngine = false
     
     func startNewGame() {
         game = Game()
-        boardState.removeAll()
         validMoves.removeAll()
         currentColorToMove = Piece.Color.white
         tappedPieceTargets.removeAll()
         validMoves = game.boardState.currentValidMoves
-        game.startNewGame()
-        boardState = game.toBoardArrayRepresentation()
+        boardArray = game.toBoardArrayRepresentation()
     }
     func loadFenGame(fen: String) {
-        #warning("add validation for fen string here")
-        boardState.removeAll()
-        validMoves.removeAll()
-        tappedPieceTargets.removeAll()
         game.loadFromFen(fen: fen)
-        boardState = game.toBoardArrayRepresentation()
-        validMoves = game.boardState.currentValidMoves
-        currentColorToMove = game.boardState.currentTurnColor
+        boardArray = game.toBoardArrayRepresentation()
     }
     
     func onPieceTap(square: Int) {
         if tappedPieceTargets.contains(square) {
-            if currentColorToMove == Piece.checkColor(piece: boardState[indexOfTappedPiece]) {
+            if currentColorToMove == Piece.checkColor(piece: game.toBoardArrayRepresentation()[indexOfTappedPiece]) {
                 makeMove(indexOfTappedPiece, square)
             }
             tappedPieceTargets.removeAll()
@@ -59,14 +51,10 @@ class GameState {
         for move in validMoves {
             if move.fromSquare == from && move.targetSquare == to {
                 game.makeMove(move: move)
-                self.validMoves = self.game.boardState.currentValidMoves
-                self.currentColorToMove = game.boardState.currentTurnColor
-
-                
-                DispatchQueue.main.async {
-                    self.boardState = self.game.toBoardArrayRepresentation()
-                }
-                var bits = generateAllAttackedSquares(bitboards: game.boardState.bitboards, currentColor: currentColorToMove.getOppositeColor())
+                validMoves = game.boardState.currentValidMoves
+                currentColorToMove = game.boardState.currentTurnColor
+                var bits = game.boardState.attackBitboard
+                boardArray = game.toBoardArrayRepresentation()
                 attackTable.removeAll()
                 while bits != 0 {
                     let x = UInt64.popLSB(&bits)
@@ -75,9 +63,6 @@ class GameState {
                 break
             }
         }
-        
-
-
 //        let bp = BoardPrinter()
 //        bp.printBoard(board: game.toBoardArrayRepresentation(), emojiMode: true, perspectiveColor: .white)
 
@@ -85,22 +70,39 @@ class GameState {
 
     func engineMove() async {
         print("engine is starting")
-        while !game.boardData.hasGameEnded {
+//        while !game.boardData.hasGameEnded {
             if vsEngine && currentColorToMove == .black {
-                let move = findBestMove(game: game, depth: 3, maximizingPlayer: false)
-                if let move = move {
-                    makeMove(move.fromSquare!, move.targetSquare!)
+                let copy = game
+                let bestMove = findBestMove(game: copy, depth: 3, maximizingPlayer: false)
+                game.makeMove(move: bestMove!)
+                DispatchQueue.main.async {
+                    self.boardArray = self.game.toBoardArrayRepresentation()
                 }
-            }
-
-            if vsEngine && currentColorToMove == .white {
-                let move = findBestMove(game: game, depth: 3, maximizingPlayer: true)
-                if let move = move {
-                    makeMove(move.fromSquare!, move.targetSquare!)
-                }
-            }
         }
 
+    }
+    
+    func startPvE() async {
+        while !game.boardData.hasGameEnded {
+            if game.boardState.currentTurnColor == .black {
+                let bestMove = findBestMove(game: game, depth: 3, maximizingPlayer: game.boardState.currentTurnColor == .white ? true : false)
+                makeMove(bestMove!.fromSquare!, bestMove!.targetSquare!)
+                DispatchQueue.main.async {
+                    self.boardArray = self.game.toBoardArrayRepresentation()
+                }
+            }
+
+        }
+    }
+    
+    func startEvE() async {
+        while !game.boardData.hasGameEnded {
+            let bestMove = findBestMove(game: game, depth: 3, maximizingPlayer: game.boardState.currentTurnColor == .white ? true : false)
+            game.makeMove(move: bestMove!)
+            DispatchQueue.main.async {
+                self.boardArray = self.game.toBoardArrayRepresentation()
+            }
+        }
     }
     
     func validTargetSquares(fromSquare: Int) -> [Int] {
@@ -112,14 +114,12 @@ class GameState {
     }
     
     func undoneMove() {
+
         game.undoMove()
-        
-        boardState.removeAll()
-        validMoves.removeAll()
         currentColorToMove = game.boardState.currentTurnColor
         tappedPieceTargets.removeAll()
         validMoves = game.boardState.currentValidMoves
-        boardState = game.toBoardArrayRepresentation()
+        boardArray = game.toBoardArrayRepresentation()
         evaluation = evaluate(bitboards: game.boardState.bitboards)
     }
 }

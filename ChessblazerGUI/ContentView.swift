@@ -15,26 +15,26 @@ struct ContentView: View {
             
             Button("Start") {
                 gameState.startNewGame()
-                if engineVsEngine {
-                    while !gameState.game.boardData.hasGameEnded {
-                        let bestMove = gameState.game.boardState.currentTurnColor == .white ? findBestMove(game: gameState.game, depth: 3, maximizingPlayer: true) : findBestMove(game: gameState.game, depth: 3, maximizingPlayer: false)
-                        if let from = bestMove?.fromSquare, let target = bestMove?.targetSquare {
-                            gameState.makeMove(from, target)
-                        }
+                
+                if vsEngine {
+                    Task {
+                        await gameState.startPvE()
+
                     }
-                } else {
-                    gameState.vsEngine = vsEngine
-                    Task.init {
-                        await gameState.engineMove()
+                                    }
+                
+                if engineVsEngine {
+                    Task {
+                        await gameState.startEvE()
                     }
                 }
-
             }
             TextField(text: $fen) {
                 Text("Input FEN here and submit (enter)")
             }.onSubmit {
                 gameState.loadFenGame(fen: fen)
             }
+            
         }
         
         HStack {
