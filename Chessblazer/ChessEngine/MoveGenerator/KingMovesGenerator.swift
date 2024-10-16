@@ -7,13 +7,6 @@
 
 import Foundation
 
-/*
- 
- perft 2
- (2039, Chessblazer.PerftData(captures: 351, enPassants: 1, castles: 91, checks: 3, checkmates: 0))
- (97905, Chessblazer.PerftData(captures: 17102, enPassants: 45, castles: 3205, checks: 993, checkmates: 1))
- 
- */
 func generateKingMovesBitboard(bitboards: [Int: Bitboard], currentColor: Piece.Color, square: Int, moves: inout [Move]) {
     let attackedSquares = generateAllAttackedSquares(bitboards: bitboards, currentColor: currentColor)
     var friendlyMask = Bitboard(0)
@@ -29,10 +22,8 @@ func generateKingMovesBitboard(bitboards: [Int: Bitboard], currentColor: Piece.C
         
     } else {
         kingBitboard = bitboards[Piece.ColoredPieces.blackKing.rawValue]!
-        let isUnderAttack = kingBitboard & attackedSquares != 0
         pieceValue = Piece.ColoredPieces.blackKing.rawValue
         friendlyMask = Magic.blackPiecesBitboards(bitboards: bitboards)
-        
     }
     
     while kingBitboard != 0 {
@@ -51,15 +42,10 @@ func generateKingMovesBitboard(bitboards: [Int: Bitboard], currentColor: Piece.C
 
 func generateCastles(bitboards: [Int: Bitboard], currentColor: Piece.Color, moves: inout [Move], castlesAvailable: Set<Character>) {
     let attackedSquares = generateAllAttackedSquares(bitboards: bitboards, currentColor: currentColor)
-    var friendlyMask = Bitboard(0)
-    var kingBitboard = Bitboard(0)
-        
-    var pieceValue = 0
     
     if currentColor == .white {
-        kingBitboard = bitboards[Piece.ColoredPieces.whiteKing.rawValue]!
-        pieceValue = Piece.ColoredPieces.whiteKing.rawValue
-        friendlyMask = Magic.whitePiecesBitboards(bitboards: bitboards)
+        let kingBitboard = bitboards[Piece.ColoredPieces.whiteKing.rawValue]!
+        let friendlyMask = Magic.allPieces(bitboards: bitboards)
 
 
         let isUnderAttack = kingBitboard & attackedSquares != 0
@@ -71,17 +57,17 @@ func generateCastles(bitboards: [Int: Bitboard], currentColor: Piece.Color, move
             let piecesRank1 = friendlyMask & Bitboard.Masks.rank1
             let rooksKing = rooksBitboard | kingBitboard
             
-            let rightRookToKing = Bitboard(144) //correct
+            let rightRookToKing = Bitboard(144)
             let rightCorrectPositions = rooksKing & rightRookToKing == rightRookToKing
-            let isRightPathClear = Bitboard(96) & piecesRank1 == 0 //correct
-            let isRightPathNotUnderAttack = attackedSquares & Bitboard(96) == 0  //correct? before was 112
+            let isRightPathClear = Bitboard(96) & piecesRank1 == 0
+            let isRightPathNotUnderAttack = attackedSquares & Bitboard(96) == 0
             let isRightPossible = isRightPathClear && isRightPathNotUnderAttack && rightCorrectPositions
 
             
-            let leftRookToKing = Bitboard(17) //correct
+            let leftRookToKing = Bitboard(17)
             let leftCorrectPositions = rooksKing & leftRookToKing == leftRookToKing
             let isLeftPathClear = Bitboard(14) & piecesRank1 == 0
-            let isLeftPathNotUnderAttack = attackedSquares & Bitboard(12) == 0  // seems correct
+            let isLeftPathNotUnderAttack = attackedSquares & Bitboard(12) == 0
             let isLeftPossible = isLeftPathClear && isLeftPathNotUnderAttack && leftCorrectPositions
             
             
@@ -95,30 +81,27 @@ func generateCastles(bitboards: [Int: Bitboard], currentColor: Piece.Color, move
             }
         }
         
-        
     } else {
-        kingBitboard = bitboards[Piece.ColoredPieces.blackKing.rawValue]!
+        let kingBitboard = bitboards[Piece.ColoredPieces.blackKing.rawValue]!
+        let friendlyMask = Magic.allPieces(bitboards: bitboards)
         let isUnderAttack = kingBitboard & attackedSquares != 0
-        pieceValue = Piece.ColoredPieces.blackKing.rawValue
-        friendlyMask = Magic.blackPiecesBitboards(bitboards: bitboards)
 
         if !isUnderAttack {
             let rooksBitboard = bitboards[Piece.ColoredPieces.blackRook.rawValue]!
             let piecesRank8 = friendlyMask & Bitboard.Masks.rank8
             let rooksKing = rooksBitboard | kingBitboard
             
-            let rightRookToKing = Bitboard(10376293541461622784) //correct
+            let rightRookToKing = Bitboard(10376293541461622784)
             let rightCorrectPositions = rooksKing & rightRookToKing == rightRookToKing
-            let isRightPathClear = Bitboard(6917529027641081856) & piecesRank8 == 0 //correct
-            let isRightPathNotUnderAttack = attackedSquares & Bitboard(6917529027641081856) == 0 // before was 8070450532247928832
+            let isRightPathClear = Bitboard(6917529027641081856) & piecesRank8 == 0
+            let isRightPathNotUnderAttack = attackedSquares & Bitboard(6917529027641081856) == 0
             let isRightPossible = isRightPathClear && isRightPathNotUnderAttack && rightCorrectPositions
 
-            let leftRookToKing = Bitboard(1224979098644774912) //correct
+            let leftRookToKing = Bitboard(1224979098644774912)
             let leftCorrectPositions = rooksKing & leftRookToKing == leftRookToKing
-            let isLeftPathClear = Bitboard(1008806316530991104) & piecesRank8 == 0 //correct
-            let isLeftPathNotUnderAttack = attackedSquares & Bitboard(864691128455135232) == 0 // before 2017612633061982208
+            let isLeftPathClear = Bitboard(1008806316530991104) & piecesRank8 == 0
+            let isLeftPathNotUnderAttack = attackedSquares & Bitboard(864691128455135232) == 0
             let isLeftPossible = isLeftPathClear && isLeftPathNotUnderAttack && leftCorrectPositions
-            
             
             if isRightPossible && castlesAvailable.contains("k") {
                 moves.append(Move(fromSquare: 60, targetSquare: 63, kingValue: Piece.ColoredPieces.blackKing.rawValue, rookValue: Piece.ColoredPieces.blackRook.rawValue, kingDestination: 62, rookDestination: 61))
@@ -128,7 +111,6 @@ func generateCastles(bitboards: [Int: Bitboard], currentColor: Piece.Color, move
                 moves.append(Move(fromSquare: 60, targetSquare: 56, kingValue: Piece.ColoredPieces.blackKing.rawValue, rookValue: Piece.ColoredPieces.blackRook.rawValue, kingDestination: 58, rookDestination: 59))
             }
         }
-        
     }
 }
 

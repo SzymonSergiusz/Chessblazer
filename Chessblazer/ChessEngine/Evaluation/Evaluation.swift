@@ -7,7 +7,7 @@
 
 import Foundation
 
-let timeLimit: TimeInterval = 2
+let timeLimit: TimeInterval = 1
 
 func isTimeLimitExceeded(searchStartTime: TimeInterval) -> Bool {
     return Date().timeIntervalSince1970 - searchStartTime >= timeLimit

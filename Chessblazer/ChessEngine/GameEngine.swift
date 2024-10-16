@@ -12,7 +12,6 @@ class GameEngine {
     static func makeMove(boardState: BoardState, move: Move) -> BoardState {
         
         var boardStateCopy = boardState
-        var bitboards = boardStateCopy.bitboards
         
         let from = move.fromSquare!
         let target = move.targetSquare!
@@ -21,8 +20,8 @@ class GameEngine {
         
         
         if move.castling {
-            bitboards = GameEngine.makeMoveOperations(bitboards: bitboards, pieceValue: move.pieceValue, from: from, target: move.castlingDestinations.king)
-            bitboards = GameEngine.makeMoveOperations(bitboards: bitboards, pieceValue: move.captureValue, from: target, target: move.castlingDestinations.rook)
+            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: pieceValue, from: from, target: move.castlingDestinations.king)
+            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: move.captureValue, from: target, target: move.castlingDestinations.rook)
             
             if pieceValue == Piece.ColoredPieces.whiteKing.rawValue {
                 boardStateCopy.castlesAvailable.remove("K")
@@ -43,23 +42,23 @@ class GameEngine {
                 
             }
             
-            var newPieceBitboard = bitboards[newPiece]!
+            var newPieceBitboard = boardStateCopy.bitboards[newPiece]!
             newPieceBitboard = newPieceBitboard | (Bitboard(1) << Bitboard(target))
             
-            var pawnBitboard = bitboards[pieceValue]!
+            var pawnBitboard = boardStateCopy.bitboards[pieceValue]!
             pawnBitboard = pawnBitboard & (~(Bitboard(1) << Bitboard(from)))
             
-            bitboards[newPiece] = newPieceBitboard
-            bitboards[pieceValue] = pawnBitboard
+            boardStateCopy.bitboards[newPiece] = newPieceBitboard
+            boardStateCopy.bitboards[pieceValue] = pawnBitboard
             
             
         } else if move.enPasssantCapture != 0 {
-            bitboards = GameEngine.makeMoveOperations(bitboards: bitboards, pieceValue: pieceValue, from: from, target: target)
+            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: pieceValue, from: from, target: target)
             let enPassantCapture = move.enPasssantCapture
             let captured = move.captureValue
-            bitboards[captured] = bitboards[captured]! & ~Bitboard(1 << enPassantCapture)
+            boardStateCopy.bitboards[captured] = boardStateCopy.bitboards[captured]! & ~Bitboard(1 << enPassantCapture)
         } else {
-            bitboards = GameEngine.makeMoveOperations(bitboards: bitboards, pieceValue: move.pieceValue, from: from, target: target)
+            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: pieceValue, from: from, target: target)
             
             switch pieceValue {
             case Piece.ColoredPieces.whiteKing.rawValue:
@@ -86,18 +85,23 @@ class GameEngine {
                 break
             }
         }
-        boardStateCopy.bitboards = bitboards
+//        boardStateCopy.attackBitboard = generateAllAttackedSquares(bitboards: boardStateCopy.bitboards, currentColor: boardStateCopy.currentTurnColor)
         return boardStateCopy
     }
     
     
     
     static func makeMoveOnly(boardState: BoardState, move: Move) -> BoardState {
+        
         var boardStateCopy = boardState
+        
         let from = move.fromSquare!
         let target = move.targetSquare!
+        
         let pieceValue = move.pieceValue
+        
         if move.castling {
+            
             boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: pieceValue, from: from, target: move.castlingDestinations.king)
             boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: move.captureValue, from: target, target: move.castlingDestinations.rook)
             
@@ -121,6 +125,11 @@ class GameEngine {
             bitboardsCopy[pieceValue] = pawnBitboard
             
             boardStateCopy.bitboards = bitboardsCopy
+        } else if move.enPasssantCapture != 0 {
+            boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: pieceValue, from: from, target: target)
+            let enPassantCapture = move.enPasssantCapture
+            let captured = move.captureValue
+            boardStateCopy.bitboards[captured] = boardStateCopy.bitboards[captured]! & ~Bitboard(1 << enPassantCapture)
         } else {
             
             boardStateCopy.bitboards = GameEngine.makeMoveOperations(bitboards: boardStateCopy.bitboards, pieceValue: pieceValue, from: from, target: target)
@@ -153,6 +162,22 @@ class GameEngine {
         boardStateCopy.attackBitboard = generateAllAttackedSquares(bitboards: boardStateCopy.bitboards, currentColor: boardStateCopy.currentTurnColor)
         return boardStateCopy
     }
+
+    
+    static func makeMoveOperations(bitboards: [Int: Bitboard], pieceValue: Int, from: Int, target: Int) -> [Int: Bitboard] {
+        var bitboardsCopy = bitboards
+        var bitboard = bitboardsCopy[pieceValue]! //it's expected to cause exception if something is wrong in code before
+        bitboard = bitboard & ~(Bitboard(1) << Bitboard(from))
+        bitboard = bitboard | (Bitboard(1) << Bitboard(target))
+        bitboardsCopy[pieceValue] = bitboard
+        for (key, value) in bitboardsCopy {
+            if (key != pieceValue) && (value & (Bitboard(1) << Bitboard(target))) != 0 {
+                bitboardsCopy[key] = bitboardsCopy[key]! & ~(Bitboard(1) << Bitboard(target))
+                break
+            }
+        }
+        return bitboardsCopy
+    }
     
     static func loadBoardFromFen(fen: String) -> BoardState {
         var boardState = BoardState(currentTurnColor: .white)
@@ -180,21 +205,7 @@ class GameEngine {
                 }
             }
         }
+        
         return boardState
-    }
-    
-    static func makeMoveOperations(bitboards: [Int: Bitboard], pieceValue: Int, from: Int, target: Int) -> [Int: Bitboard] {
-        var bitboardsCopy = bitboards
-        var bitboard = bitboards[pieceValue]! //it's expected to cause exception if something is wrong in code before
-        bitboard = bitboard & ~(Bitboard(1) << Bitboard(from))
-        bitboard = bitboard | (Bitboard(1) << Bitboard(target))
-        bitboardsCopy[pieceValue] = bitboard
-        for (key, value) in bitboardsCopy {
-            if (key != pieceValue) && (value & (Bitboard(1) << Bitboard(target))) != 0 {
-                bitboardsCopy[key] = bitboardsCopy[key]! & ~(Bitboard(1) << Bitboard(target))
-                break
-            }
-        }
-        return bitboardsCopy
     }
 }

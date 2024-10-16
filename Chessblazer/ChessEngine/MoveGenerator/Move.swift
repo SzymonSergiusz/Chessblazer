@@ -10,8 +10,7 @@ import Foundation
 class Move: Equatable, Hashable, Comparable {
     
     func hash(into hasher: inout Hasher) {
-        let c = castling ? 1 : 0
-        hasher.combine(fromSquare!+targetSquare!+c)
+        hasher.combine(fromSquare!+targetSquare!+enPasssantCapture)
     }
     
     var castling = false
@@ -60,8 +59,8 @@ class Move: Equatable, Hashable, Comparable {
         self.targetSquare = targetSquare
         self.pieceValue = kingValue
         self.captureValue = rookValue
-        castlingDestinations.king = kingDestination
-        castlingDestinations.rook = rookDestination
+        self.castlingDestinations.king = kingDestination
+        self.castlingDestinations.rook = rookDestination
         
     }
     

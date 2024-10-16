@@ -87,9 +87,11 @@ class Engine {
         // custom commands
             
         case .eve:
-            var game = Game()
+            let game = Game()
             game.startNewGame()
             let bp = BoardPrinter()
+            bp.printBoard(board: game.toBoardArrayRepresentation())
+
             while !game.boardData.hasGameEnded {
                 let bestMove = game.boardState.currentTurnColor == .white ? findBestMove(game: game, depth: 3, maximizingPlayer: true) : findBestMove(game: game, depth: 3, maximizingPlayer: false)
                 
@@ -108,7 +110,6 @@ class Engine {
             print(color)
 
         case .perftX:
-            var game = Game()
             let depth = Int(args[1]) ?? 0
             print(bulkPerftTest(depth: depth))
         case .perft:
@@ -117,20 +118,32 @@ class Engine {
                 position = args[1]
             }
             switch position {
+            
             case "2":
+                print(perftTest(depth: 2, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
+                print(perftTest(depth: 3, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
+                print(perftTest(depth: 4, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
+
+            case "2b":
+                print(bulkPerftTest(depth: 2, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
+                print(bulkPerftTest(depth: 3, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
+                print(bulkPerftTest(depth: 4, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
+
+            case "4":
+                // 4    422333    131393    0    7795    60032    15492    5
+                print(perftTest(depth: 1, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
+                print(perftTest(depth: 2, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
+                print(perftTest(depth: 3, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
+                print(perftTest(depth: 4, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
+                print(perftTest(depth: 5, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
                 
-//                
-                var game = Game()
-                game.loadFromFen(fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -")
-                print(perftTest(depth: 2, game: &game))
-
-                var game3 = Game()
-                game3.loadFromFen(fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -")
-                print(perftTest(depth: 3, game: &game3))
-
-
-
-//(97864, Chessblazer.PerftData(captures: 17102, enPassants: 45, castles: 3164, checks: 993, checkmates: 1))
+            case "4b":
+                // 4    422333    131393    0    7795    60032    15492    5
+                print(bulkPerftTest(depth: 1, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
+                print(bulkPerftTest(depth: 2, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
+                print(bulkPerftTest(depth: 3, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
+                print(bulkPerftTest(depth: 4, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
+                print(bulkPerftTest(depth: 5, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
 
             default:
                 print(bulkPerftTest(depth: 1), ", expected: 20")
@@ -139,6 +152,7 @@ class Engine {
                 print(bulkPerftTest(depth: 4), ", expected: 197281")
     //
                 print(bulkPerftTest(depth: 5), ", expected: 4,865,609")
+                
                 /*
                  
                  (20, Chessblazer.PerftData(captures: 0, enPassants: 0, castles: 0, checks: 0, checkmates: 0)) , expected: 20
@@ -146,14 +160,13 @@ class Engine {
                  (8902, Chessblazer.PerftData(captures: 34, enPassants: 0, castles: 0, checks: 12, checkmates: 0)) , expected: 8902
                  (197281, Chessblazer.PerftData(captures: 1576, enPassants: 0, castles: 0, checks: 469, checkmates: 8)) , expected: 197281
                  // (4866899, Chessblazer.PerftData(captures: 1610, enPassants: 0, castles: 0, checks: 481, checkmates: 8)) , expected: 4,865,609
-
+                 result: (423532, Chessblazer.PerftData(captures: 131725, enPassants: 0, castles: 7874, checks: 15544, checkmates: 5))
                  */
             }
 
 
             
         case .promotion:
-            var game = Game()
             let bp = BoardPrinter()
             
             

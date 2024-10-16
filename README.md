@@ -26,6 +26,7 @@
 - Opening book
 
 ## Perft test results
+### From Initial Position
 <table>
    <tr>
     <th>Depth</th>
@@ -60,6 +61,34 @@
     <tr>
     <td>5</td>
     <td>4865609</td>
+    <td>✅</td>
+  </tr>
+</table>
+### Position 2 (Kiwipete)
+<table>
+   <tr>
+    <th>Depth</th>
+    <th>Nodes</th>
+    <th>Passed</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>48</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>2039</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>97862</td>
+    <td>✅</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>4085603</td>
     <td>✅</td>
   </tr>
 </table>

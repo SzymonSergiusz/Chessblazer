@@ -42,6 +42,7 @@ struct PerftData {
     var castles: Int = 0
     var checks: Int = 0
     var checkmates: Int = 0
+    var promotions: Int = 0
 }
 
 struct MoveData {
@@ -53,6 +54,7 @@ struct MoveData {
     var bitboards: [Piece.ColoredPieces.RawValue : Bitboard]
     var castles: Set<Character>
     var currentValidMoves: [Move]
+    var attackBitboard = Bitboard(0)
 }
 
 

@@ -20,7 +20,7 @@ class Game {
     func loadFromFen(fen: String) {
         boardState = GameEngine.loadBoardFromFen(fen: fen)
         boardState.currentValidMoves = generateAllLegalMoves(boardState: boardState)
-        
+        boardState.attackBitboard = generateAllAttackedSquares(bitboards: boardState.bitboards, currentColor: boardState.currentTurnColor)
     }
     
     func startNewGame() {
@@ -38,7 +38,8 @@ class Game {
                 capturedPiece: move.captureValue,
                 bitboards: boardState.bitboards,
                 castles: boardState.castlesAvailable,
-                currentValidMoves: boardState.currentValidMoves
+                currentValidMoves: boardState.currentValidMoves,
+                attackBitboard: boardState.attackBitboard
             ))
         
         
@@ -46,15 +47,24 @@ class Game {
         boardState.currentTurnColor = boardState.currentTurnColor.getOppositeColor()
         boardState.currentValidMoves = generateAllLegalMoves(boardState: boardState)
         boardState.attackBitboard = generateAllAttackedSquares(bitboards: boardState.bitboards, currentColor: boardState.currentTurnColor)
+        
+        
+        if boardState.currentValidMoves.isEmpty {
+            boardData.hasGameEnded = true
+        }
+        
     }
     
     func undoMove() {
         guard let moveData = boardState.performedMovesList.popLast() else { return }
-        
+
         boardState.bitboards = moveData.bitboards
         boardState.castlesAvailable = moveData.castles
         boardState.currentTurnColor = moveData.color
         boardState.currentValidMoves = moveData.currentValidMoves
+        boardState.attackBitboard = moveData.attackBitboard
+        
+        
         if !boardState.currentValidMoves.isEmpty {
             boardData.hasGameEnded = false
         }
@@ -75,6 +85,11 @@ class Game {
             }
         }
         return array
+    }
+    
+    
+    func hashZobrist(board: [Int]) {
+        
     }
     
     private func toBitboardsRepresentation(array: [Int]) -> [Piece.ColoredPieces.RawValue : Bitboard] {

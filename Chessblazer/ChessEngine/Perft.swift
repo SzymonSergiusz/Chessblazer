@@ -11,25 +11,14 @@ import Foundation
 
 func perftTest(depth: Int) -> (Int, PerftData) {
     let game = Game()
-    var perftData = PerftData()
-    let bp = BoardPrinter()
-    
+    var perftData = PerftData()    
     func perft(depth: Int, game: Game) -> Int {
         var nodeCount = 0
         
         if depth == 1 {
             
-            // another idea is to add into move struct info about type of move and then resolve it here
-            
             for move in game.boardState.currentValidMoves {
-                
-//                if move.castling {
-//                    if move.moveToNotation() != "e1a1" || move.moveToNotation() != "e1h1" || move.moveToNotation() != "e8a8" || move.moveToNotation() != "e8h8" {
-//                        print("BEFORE")
-//                        bp.printBoard(board: game.toBoardArrayRepresentation())
-//                    }
-//                    
-//                }
+
                 
                 game.makeMove(move: move)
                 
@@ -48,12 +37,7 @@ func perftTest(depth: Int) -> (Int, PerftData) {
                     perftData.enPassants += 1
                 }
                 if move.castling {
-//                    if move.moveToNotation() != "e1a1" || move.moveToNotation() != "e1h1" || move.moveToNotation() != "e8a8" || move.moveToNotation() != "e8h8" {
-//                        print("AFTER")
-//                        bp.printBoard(board: game.toBoardArrayRepresentation())
-//                        print("NOTATION:, ", move.moveToNotation())
-//                        print("____________________________________")
-//                    }
+
                     perftData.castles += 1
 
                     
@@ -79,11 +63,10 @@ func perftTest(depth: Int) -> (Int, PerftData) {
     return (perft(depth: depth, game: game), perftData)
 }
 
-func perftTest(depth: Int, game: inout Game) -> (Int, PerftData) {
+func perftTest(depth: Int, fen: String) -> (Int, PerftData) {
     var perftData = PerftData()
-//    var checkedPositions = Set<[Int]>()
-//    let bp = BoardPrinter()
-    
+    let game = Game()
+    game.loadFromFen(fen: fen)
     func perft(depth: Int, game: Game) -> Int {
         var nodeCount = 0
         
@@ -92,17 +75,16 @@ func perftTest(depth: Int, game: inout Game) -> (Int, PerftData) {
             if game.boardData.hasGameEnded {
                 return 0
             }
-            
-            // another idea is to add into move struct info about type of move and then resolve it here
-            //            print(game.boardState.castlesAvailable)
             let moves = game.boardState.currentValidMoves
-            
-            
-//            if !checkedPositions.contains(game.toBoardArrayRepresentation()) {
-//                checkedPositions.insert(game.toBoardArrayRepresentation())
 
                 for move in moves {
                     game.makeMove(move: move)
+
+                    if move.castling {
+                        perftData.castles += 1
+
+                    }
+                    
                     if game.boardState.currentValidMoves.isEmpty && checkIfCheck(boardState: game.boardState) {
                         perftData.checkmates += 1
                     }
@@ -111,24 +93,21 @@ func perftTest(depth: Int, game: inout Game) -> (Int, PerftData) {
                         perftData.checks += 1
                     }
                     
+                    if move.promotionPiece != 0 {
+                        perftData.promotions += 1
+                    }
+                    
+                    
                     if move.captureValue != 0 && !move.castling {
                         perftData.captures += 1
                     }
                     if move.enPasssantCapture != 0 {
                         perftData.enPassants += 1
                     }
-                    if move.castling {
-                        perftData.castles += 1
-
-                    }
                     game.undoMove()
-//                }
-            }
-            return moves.count
+                }
+                return moves.count
         }
-        
-
-        
         for move in game.boardState.currentValidMoves {
             game.makeMove(move: move)
             
@@ -144,6 +123,30 @@ func perftTest(depth: Int, game: inout Game) -> (Int, PerftData) {
 func bulkPerftTest(depth: Int) -> Int {
     let game = Game()
     
+    func perft(depth: Int, game: Game) -> Int {
+        var nodeCount = 0
+        
+        if depth == 1 {
+            return game.boardState.currentValidMoves.count
+        }
+        
+//        if game.boardData.hasGameEnded {
+//            return 0
+//        }
+        
+        for move in game.boardState.currentValidMoves {
+            game.makeMove(move: move)
+            nodeCount += perft(depth: depth - 1, game: game)
+            game.undoMove()
+        }
+        return nodeCount
+    }
+    return perft(depth: depth, game: game)
+}
+
+func bulkPerftTest(depth: Int, fen: String) -> Int {
+    let game = Game()
+    game.loadFromFen(fen: fen)
     func perft(depth: Int, game: Game) -> Int {
         var nodeCount = 0
         

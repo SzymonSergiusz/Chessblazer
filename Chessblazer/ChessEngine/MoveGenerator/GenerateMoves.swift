@@ -43,6 +43,7 @@ func generateAllPossibleMoves(bitboards: [Int: Bitboard], currentColor: Piece.Co
                     generatePawnMoves(bitboards: bitboards, currentColor: currentColor, square: square, moves: &moves)
                 case .king:
                     generateKingMovesBitboard(bitboards: bitboards, currentColor: currentColor, square: square, moves: &moves)
+                    generateCastles(bitboards: bitboards, currentColor: currentColor, moves: &moves, castlesAvailable: castlesAvailable)
 
                 case .knight:
                     generateKnightMoves(bitboards: bitboards, currentColor: currentColor, square: square, moves: &moves)
@@ -112,7 +113,6 @@ func generateAllLegalMoves(boardState: BoardState) -> [Move] {
     var legalMoves = [Move]()
     let lastMove: Move? = boardState.performedMovesList.last?.move
     generateAllPossibleMoves(bitboards: boardState.bitboards, currentColor: boardState.currentTurnColor, moves: &possibleMoves, lastMove: lastMove, castlesAvailable: boardState.castlesAvailable)
-    generateCastles(bitboards: boardState.bitboards, currentColor: boardState.currentTurnColor, moves: &possibleMoves, castlesAvailable: boardState.castlesAvailable)
 
     
     for move in possibleMoves {
@@ -123,5 +123,4 @@ func generateAllLegalMoves(boardState: BoardState) -> [Move] {
     }
     
     return legalMoves
-//    return Array(Set(legalMoves))
 }

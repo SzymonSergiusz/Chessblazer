@@ -187,7 +187,7 @@ func generatePawnAttacks(currentColor: Piece.Color, square: Int) -> Bitboard {
 
 
 func enPassantCheck(bitboards: [Int: Bitboard], lastMove: Move) -> [Move] {
-    var moves = [Move]()
+    var moves = Set<Move>()
     guard let from = lastMove.fromSquare, let target = lastMove.targetSquare else { return [Move]() }
     
     if lastMove.pieceValue == Piece.ColoredPieces.whitePawn.rawValue {
@@ -196,7 +196,7 @@ func enPassantCheck(bitboards: [Int: Bitboard], lastMove: Move) -> [Move] {
             while (blackPawns != 0) {
                 let blackPawn = Bitboard.popLSB(&blackPawns)
                 if blackPawn-1 == target || blackPawn+1 == target {
-                    moves.append(Move(fromSquare: blackPawn, targetSquare: target - 8, enPasssantCapture: target, pieceValue: Piece.ColoredPieces.blackPawn.rawValue, captureValue: Piece.ColoredPieces.whitePawn.rawValue))
+                    moves.insert(Move(fromSquare: blackPawn, targetSquare: target - 8, enPasssantCapture: target, pieceValue: Piece.ColoredPieces.blackPawn.rawValue, captureValue: Piece.ColoredPieces.whitePawn.rawValue))
                 }
             }
         }
@@ -206,7 +206,7 @@ func enPassantCheck(bitboards: [Int: Bitboard], lastMove: Move) -> [Move] {
             while (whitePawns != 0) {
                 let whitePawn = Bitboard.popLSB(&whitePawns)
                 if whitePawn-1 == target || whitePawn+1 == target {
-                    moves.append(Move(fromSquare: whitePawn, targetSquare: target+8, enPasssantCapture: target, pieceValue: Piece.ColoredPieces.whitePawn.rawValue, captureValue: Piece.ColoredPieces.blackPawn.rawValue))
+                    moves.insert(Move(fromSquare: whitePawn, targetSquare: target+8, enPasssantCapture: target, pieceValue: Piece.ColoredPieces.whitePawn.rawValue, captureValue: Piece.ColoredPieces.blackPawn.rawValue))
                 }
             }
             
@@ -219,5 +219,5 @@ func enPassantCheck(bitboards: [Int: Bitboard], lastMove: Move) -> [Move] {
 //            print(m.moveToNotation())
 //        }
 //    }
-    return Array(Set(moves))
+    return Array(moves)
 }
