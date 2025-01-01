@@ -22,7 +22,7 @@ class Move: Equatable, Hashable, Comparable, Codable {
     var promotionPiece: Int = 0
     var enPasssantCapture = 0
     
-    var pieceValue: Int
+    var pieceValue: Int = 0
     var captureValue = 0
 
     var asString: String {
@@ -92,24 +92,23 @@ class Move: Equatable, Hashable, Comparable, Codable {
     static func < (lhs: Move, rhs: Move) -> Bool {
         return lhs.moveValue() < rhs.moveValue()
     }
-//    init(notation: String) {
-//        
-//        #warning("think about it")
-//        
-//        if notation.count == 4 {
-//            self.fromSquare = Move.translateFromNotationToSquare(String(notation.prefix(2)))
-//            self.targetSquare = Move.translateFromNotationToSquare(String(notation.suffix(2)))
-//        } else {
-//            self.fromSquare = Move.translateFromNotationToSquare(String(notation.prefix(2)))
-//            
-//            let start = notation.index(notation.startIndex, offsetBy: 2)
-//            let end = notation.index(notation.startIndex, offsetBy: 4)
-//            self.targetSquare = Move.translateFromNotationToSquare(String(notation[start..<end]))
-//            if let pp = Piece.ColoredPiecesDict[String(notation.suffix(1))] {
-//                self.promotionPiece = pp.rawValue
-//            }
-//        }
-//    }
+    init(notation: String) {
+                
+        if notation.count == 4 {
+            self.fromSquare = translateFromNotationToSquare(String(notation.prefix(2)))
+            self.targetSquare = translateFromNotationToSquare(String(notation.suffix(2)))
+        } else {
+            self.fromSquare = translateFromNotationToSquare(String(notation.prefix(2)))
+            
+            let start = notation.index(notation.startIndex, offsetBy: 2)
+            let end = notation.index(notation.startIndex, offsetBy: 4)
+            self.targetSquare = translateFromNotationToSquare(String(notation[start..<end]))
+            if let pp = Piece.ColoredPiecesDict[String(notation.suffix(1))] {
+                self.promotionPiece = pp.rawValue
+            }
+        }
+        self.pieceValue = 0
+    }
     
     func squareToNotation(square: Int) -> String {
         let ranks = square / 8 + 1
@@ -128,7 +127,7 @@ class Move: Equatable, Hashable, Comparable, Codable {
         return "\(squareToNotation(square: fromSquare!))\(squareToNotation(square: targetSquare!))"
     }
     
-    static let letterToNumber: [String : Int] = [
+    var letterToNumber: [String : Int] = [
         "A" : 0,
         "B" : 1,
         "C" : 2,
@@ -139,7 +138,7 @@ class Move: Equatable, Hashable, Comparable, Codable {
         "H" : 7,
     ]
     
-    static func translateFromNotationToSquare(_ notation: String) -> Int? {
+    func translateFromNotationToSquare(_ notation: String) -> Int? {
         guard notation.count == 2 else { return nil }
         let letter = String(notation.prefix(1))
         guard let fileIndex = letterToNumber[letter.uppercased()] else { return nil }

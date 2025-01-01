@@ -9,12 +9,9 @@ import Foundation
 
 class Engine {
     let engineName = "Chessblazer"
-    let engineVersion = "very alpha 0.00001"
+    let engineVersion = "alpha 0.001"
     var quit = false
     let engineAuthor = "sergiusz"
-    var engineId: String {
-        engineName+" "+engineAuthor
-    }
     
     var game = Game()
     
@@ -24,7 +21,8 @@ class Engine {
 
         switch command {
         case .uci:
-            sendOutput(output: engineId)
+            sendOutput(output: "id name \(engineName)")
+            sendOutput(output: "id author \(engineAuthor)")
             sendOutput(output: "uciok")
         case .isready:
             // loadEngine first 
@@ -33,43 +31,28 @@ class Engine {
             game.startNewGame()
             
         case .position:
-            #warning("refactor with regex for: position fen ... | position startpos moves ...")
-            
             if args[1] == "fen" {
                 game.loadFromFen(fen: args[2])
             } else if args[1] == "startpos" {
-                if args[2] == "moves" {
+                game.startNewGame()
+                if args.indices.contains(2), args[2] == "moves" {
                     let moves = args[3..<args.count]
-//                    for move in moves {
-//                        game.makeMove(board: &game.board, move: Move(notation: "move"))
-//                    }
-                    
+                    for move in moves {
+                        game.makeMove(move: game.findMove(notation: move))
+                        
+                    }
                 }
             }
-//           var argIndex = 1
-//            if args[argIndex] == "startpos" {
-//                game.startNewGame()
-//                argIndex += 1
-//            } else if args[argIndex] == "fen" {
-//                let fenParts = args[argIndex + 1...(args.count - 1)].prefix(6)
-//                let fen = fenParts.joined(separator: " ")
-//                game.loadBoardFromFen(fen: fen)
-//                argIndex += 7
-//            }
-//            
-//            if argIndex < args.count && args[argIndex] == "moves" {
-//                argIndex += 1
-//                for i in argIndex..<args.count {
-//                    game.makeMove(board: &game.board, move: Move(notation: args[i]))
-//                }
-//            }
 
         case .go:
             //            let command = "go searchmoves e2e4 d2d4 ponder wtime 300000 btime 300000 winc 5000 binc 5000 movestogo 30 depth 20 nodes 1000000 mate 2 movetime 60000 infinite"
 
             let parsedParams = UciGoInput.parse(from: input)
-            print("Parsed UCI Go Input:", parsedParams)
-            
+//            print("Parsed UCI Go Input:", parsedParams)
+            let bestMove = game.boardState.currentTurnColor == .white ? findBestMove(game: game, depth: 3, maximizingPlayer: true) : findBestMove(game: game, depth: 3, maximizingPlayer: false)
+            if let move = bestMove {
+                print("bestmove \(move.moveToNotation())")
+            }
             // so go for dsl regex to capture all possible params and then handle it
             // if no depth then lets say depth = 50 and make it async so you can send signal to stop with .stop
             

@@ -7,7 +7,7 @@
 
 import Foundation
 
-let timeLimit: TimeInterval = 1
+let timeLimit: TimeInterval = 0.01
 
 func isTimeLimitExceeded(searchStartTime: TimeInterval) -> Bool {
     return Date().timeIntervalSince1970 - searchStartTime >= timeLimit
@@ -128,7 +128,7 @@ func iterativeDeepening(game: Game, initialDepth: Int, maximizingPlayer: Bool) -
             }
         }
 
-        print("Depth: \(depth), Best Move: \(String(describing: bestMove?.moveToNotation())), Evaluation: \(bestEval)")
+//        print("Depth: \(depth), Best Move: \(String(describing: bestMove?.moveToNotation())), Evaluation: \(bestEval)")
     }
 
     return bestMove

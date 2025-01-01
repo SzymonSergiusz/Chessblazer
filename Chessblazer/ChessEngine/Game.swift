@@ -86,6 +86,16 @@ class Game {
         return bitboards
     }
     
+    func findMove(notation: String) -> Move {
+        var move = Move(notation: notation)
+        
+        var found = boardState.currentValidMoves.first(where: {
+            $0.fromSquare == move.fromSquare && $0.targetSquare == move.targetSquare
+        })
+        return found!
+    }
+    
+    
     func toBoardArrayRepresentation() -> [Int] {
         var array = Array(repeating: 0, count: 64)
         let copy = boardState.bitboards

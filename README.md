@@ -25,6 +25,9 @@
 - Transposition Table
 - Opening book
 
+## Next steps
+- Implementing asynchronicity with Swift 6
+- Integrating the engine with Lichess bot via UCI
 ## Perft test results
 <a href="https://www.chessprogramming.org/Perft_Results">I use this data to compare with my results</a>
 
