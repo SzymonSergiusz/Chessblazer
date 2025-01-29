@@ -88,56 +88,7 @@ class Engine {
         
         case .main:
             saveKeys()
-
-        case .perftX:
-            let depth = Int(args[1]) ?? 0
-            print(bulkPerftTest(depth: depth))
-        case .perft:
-            var position = ""
-            if args.count > 1 {
-                position = args[1]
-            }
-            switch position {
             
-            case "2":
-                print(perftTest(depth: 2, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
-                print(perftTest(depth: 3, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
-                print(perftTest(depth: 4, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
-
-            case "2b":
-                print(bulkPerftTest(depth: 2, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
-                print(bulkPerftTest(depth: 3, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
-                print(bulkPerftTest(depth: 4, fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"))
-
-            case "4":
-                // 4    422333    131393    0    7795    60032    15492    5
-                print(perftTest(depth: 1, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
-                print(perftTest(depth: 2, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
-                print(perftTest(depth: 3, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
-                print(perftTest(depth: 4, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
-                print(perftTest(depth: 5, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
-                
-            case "4b":
-                // 4    422333    131393    0    7795    60032    15492    5
-                print(bulkPerftTest(depth: 1, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
-                print(bulkPerftTest(depth: 2, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
-                print(bulkPerftTest(depth: 3, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
-                print(bulkPerftTest(depth: 4, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
-                print(bulkPerftTest(depth: 5, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
-
-            default:
-                print(bulkPerftTest(depth: 1), ", expected: 20")
-                print(bulkPerftTest(depth: 2), ", expected: 400")
-                print(bulkPerftTest(depth: 3), ", expected: 8902")
-                print(bulkPerftTest(depth: 4), ", expected: 197281")
-//                print(bulkPerftTest(depth: 5), ", expected: 4,865,609")
-                
-//                print(bulkPerftTest(depth: 6), ", expected: 119 060 324")
-//                print(bulkPerftTest(depth: 7), ", expected: 3 195 901 860")
-//                print(bulkPerftTest(depth: 8), ", expected: 84 998 978 956")
-//                print(bulkPerftTest(depth: 9), ", expected: 2 439 530 234 167")
-            }
-
         case .mateInOne:
             let bp = BoardPrinter()
             let game = Game()
@@ -186,8 +137,6 @@ enum CommandsGUItoEngine: String {
     case pve
     case main
     case promotion
-    case perft
-    case perftX
     case eve // Engine vs Engine
     case mateInOne
 }
