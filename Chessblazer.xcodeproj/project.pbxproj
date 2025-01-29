@@ -211,6 +211,7 @@
 		317F00882C57DA34000E4AD6 /* MoveGenerator */ = {
 			isa = PBXGroup;
 			children = (
+				31AC3B682D4A7C9A0018BE3E /* NotationParser.swift */,
 				318129242C530BB0002F1E40 /* Move.swift */,
 				317F008F2C584924000E4AD6 /* GenerateMoves.swift */,
 				3147A5F12C8911DD007E132F /* PawnMovesGenerator.swift */,
@@ -218,7 +219,6 @@
 				31B10B372CB846E60077E27A /* SliderMovesGenerator.swift */,
 				31B10B3B2CB846F90077E27A /* KnightMovesGenerator.swift */,
 				31B10B3F2CB848D40077E27A /* GeneratorUtils.swift */,
-				31AC3B682D4A7C9A0018BE3E /* NotationParser.swift */,
 			);
 			path = MoveGenerator;
 			sourceTree = "<group>";

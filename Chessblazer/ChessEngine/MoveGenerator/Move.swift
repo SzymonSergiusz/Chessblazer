@@ -20,8 +20,6 @@ struct Move: Equatable, Hashable, Comparable, Codable {
     var pieceValue: Int = 0
     var captureValue = 0
     
-    var tags: [MoveType] = []
-    
     var fromSquare: Int?
     var targetSquare: Int?
     
@@ -110,12 +108,4 @@ struct Move: Equatable, Hashable, Comparable, Codable {
         self.pieceValue = 0
     }
 
-}
-
-enum MoveType: Codable {
-    case none
-    case promotion(promotedPiece: Int)
-    case capture
-    case enPassant(capture: Int)
-    case castling(rook: Int, king: Int)
 }
