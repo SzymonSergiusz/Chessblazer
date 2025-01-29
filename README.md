@@ -31,6 +31,7 @@
 
 ## Perft results
 <a href="https://www.chessprogramming.org/Perft_Results">I use this data to compare with my results</a>
+
 Performance tests are validated through unit tests implemented with the Swift Testing framework.
 To execute the performance tests, run the 'Performance Tests' suite
 ### From Initial Position
