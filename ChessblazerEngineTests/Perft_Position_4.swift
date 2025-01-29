@@ -7,7 +7,7 @@
 
 import Testing
 
-@Suite("Perft tests")
+@Suite("Perft tests // Position 4")
 struct Perft_Position_4 {
     
     @Test(arguments: [

@@ -7,7 +7,7 @@
 
 import Testing
 
-@Suite("Perft tests")
+@Suite("Perft tests // Kiwipete")
 struct Perft_Kiwipete {
     
     @Test(arguments: [
