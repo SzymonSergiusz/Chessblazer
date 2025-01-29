@@ -17,7 +17,7 @@
 
 import Testing
 
-@Suite("Perft tests")
+@Suite("Perft tests // Initial")
 struct Perft_Initial_Position {
     
     @Test(arguments: [

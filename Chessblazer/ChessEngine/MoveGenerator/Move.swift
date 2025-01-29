@@ -7,27 +7,27 @@
 
 import Foundation
 
-class Move: Equatable, Hashable, Comparable, Codable {
+struct Move: Equatable, Hashable, Comparable, Codable {
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(fromSquare!+targetSquare!+enPasssantCapture)
     }
     
-    var castling = false
-//    var castlingDestinations: (king: Int, rook: Int) = (0, 0)
     var castlingRookDestination = 0
     var castlingKingDestination = 0
-    var fromSquare: Int?
-    var targetSquare: Int?
     var promotionPiece: Int = 0
     var enPasssantCapture = 0
-    
     var pieceValue: Int = 0
     var captureValue = 0
+    
+    var tags: [MoveType] = []
+    
+    var fromSquare: Int?
+    var targetSquare: Int?
+    
+    
+    var castling: Bool { castlingRookDestination != 0 || castlingKingDestination != 0}
 
-    var asString: String {
-        "\(fromSquare!) \(targetSquare!)"
-    }
     
     init(fromSquare: Int, targetSquare: Int, enPasssantCapture: Int, pieceValue: Int, captureValue: Int) {
         self.fromSquare = fromSquare
@@ -53,7 +53,6 @@ class Move: Equatable, Hashable, Comparable, Codable {
     }
     
     init(fromSquare: Int, targetSquare: Int, kingValue: Int, rookValue: Int, kingDestination: Int, rookDestination: Int) {
-        self.castling = true
         self.fromSquare = fromSquare
         self.targetSquare = targetSquare
         self.pieceValue = kingValue
@@ -66,7 +65,8 @@ class Move: Equatable, Hashable, Comparable, Codable {
     static func == (lhs: Move, rhs: Move) -> Bool {
         return (lhs.fromSquare == rhs.fromSquare) && (lhs.targetSquare == rhs.targetSquare)
     }
-#warning("think about it")
+    
+    #warning("think about it")
     func moveValue(attackPawnTable: Bitboard = Bitboard(0)) -> Int {
         var score = 0
         let pieceRealValue = PieceValueTable[pieceValue]!
@@ -109,41 +109,13 @@ class Move: Equatable, Hashable, Comparable, Codable {
         }
         self.pieceValue = 0
     }
-    
-    func squareToNotation(square: Int) -> String {
-        let ranks = square / 8 + 1
-        let files = square % 8
-        let letters = "abcdefgh"
 
-        guard ranks >= 1 && ranks <= 8 && files >= 0 && files < 8 else {
-            return "Invalid square"
-        }
+}
 
-        let fileLetter = letters[letters.index(letters.startIndex, offsetBy: files)]
-        return "\(fileLetter)\(ranks)"
-    }
-    
-    func moveToNotation() -> String {
-        return "\(squareToNotation(square: fromSquare!))\(squareToNotation(square: targetSquare!))"
-    }
-    
-    var letterToNumber: [String : Int] = [
-        "A" : 0,
-        "B" : 1,
-        "C" : 2,
-        "D" : 3,
-        "E" : 4,
-        "F" : 5,
-        "G" : 6,
-        "H" : 7,
-    ]
-    
-    func translateFromNotationToSquare(_ notation: String) -> Int? {
-        guard notation.count == 2 else { return nil }
-        let letter = String(notation.prefix(1))
-        guard let fileIndex = letterToNumber[letter.uppercased()] else { return nil }
-        guard let rankNumber: Int = Int(String(notation.suffix(1))), rankNumber >= 1, rankNumber <= 8 else { return nil }
-        let rankIndex = rankNumber - 1
-        return 8 * rankIndex + fileIndex
-    }
+enum MoveType: Codable {
+    case none
+    case promotion(promotedPiece: Int)
+    case capture
+    case enPassant(capture: Int)
+    case castling(rook: Int, king: Int)
 }
