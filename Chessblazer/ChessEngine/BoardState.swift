@@ -39,15 +39,6 @@ struct BoardData {
     var gameResult: GameResult = .none
 }
 
-struct PerftData {
-    var captures: Int = 0
-    var enPassants: Int = 0
-    var castles: Int = 0
-    var checks: Int = 0
-    var checkmates: Int = 0
-    var promotions: Int = 0
-}
-
 struct MoveData {
     var piece: Int
     var turn: Int

@@ -7,8 +7,25 @@
 
 import Foundation
 
-// bulk
+struct PerftData : Equatable {
+    var captures: Int = 0
+    var enPassants: Int = 0
+    var castles: Int = 0
+    var checks: Int = 0
+    var checkmates: Int = 0
+    var promotions: Int = 0
+    
+    static func ==(lhs: PerftData, rhs: PerftData) -> Bool {
+        return lhs.captures == rhs.captures
+        && lhs.castles == rhs.castles
+        && lhs.checks == rhs.checks
+        && lhs.checkmates == rhs.checkmates
+        && lhs.enPassants == rhs.enPassants
+        && lhs.promotions == rhs.promotions
+    }
+}
 
+// bulk
 func perftTest(depth: Int) -> (Int, PerftData) {
     let game = Game()
     var perftData = PerftData()    
@@ -18,8 +35,6 @@ func perftTest(depth: Int) -> (Int, PerftData) {
         if depth == 1 {
             
             for move in game.boardState.currentValidMoves {
-
-                
                 game.makeMove(move: move)
                 
                 if game.boardState.currentValidMoves.isEmpty && checkIfCheck(boardState: game.boardState) {
@@ -37,14 +52,10 @@ func perftTest(depth: Int) -> (Int, PerftData) {
                     perftData.enPassants += 1
                 }
                 if move.castling {
-
                     perftData.castles += 1
-
-                    
                 }
                 game.undoMove()
             }
-            
             return game.boardState.currentValidMoves.count
         }
         

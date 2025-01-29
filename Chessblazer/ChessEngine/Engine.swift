@@ -126,16 +126,16 @@ class Engine {
                 print(bulkPerftTest(depth: 5, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"))
 
             default:
-//                print(bulkPerftTest(depth: 1), ", expected: 20")
-//                print(bulkPerftTest(depth: 2), ", expected: 400")
-//                print(bulkPerftTest(depth: 3), ", expected: 8902")
-//                print(bulkPerftTest(depth: 4), ", expected: 197281")
+                print(bulkPerftTest(depth: 1), ", expected: 20")
+                print(bulkPerftTest(depth: 2), ", expected: 400")
+                print(bulkPerftTest(depth: 3), ", expected: 8902")
+                print(bulkPerftTest(depth: 4), ", expected: 197281")
 //                print(bulkPerftTest(depth: 5), ", expected: 4,865,609")
                 
 //                print(bulkPerftTest(depth: 6), ", expected: 119 060 324")
-                print(bulkPerftTest(depth: 7), ", expected: 3 195 901 860")
-                print(bulkPerftTest(depth: 8), ", expected: 84 998 978 956")
-                print(bulkPerftTest(depth: 9), ", expected: 2 439 530 234 167")
+//                print(bulkPerftTest(depth: 7), ", expected: 3 195 901 860")
+//                print(bulkPerftTest(depth: 8), ", expected: 84 998 978 956")
+//                print(bulkPerftTest(depth: 9), ", expected: 2 439 530 234 167")
             }
 
         case .mateInOne:
@@ -180,6 +180,7 @@ enum CommandsGUItoEngine: String {
     case stop
     case ponderhit
     case quit
+    
     //custom
     case printBoard
     case pve
