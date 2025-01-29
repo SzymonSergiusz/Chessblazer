@@ -8,19 +8,17 @@
 import Testing
 
 @Suite("Perft tests")
-struct Perft_Position_3 {
+struct Perft_Position_4 {
     
     @Test(arguments: [
-        (depth: 1, expectedNodes: 14),
-        (depth: 2, expectedNodes: 191),
-        (depth: 3, expectedNodes: 2812),
-        (depth: 4, expectedNodes: 43238),
-        (depth: 5, expectedNodes: 674624),
-        (depth: 6, expectedNodes: 11030083),
+        (depth: 1, expectedNodes: 6),
+        (depth: 2, expectedNodes: 264),
+        (depth: 3, expectedNodes: 9467),
+        (depth: 4, expectedNodes: 422333),
     ])
     func testNodes(depth: Int, expectedNodes: Int) async throws {
         let timer = ContinuousClock().now
-        let result = bulkPerftTest(depth: depth, fen: "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -")
+        let result = bulkPerftTest(depth: depth, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1")
         let elapsedTime = timer.duration(to: .now)
         #expect(result == expectedNodes)
         print("Depth \(depth)" + ": \(elapsedTime) seconds")
@@ -28,16 +26,15 @@ struct Perft_Position_3 {
     }
 
     @Test(arguments: [
-        (depth: 1, expectedNodes: 14, expectedData: PerftData(captures: 1, enPassants: 0, castles: 0, checks: 2, checkmates: 0, promotions: 0)),
-        (depth: 2, expectedNodes: 191, expectedData: PerftData(captures: 14, enPassants: 0, castles: 0, checks: 10, checkmates: 0, promotions: 0)),
-        (depth: 3, expectedNodes: 2812, expectedData: PerftData(captures: 209, enPassants: 2, castles: 0, checks: 267, checkmates: 0, promotions: 0)),
+        (depth: 1, expectedNodes: 6, expectedData: PerftData(captures: 0, enPassants: 0, castles: 0, checks: 0, checkmates: 0, promotions: 0)),
+        (depth: 2, expectedNodes: 264, expectedData: PerftData(captures: 87, enPassants: 0, castles: 6, checks: 10, checkmates: 0, promotions: 48)),
+        (depth: 3, expectedNodes: 9467, expectedData: PerftData(captures: 1021, enPassants: 4, castles: 0, checks: 38, checkmates: 22, promotions: 120)),
         
-        (depth: 4, expectedNodes: 43238, expectedData: PerftData(captures: 3348, enPassants: 123, castles: 0, checks: 1680, checkmates: 17, promotions: 0)),
-        (depth: 5, expectedNodes: 674624, expectedData: PerftData(captures: 52051, enPassants: 1165, castles: 0, checks: 52950, checkmates: 0, promotions: 0)),
+        (depth: 4, expectedNodes: 422333, expectedData: PerftData(captures: 131393, enPassants: 0, castles: 7795, checks: 15492, checkmates: 5, promotions: 60032)),
     ])
     func testDetails(depth: Int, expectedNodes: Int, expectedData: PerftData) async throws {
         let timer = ContinuousClock().now
-        let result = perftTest(depth: depth, fen: "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -")
+        let result = perftTest(depth: depth, fen: "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1")
         let elapsedTime = timer.duration(to: .now)
         #expect(result.0 == expectedNodes && result.1 == expectedData)
         print("[Detailed] Depth \(depth)" + ": \(elapsedTime) seconds")
