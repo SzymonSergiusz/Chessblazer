@@ -67,6 +67,9 @@
 		3181293F2C56DAA4002F1E40 /* Pieces.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3181291A2C51B3EC002F1E40 /* Pieces.swift */; };
 		318129402C56DAA4002F1E40 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3181291E2C51B803002F1E40 /* Game.swift */; };
 		318129432C56DAA4002F1E40 /* Move.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318129242C530BB0002F1E40 /* Move.swift */; };
+		31AC3B692D4A7C9A0018BE3E /* NotationParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31AC3B682D4A7C9A0018BE3E /* NotationParser.swift */; };
+		31AC3B6A2D4A7C9A0018BE3E /* NotationParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31AC3B682D4A7C9A0018BE3E /* NotationParser.swift */; };
+		31AC3B6B2D4A7C9A0018BE3E /* NotationParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31AC3B682D4A7C9A0018BE3E /* NotationParser.swift */; };
 		31ADBF392C5B05F600A97097 /* Bitboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317F00892C57DA4D000E4AD6 /* Bitboard.swift */; };
 		31ADBF3A2C5B05F600A97097 /* BitboardPrinters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317F008B2C58460E000E4AD6 /* BitboardPrinters.swift */; };
 		31ADBF3B2C5B05F600A97097 /* BitboardOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317F008D2C5847D3000E4AD6 /* BitboardOperations.swift */; };
@@ -138,6 +141,7 @@
 		318129352C55B0C5002F1E40 /* ChessblazerGUI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ChessblazerGUI.entitlements; sourceTree = "<group>"; };
 		318129372C55B0C5002F1E40 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		319A81B72CC07AD500BDD48D /* showcase2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = showcase2.gif; sourceTree = "<group>"; };
+		31AC3B682D4A7C9A0018BE3E /* NotationParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotationParser.swift; sourceTree = "<group>"; };
 		31ADBF3E2C5BF63D00A97097 /* ChessPieceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessPieceView.swift; sourceTree = "<group>"; };
 		31ADBF402C5BF68900A97097 /* ChessPiece.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessPiece.swift; sourceTree = "<group>"; };
 		31ADBF422C5C148300A97097 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
@@ -214,6 +218,7 @@
 				31B10B372CB846E60077E27A /* SliderMovesGenerator.swift */,
 				31B10B3B2CB846F90077E27A /* KnightMovesGenerator.swift */,
 				31B10B3F2CB848D40077E27A /* GeneratorUtils.swift */,
+				31AC3B682D4A7C9A0018BE3E /* NotationParser.swift */,
 			);
 			path = MoveGenerator;
 			sourceTree = "<group>";
@@ -480,6 +485,7 @@
 				3103B6B12D484A88000CCDFA /* MagicGeneration.swift in Sources */,
 				3103B6B22D484A88000CCDFA /* Bitboard.swift in Sources */,
 				3103B6B32D484A88000CCDFA /* BitboardPrinters.swift in Sources */,
+				31AC3B6A2D4A7C9A0018BE3E /* NotationParser.swift in Sources */,
 				3103B6B42D484A88000CCDFA /* BitboardOperations.swift in Sources */,
 				3103B6B52D484A88000CCDFA /* UciUtils.swift in Sources */,
 				3103B6B62D484A88000CCDFA /* Move.swift in Sources */,
@@ -505,6 +511,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				311D86B02CC0179D00189612 /* TranspositionTable.swift in Sources */,
+				31AC3B692D4A7C9A0018BE3E /* NotationParser.swift in Sources */,
 				31B10B482CB89B780077E27A /* GameEngine.swift in Sources */,
 				3181291B2C51B3EC002F1E40 /* Pieces.swift in Sources */,
 				318129272C5440A0002F1E40 /* BoardPrinter.swift in Sources */,
@@ -541,6 +548,7 @@
 				31B10B2E2CB83F7B0077E27A /* BoardState.swift in Sources */,
 				3147A5F32C8915F9007E132F /* PawnMovesGenerator.swift in Sources */,
 				310C84912C6C029400E5566A /* Evaluation.swift in Sources */,
+				31AC3B6B2D4A7C9A0018BE3E /* NotationParser.swift in Sources */,
 				316E7E0E2C8CE0540028CC16 /* MagicBishop.swift in Sources */,
 				310C84922C6C029400E5566A /* PieceSquareTables.swift in Sources */,
 				31ADBF3D2C5B080600A97097 /* Magic.swift in Sources */,

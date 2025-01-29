@@ -27,6 +27,29 @@ func generateRookMoves(bitboards: [Int: Bitboard], currentColor: Piece.Color, sq
         moves.append(Move(fromSquare: square, targetSquare: targetSquare, pieceValue: pieceValue, captureValue: getPieceValueFromField(at: targetSquare, bitboards: bitboards)))
     }
 }
+
+func generateRookMovesForQueen(bitboards: [Int: Bitboard], currentColor: Piece.Color, square: Int, moves: inout [Move]) {
+    let whitePieces = Magic.whitePiecesBitboards(bitboards: bitboards)
+    let blackPieces = Magic.blackPiecesBitboards(bitboards: bitboards)
+    let allPieces = whitePieces | blackPieces
+    let blockerBitboard = allPieces & Rook.masks[square] // & checkRayMask
+    var movesBitboard = Rook.lookUpTable[square]![magicIndex(magic: rookMagics[square], shift: rookShifts[square], blocker: blockerBitboard)]!
+    var pieceValue = 0
+    
+    if currentColor == .white {
+        movesBitboard = movesBitboard & ~whitePieces
+        pieceValue = Piece.ColoredPieces.whiteQueen.rawValue
+    } else {
+        movesBitboard = movesBitboard & ~blackPieces
+        pieceValue = Piece.ColoredPieces.blackQueen.rawValue
+
+    }
+    while movesBitboard != 0 {
+        let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
+        moves.append(Move(fromSquare: square, targetSquare: targetSquare, pieceValue: pieceValue, captureValue: getPieceValueFromField(at: targetSquare, bitboards: bitboards)))
+    }
+}
+
 func generateRookAttacks(bitboards: [Int: Bitboard], square: Int, friendlyBitboard: Bitboard) -> Bitboard {
     let whitePieces = Magic.whitePiecesBitboards(bitboards: bitboards)
     let blackPieces = Magic.blackPiecesBitboards(bitboards: bitboards)
@@ -64,6 +87,33 @@ func generateBishopMoves(bitboards: [Int: Bitboard], currentColor: Piece.Color,s
     }
 }
 
+func generateBishopMovesForQueen(bitboards: [Int: Bitboard], currentColor: Piece.Color,square: Int, moves: inout [Move]) {
+    
+    let whitePieces = Magic.whitePiecesBitboards(bitboards: bitboards)
+    let blackPieces = Magic.blackPiecesBitboards(bitboards: bitboards)
+    let allPieces = whitePieces | blackPieces
+    
+    let blockerBitboard = allPieces & Bishop.masks[square] // & checkRayMask
+    
+    var movesBitboard = Bishop.lookUpTable[square]![magicIndex(magic: bishopMagics[square], shift: bishopShifts[square], blocker: blockerBitboard)]!
+    
+    var pieceValue = 0
+    if currentColor == .white {
+        movesBitboard = movesBitboard & ~whitePieces
+        pieceValue = Piece.ColoredPieces.whiteQueen.rawValue
+    } else {
+        movesBitboard = movesBitboard & ~blackPieces
+        pieceValue = Piece.ColoredPieces.blackQueen.rawValue
+
+    }
+    
+    while movesBitboard != 0 {
+        
+        let targetSquare: Int = Bitboard.popLSB(&movesBitboard)
+        moves.append(Move(fromSquare: square, targetSquare: targetSquare, pieceValue: pieceValue, captureValue: getPieceValueFromField(at: targetSquare, bitboards: bitboards)))
+    }
+}
+
 
 func generateBishopAttacks(bitboards: [Int: Bitboard], square: Int, friendlyBitboard: Bitboard) -> Bitboard {
     let whitePieces = Magic.whitePiecesBitboards(bitboards: bitboards)
@@ -77,13 +127,8 @@ func generateBishopAttacks(bitboards: [Int: Bitboard], square: Int, friendlyBitb
 
 func generateQueenMoves(bitboards: [Int: Bitboard], currentColor: Piece.Color, square: Int, moves: inout [Move]) {
     var queenMoves = [Move]()
-    let queen: Piece.ColoredPieces = currentColor == .white ? .whiteQueen : .blackQueen
-    generateRookMoves(bitboards: bitboards, currentColor: currentColor, square: square, moves: &queenMoves)
-    generateBishopMoves(bitboards: bitboards, currentColor: currentColor, square: square, moves: &queenMoves)
-    queenMoves = queenMoves.map { move in
-        move.pieceValue = queen.rawValue
-        return move
-    }
+    generateRookMovesForQueen(bitboards: bitboards, currentColor: currentColor, square: square, moves: &queenMoves)
+    generateBishopMovesForQueen(bitboards: bitboards, currentColor: currentColor, square: square, moves: &queenMoves)
     moves.append(contentsOf: queenMoves)
 }
 
